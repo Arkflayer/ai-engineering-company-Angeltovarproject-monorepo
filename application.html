@@ -17,10 +17,22 @@
                 <span aria-hidden="true" class="text-3xl">📦</span>
                 <span>TrackFlow</span>
             </a>
-            <nav aria-label="Navegación principal" class="flex items-center gap-4 sm:gap-6 text-sm font-medium">
+            <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-4 sm:gap-6 text-sm font-medium">
                 <a href="index.html" class="hover:text-indigo-700 transition">Inicio</a>
                 <a href="index.html#servicios" class="hover:text-indigo-700 transition">Servicios</a>
             </nav>
+            <!-- Mobile hamburger -->
+            <button id="menuToggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition" aria-label="Abrir menú" aria-expanded="false">
+                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile menu panel -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white px-4 py-4 space-y-3 text-sm font-medium">
+            <a href="index.html" class="block hover:text-indigo-700 transition">Inicio</a>
+            <a href="index.html#servicios" class="block hover:text-indigo-700 transition">Servicios</a>
+        </div>
         </div>
     </header>
 
@@ -231,5 +243,20 @@
     </footer>
 
     <script src="validation.js"></script>
+    <script>
+        /* Menú hamburguesa mobile */
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('menuToggle');
+            const menu = document.getElementById('mobileMenu');
+            if (toggle && menu) {
+                toggle.addEventListener('click', () => {
+                    const expanded = toggle.getAttribute('aria-expanded') === 'true' ? false : true;
+                    menu.classList.toggle('hidden');
+                    toggle.setAttribute('aria-expanded', expanded);
+                    toggle.setAttribute('aria-label', expanded ? 'Cerrar menú' : 'Abrir menú');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
