@@ -1,0 +1,101 @@
+/* =========================================
+   styles.css - Estilos complementarios a Tailwind
+   ========================================= */
+
+/* Transición suave en scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* =========================================
+   Mensajes de error del formulario
+   ========================================= */
+.error-msg {
+    display: none;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.error-msg.visible {
+    display: block;
+}
+
+/* Input con error */
+input.input-error,
+select.input-error,
+textarea.input-error {
+    border-color: #ef4444 !important; /* red-500 */
+    background-color: #fef2f2;        /* red-50 */
+}
+
+/* =========================================
+   Fieldset y legend accesibles
+   ========================================= */
+fieldset {
+    border: 1px solid #e5e7eb;
+}
+
+legend {
+    font-size: 1.05rem;
+}
+
+/* =========================================
+   Focus visible accesible
+   ========================================= */
+*:focus-visible {
+    outline: 2px solid #4338ca;
+    outline-offset: 2px;
+}
+
+/* =========================================
+   Animación de aparición para el mensaje de éxito
+   ========================================= */
+#successMessage:not(.hidden) {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================
+   Botón deshabilitado
+   ========================================= */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   Body background: imagen de transporte
+   ========================================= */
+body {
+    background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Overlay semitransparente para legibilidad */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: -1;
+}
+
+/* Ajuste para que los elementos no se vean afectados por el overlay */
+body > * {
+    position: relative;
+    z-index: 1;
+}

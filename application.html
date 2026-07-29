@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrackFlow - Únete al equipo</title>
+    <meta name="description" content="Formulario de aplicación para unirte a TrackFlow, empresa de logística inteligente para e-commerce." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="text-gray-800 font-sans antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50" role="banner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold text-indigo-700 flex items-center gap-2" aria-label="TrackFlow inicio">
+                <span aria-hidden="true" class="text-3xl">📦</span>
+                <span>TrackFlow</span>
+            </a>
+            <nav aria-label="Navegación principal" class="flex items-center gap-4 sm:gap-6 text-sm font-medium">
+                <a href="index.html" class="hover:text-indigo-700 transition">Inicio</a>
+                <a href="index.html#servicios" class="hover:text-indigo-700 transition">Servicios</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="max-w-3xl mx-auto px-4 py-12 sm:py-16">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center mb-2">Únete a TrackFlow</h1>
+            <p class="text-center text-gray-500 mb-10">
+                Forma parte del equipo que está transformando la logística para el e-commerce.
+            </p>
+
+            <form id="applicationForm" class="bg-white p-6 sm:p-8 rounded-xl shadow-md space-y-6" novalidate>
+
+                <!-- ===== DATOS PERSONALES ===== -->
+                <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
+                    <legend class="text-lg font-semibold text-indigo-700 px-2">Datos personales</legend>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4">
+                        <!-- Nombre -->
+                        <div class="sm:col-span-2">
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Ej. Ana García" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="nombre">El nombre es obligatorio (mín. 2 caracteres).</span>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico *</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="ejemplo@correo.com" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="email">Ingresa un correo electrónico válido.</span>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div>
+                            <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="+1 213 555 0100" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="telefono">Ingresa un número de teléfono válido.</span>
+                        </div>
+
+                        <!-- País -->
+                        <div>
+                            <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">País *</label>
+                            <select id="pais" name="pais" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                                <option value="">Selecciona</option>
+                                <option value="US">Estados Unidos</option>
+                                <option value="ES">España</option>
+                                <option value="other">Otro</option>
+                            </select>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="pais">Selecciona un país.</span>
+                        </div>
+
+                        <!-- Ciudad -->
+                        <div>
+                            <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+                            <input type="text" id="ciudad" name="ciudad" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Ej. Los Ángeles" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="ciudad">La ciudad es obligatoria.</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- ===== EXPERIENCIA Y ROL ===== -->
+                <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
+                    <legend class="text-lg font-semibold text-indigo-700 px-2">Experiencia y rol</legend>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4">
+                        <!-- Departamento -->
+                        <div>
+                            <label for="departamento" class="block text-sm font-medium text-gray-700 mb-1">Departamento *</label>
+                            <select id="departamento" name="departamento" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                                <option value="">Selecciona un departamento</option>
+                                <option value="almacen">Operaciones de Almacén</option>
+                                <option value="ultima-milla">Última Milla y Transportistas</option>
+                                <option value="logistica-inversa">Logística Inversa</option>
+                                <option value="atencion-cliente">Atención al Cliente (CX)</option>
+                                <option value="comercial">Comercial y Relación con Clientes</option>
+                                <option value="tecnologia">Tecnología</option>
+                            </select>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="departamento">Selecciona un departamento.</span>
+                        </div>
+
+                        <!-- Años de experiencia -->
+                        <div>
+                            <label for="experiencia" class="block text-sm font-medium text-gray-700 mb-1">Años de experiencia *</label>
+                            <input type="number" id="experiencia" name="experiencia" required min="0" max="50"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Ej. 3" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="experiencia">Ingresa un número entre 0 y 50.</span>
+                        </div>
+
+                        <!-- LinkedIn -->
+                        <div class="sm:col-span-2">
+                            <label for="url" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn / Portafolio</label>
+                            <input type="url" id="url" name="url"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="https://linkedin.com/in/tuperfil" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="url">Ingresa una URL válida (opcional).</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- ===== MOTIVACIÓN ===== -->
+                <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
+                    <legend class="text-lg font-semibold text-indigo-700 px-2">Motivación</legend>
+
+                    <div class="mt-4 space-y-4">
+                        <!-- Mensaje -->
+                        <div>
+                            <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-1">
+                                ¿Por qué quieres trabajar en TrackFlow? *
+                            </label>
+                            <textarea id="mensaje" name="mensaje" rows="4" required minlength="20"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Cuéntanos sobre ti, tu experiencia en logística y por qué te interesa TrackFlow (mín. 20 caracteres)"></textarea>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="mensaje">El mensaje debe tener al menos 20 caracteres.</span>
+                        </div>
+
+                        <!-- Cómo te enteraste -->
+                        <div>
+                            <label for="referido" class="block text-sm font-medium text-gray-700 mb-1">¿Cómo nos conociste?</label>
+                            <select id="referido" name="referido"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                                <option value="">Selecciona una opción</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="recomendacion">Recomendación de empleado</option>
+                                <option value="web">Búsqueda en web</option>
+                                <option value="feria">Feria de empleo / Evento</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <!-- Disponibilidad -->
+                        <div>
+                            <label for="disponibilidad" class="block text-sm font-medium text-gray-700 mb-1">Fecha de disponibilidad *</label>
+                            <input type="date" id="disponibilidad" name="disponibilidad" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="disponibilidad">Selecciona una fecha de disponibilidad.</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Términos -->
+                <div class="flex items-start gap-2">
+                    <input type="checkbox" id="terminos" name="terminos" required
+                        class="mt-1 rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                    <label for="terminos" class="text-sm text-gray-600">
+                        Acepto los <a href="#" class="text-indigo-700 underline">términos y condiciones</a> y la 
+                        <a href="#" class="text-indigo-700 underline">política de privacidad</a> *
+                    </label>
+                </div>
+                <span class="error-msg text-red-500 text-sm hidden" data-field="terminos">Debes aceptar los términos y condiciones.</span>
+
+                <!-- Botones -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button type="submit"
+                        class="flex-1 bg-indigo-700 text-white py-3 rounded-lg font-semibold hover:bg-indigo-800 transition shadow-md">
+                        Enviar aplicación
+                    </button>
+                    <button type="reset" id="resetBtn"
+                        class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                        Limpiar formulario
+                    </button>
+                </div>
+            </form>
+
+            <!-- Mensaje de éxito -->
+            <div id="successMessage" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
+                <p class="text-green-700 text-lg font-semibold">✅ ¡Aplicación enviada con éxito!</p>
+                <p class="text-green-600 text-sm mt-1">Gracias por aplicar a TrackFlow. Te contactaremos pronto.</p>
+                <a href="index.html" class="inline-block mt-4 text-indigo-700 font-medium hover:underline">Volver al inicio</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-10 px-4 text-sm" role="contentinfo">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
+            <div>
+                <h4 class="font-semibold text-white mb-2">TrackFlow</h4>
+                <p class="text-gray-400">Logística inteligente para e-commerce.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-white mb-2">Contacto</h4>
+                <p class="text-gray-400">📧 hola@trackflow-logistics.com</p>
+                <p class="text-gray-400">📞 +1 (213) 555-0100</p>
+                <p class="text-gray-400">📍 Los Ángeles, CA · Zaragoza, España</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-white mb-2">Enlaces</h4>
+                <ul class="space-y-1">
+                    <li><a href="index.html" class="hover:text-white transition">Inicio</a></li>
+                    <li><a href="index.html#servicios" class="hover:text-white transition">Servicios</a></li>
+                    <li><a href="application.html" class="hover:text-white transition">Únete al equipo</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-700 text-center text-gray-500">
+            <p>&copy; 2026 TrackFlow Logistics. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="validation.js"></script>
+</body>
+</html>
