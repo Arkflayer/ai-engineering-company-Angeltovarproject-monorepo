@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TrackFlow - Únete al equipo</title>
-    <meta name="description" content="Formulario de aplicación para unirte a TrackFlow, empresa de logística inteligente para e-commerce." />
+    <title data-i18n="app.title">TrackFlow - Empieza a enviar con TrackFlow</title>
+    <meta name="description" content="Formulario para solicitar los servicios logísticos de TrackFlow. Almacenamiento, última milla y logística inversa para e-commerce." />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css" />
+    <script src="lang.js"></script>
 </head>
 <body class="text-gray-800 font-sans antialiased">
 
@@ -15,11 +16,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <a href="index.html" class="text-2xl font-bold text-indigo-700 flex items-center gap-2" aria-label="TrackFlow inicio">
                 <span aria-hidden="true" class="text-3xl">📦</span>
-                <span>TrackFlow</span>
+                <span data-i18n="header.title">TrackFlow</span>
             </a>
             <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-4 sm:gap-6 text-sm font-medium">
-                <a href="index.html" class="hover:text-indigo-700 transition">Inicio</a>
-                <a href="index.html#servicios" class="hover:text-indigo-700 transition">Servicios</a>
+                <a href="index.html" class="hover:text-indigo-700 transition" data-i18n="nav.inicio">Inicio</a>
+                <a href="index.html#servicios" class="hover:text-indigo-700 transition" data-i18n="nav.servicios">Servicios</a>
+                <!-- Language switcher -->
+                <div class="lang-switcher flex items-center gap-1 border-l border-gray-300 pl-4">
+                    <button type="button" data-lang="es" onclick="setLang('es')" class="text-xs px-2 py-1 rounded font-semibold bg-indigo-700 text-white">ES</button>
+                    <button type="button" data-lang="en" onclick="setLang('en')" class="text-xs px-3 py-1.5 rounded font-semibold text-gray-500 border border-gray-300">EN</button>
+                </div>
             </nav>
             <!-- Mobile hamburger -->
             <button id="menuToggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition" aria-label="Abrir menú" aria-expanded="false">
@@ -30,59 +36,81 @@
         </div>
         <!-- Mobile menu panel -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white px-4 py-4 space-y-3 text-sm font-medium">
-            <a href="index.html" class="block hover:text-indigo-700 transition">Inicio</a>
-            <a href="index.html#servicios" class="block hover:text-indigo-700 transition">Servicios</a>
+            <a href="index.html" class="block hover:text-indigo-700 transition" data-i18n="nav.inicio">Inicio</a>
+            <a href="index.html#servicios" class="block hover:text-indigo-700 transition" data-i18n="nav.servicios">Servicios</a>
+            <div class="lang-switcher flex items-center gap-2 pt-2 border-t border-gray-200">
+                <button type="button" data-lang="es" onclick="setLang('es')" class="text-xs px-3 py-1.5 rounded font-semibold bg-indigo-700 text-white">ES</button>
+                <button type="button" data-lang="en" onclick="setLang('en')" class="text-xs px-3 py-1.5 rounded font-semibold text-gray-500 border border-gray-300">EN</button>
+            </div>
         </div>
         </div>
     </header>
 
     <main>
         <div class="max-w-3xl mx-auto px-4 py-12 sm:py-16">
-            <h1 class="text-3xl sm:text-4xl font-bold text-center mb-2">Únete a TrackFlow</h1>
-            <p class="text-center text-gray-500 mb-10">
-                Forma parte del equipo que está transformando la logística para el e-commerce.
+            <h1 class="text-3xl sm:text-4xl font-bold text-center mb-2" data-i18n="app.title">Empieza a enviar con TrackFlow</h1>
+            <p class="text-center text-gray-500 mb-10" data-i18n="app.subtitle">
+                Cuéntanos sobre tu empresa y te enviaremos una propuesta personalizada en menos de 48 horas.
             </p>
 
-            <form id="applicationForm" class="bg-white p-6 sm:p-8 rounded-xl shadow-md space-y-6" novalidate>
+            <form id="clientForm" class="bg-white p-6 sm:p-8 rounded-xl shadow-md space-y-6" novalidate>
 
-                <!-- ===== DATOS PERSONALES ===== -->
+                <!-- ===== DATOS DE LA EMPRESA ===== -->
                 <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
-                    <legend class="text-lg font-semibold text-indigo-700 px-2">Datos personales</legend>
+                    <legend class="text-lg font-semibold text-indigo-700 px-2" data-i18n="form.company.legend">Datos de la empresa</legend>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4">
-                        <!-- Nombre -->
+                        <!-- Nombre de la empresa -->
                         <div class="sm:col-span-2">
-                            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" required
+                            <label for="empresa" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.name">Nombre de la empresa *</label>
+                            <input type="text" id="empresa" name="empresa" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-                                placeholder="Ej. Ana García" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="nombre">El nombre es obligatorio (mín. 2 caracteres).</span>
+                                placeholder="Ej. Mi Tienda Online S.L." />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="empresa" data-i18n-key="form.company.name.error">El nombre de la empresa es obligatorio (mín. 2 caracteres).</span>
                         </div>
 
-                        <!-- Email -->
+                        <!-- Persona de contacto -->
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico *</label>
+                            <label for="contacto" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.contact">Persona de contacto *</label>
+                            <input type="text" id="contacto" name="contacto" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Ej. María López" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="contacto" data-i18n-key="form.company.contact.error">El nombre de contacto es obligatorio.</span>
+                        </div>
+
+                        <!-- Cargo -->
+                        <div>
+                            <label for="cargo" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.position">Cargo *</label>
+                            <input type="text" id="cargo" name="cargo" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+                                placeholder="Ej. Directora de Operaciones" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="cargo" data-i18n-key="form.company.position.error">El cargo es obligatorio.</span>
+                        </div>
+
+                        <!-- Email corporativo -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.email">Correo electrónico corporativo *</label>
                             <input type="email" id="email" name="email" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-                                placeholder="ejemplo@correo.com" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="email">Ingresa un correo electrónico válido.</span>
+                                placeholder="ejemplo@miempresa.com" />
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="email" data-i18n-key="form.company.email.error">Ingresa un correo electrónico válido.</span>
                         </div>
 
                         <!-- Teléfono -->
                         <div>
-                            <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                            <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.phone">Teléfono *</label>
                             <input type="tel" id="telefono" name="telefono" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
                                 placeholder="+1 213 555 0100" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="telefono">Ingresa un número de teléfono válido.</span>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="telefono" data-i18n-key="form.company.phone.error">Ingresa un número de teléfono válido.</span>
                         </div>
 
                         <!-- País -->
                         <div>
-                            <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">País *</label>
+                            <label for="pais" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.country">País *</label>
                             <select id="pais" name="pais" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
-                                <option value="">Selecciona tu país</option>
+                                <option value="" data-i18n="form.company.country.placeholder">Selecciona tu país</option>
                                 <option value="AR">Argentina</option>
                                 <option value="AU">Australia</option>
                                 <option value="BR">Brasil</option>
@@ -92,7 +120,6 @@
                                 <option value="CO">Colombia</option>
                                 <option value="KR">Corea del Sur</option>
                                 <option value="CR">Costa Rica</option>
-                                <option value="CU">Cuba</option>
                                 <option value="EC">Ecuador</option>
                                 <option value="EG">Egipto</option>
                                 <option value="SV">El Salvador</option>
@@ -117,97 +144,154 @@
                                 <option value="VE">Venezuela</option>
                                 <option value="other">Otro</option>
                             </select>
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="pais">Selecciona un país.</span>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="pais" data-i18n-key="form.company.country.error">Selecciona un país.</span>
                         </div>
 
                         <!-- Ciudad -->
                         <div>
-                            <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+                            <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.company.city">Ciudad *</label>
                             <input type="text" id="ciudad" name="ciudad" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
                                 placeholder="Ej. Los Ángeles" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="ciudad">La ciudad es obligatoria.</span>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="ciudad" data-i18n-key="form.company.city.error">La ciudad es obligatoria.</span>
                         </div>
                     </div>
                 </fieldset>
 
-                <!-- ===== EXPERIENCIA Y ROL ===== -->
+                <!-- ===== INFORMACIÓN COMERCIAL ===== -->
                 <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
-                    <legend class="text-lg font-semibold text-indigo-700 px-2">Experiencia y rol</legend>
+                    <legend class="text-lg font-semibold text-indigo-700 px-2" data-i18n="form.business.legend">Información comercial</legend>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4">
-                        <!-- Departamento -->
+                        <!-- Volumen mensual de pedidos -->
                         <div>
-                            <label for="departamento" class="block text-sm font-medium text-gray-700 mb-1">Departamento *</label>
-                            <select id="departamento" name="departamento" required
+                            <label for="volumen" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.business.volume">Volumen mensual estimado de pedidos *</label>
+                            <select id="volumen" name="volumen" required
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
-                                <option value="">Selecciona un departamento</option>
-                                <option value="almacen">Operaciones de Almacén</option>
-                                <option value="ultima-milla">Última Milla y Transportistas</option>
-                                <option value="logistica-inversa">Logística Inversa</option>
-                                <option value="atencion-cliente">Atención al Cliente (CX)</option>
-                                <option value="comercial">Comercial y Relación con Clientes</option>
-                                <option value="tecnologia">Tecnología</option>
+                                <option value="" data-i18n="form.business.volume.placeholder">Selecciona un rango</option>
+                                <option value="lt1000">&lt; 1.000</option>
+                                <option value="1000-5000">1.000 - 5.000</option>
+                                <option value="5000-20000">5.000 - 20.000</option>
+                                <option value="20000-100000">20.000 - 100.000</option>
+                                <option value="gt100000">&gt; 100.000</option>
                             </select>
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="departamento">Selecciona un departamento.</span>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="volumen" data-i18n-key="form.business.volume.error">Selecciona un rango de volumen.</span>
                         </div>
 
-                        <!-- Años de experiencia -->
+                        <!-- Categoría de productos -->
                         <div>
-                            <label for="experiencia" class="block text-sm font-medium text-gray-700 mb-1">Años de experiencia *</label>
-                            <input type="number" id="experiencia" name="experiencia" required min="0" max="50"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-                                placeholder="Ej. 3" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="experiencia">Ingresa un número entre 0 y 50.</span>
+                            <label for="categoria" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.business.category">Categoría de productos *</label>
+                            <select id="categoria" name="categoria" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                                <option value="" data-i18n="form.business.category.placeholder">Selecciona una categoría</option>
+                                <option value="moda">Moda y accesorios</option>
+                                <option value="electronica">Electrónica y tecnología</option>
+                                <option value="hogar">Hogar y jardín</option>
+                                <option value="salud">Salud y belleza</option>
+                                <option value="alimentacion">Alimentación</option>
+                                <option value="libros">Libros y papelería</option>
+                                <option value="deportes">Deportes y ocio</option>
+                                <option value="automocion">Automoción</option>
+                                <option value="mascotas">Mascotas</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="categoria" data-i18n-key="form.business.category.error">Selecciona una categoría.</span>
                         </div>
 
-                        <!-- LinkedIn -->
-                        <div class="sm:col-span-2">
-                            <label for="url" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn / Portafolio</label>
-                            <input type="url" id="url" name="url"
+                        <!-- Plataforma e-commerce -->
+                        <div>
+                            <label for="plataforma" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.business.platform">Plataforma de e-commerce *</label>
+                            <select id="plataforma" name="plataforma" required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                                <option value="" data-i18n="form.business.platform.placeholder">Selecciona una plataforma</option>
+                                <option value="shopify">Shopify</option>
+                                <option value="magento">Magento / Adobe Commerce</option>
+                                <option value="woocommerce">WooCommerce</option>
+                                <option value="prestashop">PrestaShop</option>
+                                <option value="salesforce">Salesforce Commerce Cloud</option>
+                                <option value="bigcommerce">BigCommerce</option>
+                                <option value="vtex">VTEX</option>
+                                <option value="mercadolibre">Mercado Libre</option>
+                                <option value="amazon">Amazon</option>
+                                <option value="propia">Tienda propia / CMS propio</option>
+                                <option value="otra">Otra</option>
+                            </select>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="plataforma" data-i18n-key="form.business.platform.error">Selecciona una plataforma.</span>
+                        </div>
+
+                        <!-- Proveedor logístico actual -->
+                        <div>
+                            <label for="proveedor" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.business.provider">Proveedor logístico actual</label>
+                            <input type="text" id="proveedor" name="proveedor"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-                                placeholder="https://linkedin.com/in/tuperfil" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="url">Ingresa una URL válida (opcional).</span>
+                                placeholder="Ej. DHL, MRW, Ninguno..." />
                         </div>
                     </div>
                 </fieldset>
 
-                <!-- ===== MOTIVACIÓN ===== -->
+                <!-- ===== SERVICIOS QUE NECESITAS ===== -->
                 <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
-                    <legend class="text-lg font-semibold text-indigo-700 px-2">Motivación</legend>
+                    <legend class="text-lg font-semibold text-indigo-700 px-2" data-i18n="form.services.legend">Servicios que necesitas</legend>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="almacen" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.warehouse">Operaciones de almacén</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="ultimamilla" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.lastmile">Última milla</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="logistica-inversa" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.reverselogistics">Logística inversa</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="cx" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.cx">Atención al cliente (CX)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="reportes" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.reports">Informes y dashboards</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="servicios" value="automatizacion" class="rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
+                            <span class="text-sm font-medium" data-i18n="form.services.automation">Automatización inteligente</span>
+                        </label>
+                    </div>
+                    <span class="error-msg text-red-500 text-sm hidden" data-field="servicios" data-i18n-key="form.services.error">Selecciona al menos un servicio.</span>
+                </fieldset>
+
+                <!-- ===== INFORMACIÓN ADICIONAL ===== -->
+                <fieldset class="border border-gray-200 rounded-xl p-4 sm:p-6">
+                    <legend class="text-lg font-semibold text-indigo-700 px-2" data-i18n="form.additional.legend">Información adicional</legend>
 
                     <div class="mt-4 space-y-4">
                         <!-- Mensaje -->
                         <div>
-                            <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-1">
-                                ¿Por qué quieres trabajar en TrackFlow? *
+                            <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.additional.message">
+                                Cuéntanos sobre tus necesidades *
                             </label>
                             <textarea id="mensaje" name="mensaje" rows="4" required minlength="20"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-                                placeholder="Cuéntanos sobre ti, tu experiencia en logística y por qué te interesa TrackFlow (mín. 20 caracteres)"></textarea>
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="mensaje">El mensaje debe tener al menos 20 caracteres.</span>
+                                placeholder="Describe tu operación, volumen actual, desafíos logísticos y cualquier requisito especial (mín. 20 caracteres)"></textarea>
+                            <span class="error-msg text-red-500 text-sm hidden" data-field="mensaje" data-i18n-key="form.additional.message.error">El mensaje debe tener al menos 20 caracteres.</span>
                         </div>
 
-                        <!-- Cómo te enteraste -->
+                        <!-- Cómo nos conociste -->
                         <div>
-                            <label for="referido" class="block text-sm font-medium text-gray-700 mb-1">¿Cómo nos conociste?</label>
+                            <label for="referido" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="form.additional.referral">¿Cómo nos conociste?</label>
                             <select id="referido" name="referido"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
-                                <option value="">Selecciona una opción</option>
+                                <option value="" data-i18n="form.additional.referral.placeholder">Selecciona una opción</option>
                                 <option value="linkedin">LinkedIn</option>
-                                <option value="recomendacion">Recomendación de empleado</option>
-                                <option value="web">Búsqueda en web</option>
-                                <option value="feria">Feria de empleo / Evento</option>
+                                <option value="google">Google</option>
+                                <option value="recomendacion">Recomendación de cliente</option>
+                                <option value="feria">Feria / Evento</option>
+                                <option value="redes">Redes sociales</option>
+                                <option value="blog">Artículo / Blog</option>
                                 <option value="otro">Otro</option>
                             </select>
-                        </div>
-
-                        <!-- Disponibilidad -->
-                        <div>
-                            <label for="disponibilidad" class="block text-sm font-medium text-gray-700 mb-1">Fecha de disponibilidad *</label>
-                            <input type="date" id="disponibilidad" name="disponibilidad" required
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:outline-none" />
-                            <span class="error-msg text-red-500 text-sm hidden" data-field="disponibilidad">Selecciona una fecha de disponibilidad.</span>
                         </div>
                     </div>
                 </fieldset>
@@ -217,20 +301,23 @@
                     <input type="checkbox" id="terminos" name="terminos" required
                         class="mt-1 rounded border-gray-300 text-indigo-700 focus:ring-indigo-500" />
                     <label for="terminos" class="text-sm text-gray-600">
-                        Acepto los <a href="#" class="text-indigo-700 underline">términos y condiciones</a> y la 
-                        <a href="#" class="text-indigo-700 underline">política de privacidad</a> *
+                        <span data-i18n="form.terms.text">Acepto los</span>
+                        <a href="#" class="text-indigo-700 underline" data-i18n="form.terms.terms">términos y condiciones</a>
+                        <span data-i18n="form.terms.and">y la</span>
+                        <a href="#" class="text-indigo-700 underline" data-i18n="form.terms.privacy">política de privacidad</a>
+                        <span data-i18n="form.terms.suffix">*</span>
                     </label>
                 </div>
-                <span class="error-msg text-red-500 text-sm hidden" data-field="terminos">Debes aceptar los términos y condiciones.</span>
+                <span class="error-msg text-red-500 text-sm hidden" data-field="terminos" data-i18n-key="form.terms.error">Debes aceptar los términos y condiciones.</span>
 
                 <!-- Botones -->
                 <div class="flex flex-col sm:flex-row gap-4">
                     <button type="submit"
-                        class="flex-1 bg-indigo-700 text-white py-3 rounded-lg font-semibold hover:bg-indigo-800 transition shadow-md">
-                        Enviar aplicación
+                        class="flex-1 bg-indigo-700 text-white py-3 rounded-lg font-semibold hover:bg-indigo-800 transition shadow-md" data-i18n="form.submit">
+                        Enviar solicitud
                     </button>
                     <button type="reset" id="resetBtn"
-                        class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                        class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition" data-i18n="form.reset">
                         Limpiar formulario
                     </button>
                 </div>
@@ -238,9 +325,9 @@
 
             <!-- Mensaje de éxito -->
             <div id="successMessage" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
-                <p class="text-green-700 text-lg font-semibold">✅ ¡Aplicación enviada con éxito!</p>
-                <p class="text-green-600 text-sm mt-1">Gracias por aplicar a TrackFlow. Te contactaremos pronto.</p>
-                <a href="index.html" class="inline-block mt-4 text-indigo-700 font-medium hover:underline">Volver al inicio</a>
+                <p class="text-green-700 text-lg font-semibold" data-i18n="app.success.title">✅ ¡Solicitud enviada con éxito!</p>
+                <p class="text-green-600 text-sm mt-1" data-i18n="app.success.desc">Gracias por confiar en TrackFlow. Nuestro equipo comercial se pondrá en contacto contigo en menos de 48 horas.</p>
+                <a href="index.html" class="inline-block mt-4 text-indigo-700 font-medium hover:underline" data-i18n="app.success.back">Volver al inicio</a>
             </div>
         </div>
     </main>
@@ -249,26 +336,26 @@
     <footer class="bg-gray-800 text-gray-300 py-10 px-4 text-sm" role="contentinfo">
         <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
             <div>
-                <h4 class="font-semibold text-white mb-2">TrackFlow</h4>
-                <p class="text-gray-400">Logística inteligente para e-commerce.</p>
+                <h4 class="font-semibold text-white mb-2" data-i18n="header.title">TrackFlow</h4>
+                <p class="text-gray-400" data-i18n="footer.tagline">Logística inteligente para e-commerce.</p>
             </div>
             <div>
-                <h4 class="font-semibold text-white mb-2">Contacto</h4>
+                <h4 class="font-semibold text-white mb-2" data-i18n="footer.contacto">Contacto</h4>
                 <p class="text-gray-400">📧 hola@trackflow-logistics.com</p>
                 <p class="text-gray-400">📞 +1 (213) 555-0100</p>
                 <p class="text-gray-400">📍 Los Ángeles, CA · Zaragoza, España</p>
             </div>
             <div>
-                <h4 class="font-semibold text-white mb-2">Enlaces</h4>
+                <h4 class="font-semibold text-white mb-2" data-i18n="footer.enlaces">Enlaces</h4>
                 <ul class="space-y-1">
-                    <li><a href="index.html" class="hover:text-white transition">Inicio</a></li>
-                    <li><a href="index.html#servicios" class="hover:text-white transition">Servicios</a></li>
-                    <li><a href="application.html" class="hover:text-white transition">Únete al equipo</a></li>
+                    <li><a href="index.html" class="hover:text-white transition" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="index.html#servicios" class="hover:text-white transition" data-i18n="nav.servicios">Servicios</a></li>
+                    <li><a href="application.html" class="hover:text-white transition" data-i18n="nav.unete">Empieza ahora</a></li>
                 </ul>
             </div>
         </div>
         <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-700 text-center text-gray-500">
-            <p>&copy; 2026 TrackFlow Logistics. Todos los derechos reservados.</p>
+            <p data-i18n="footer.copyright">© 2026 TrackFlow Logistics. Todos los derechos reservados.</p>
         </div>
     </footer>
 

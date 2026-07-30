@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TrackFlow - Logística inteligente de última milla</title>
+    <title data-i18n="header.title">TrackFlow - Logística inteligente de última milla</title>
     <meta name="description" content="TrackFlow almacena, prepara y entrega pedidos para marcas de e-commerce. Gestión de almacenes, última milla y logística inversa en EE.UU. y España." />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css" />
+    <script src="lang.js"></script>
 
     <!-- Schema.org markup for Organization -->
     <script type="application/ld+json">
@@ -62,14 +63,19 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <a href="index.html" class="text-2xl font-bold text-indigo-700 flex items-center gap-2" aria-label="TrackFlow inicio">
                 <span aria-hidden="true" class="text-3xl">📦</span>
-                <span>TrackFlow</span>
+                <span data-i18n="header.title">TrackFlow</span>
             </a>
             <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-4 sm:gap-6 text-sm font-medium">
-                <a href="#servicios" class="hover:text-indigo-700 transition">Servicios</a>
-                <a href="#presencia" class="hover:text-indigo-700 transition">Presencia</a>
-                <a href="#equipo" class="hover:text-indigo-700 transition">Equipo</a>
-                <a href="application.html" target="_blank" class="bg-indigo-700 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-indigo-800 transition text-center">
-                    Únete
+                <a href="#servicios" class="hover:text-indigo-700 transition" data-i18n="nav.servicios">Servicios</a>
+                <a href="#presencia" class="hover:text-indigo-700 transition" data-i18n="nav.presencia">Presencia</a>
+                <a href="#equipo" class="hover:text-indigo-700 transition" data-i18n="nav.equipo">Equipo</a>
+                <!-- Language switcher -->
+                <div class="lang-switcher flex items-center gap-1 border-l border-gray-300 pl-4">
+                    <button type="button" data-lang="es" onclick="setLang('es')" class="text-xs px-2 py-1 rounded font-semibold bg-indigo-700 text-white">ES</button>
+                    <button type="button" data-lang="en" onclick="setLang('en')" class="text-xs px-2 py-1 rounded font-semibold text-gray-500 border border-gray-300">EN</button>
+                </div>
+                <a href="application.html" target="_blank" class="bg-indigo-700 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-indigo-800 transition text-center font-semibold shadow-md" data-i18n="nav.unete">
+                    Empieza ahora
                 </a>
             </nav>
             <!-- Mobile hamburger -->
@@ -81,11 +87,15 @@
         </div>
         <!-- Mobile menu panel -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white px-4 py-4 space-y-3 text-sm font-medium">
-            <a href="#servicios" class="block hover:text-indigo-700 transition">Servicios</a>
-            <a href="#presencia" class="block hover:text-indigo-700 transition">Presencia</a>
-            <a href="#equipo" class="block hover:text-indigo-700 transition">Equipo</a>
-            <a href="application.html" target="_blank" class="block text-center bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 transition">
-                Únete
+            <a href="#servicios" class="block hover:text-indigo-700 transition" data-i18n="nav.servicios">Servicios</a>
+            <a href="#presencia" class="block hover:text-indigo-700 transition" data-i18n="nav.presencia">Presencia</a>
+            <a href="#equipo" class="block hover:text-indigo-700 transition" data-i18n="nav.equipo">Equipo</a>
+            <div class="lang-switcher flex items-center gap-2 pt-2 border-t border-gray-200">
+                <button type="button" data-lang="es" onclick="setLang('es')" class="text-xs px-3 py-1.5 rounded font-semibold bg-indigo-700 text-white">ES</button>
+                <button type="button" data-lang="en" onclick="setLang('en')" class="text-xs px-3 py-1.5 rounded font-semibold text-gray-500 border border-gray-300">EN</button>
+            </div>
+            <a href="application.html" target="_blank" class="block text-center bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 transition font-semibold" data-i18n="nav.unete">
+                Empieza ahora
             </a>
         </div>
         </div>
@@ -95,19 +105,19 @@
 
         <!-- Hero -->
         <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 text-center" aria-label="Presentación de TrackFlow">
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6" data-i18n="hero.title">
                 Logística inteligente para tu <span class="text-indigo-700">e-commerce</span>
             </h1>
-            <p class="text-base sm:text-lg text-gray-700 max-w-2xl mx-auto mb-10 px-2 font-medium">
+            <p class="text-base sm:text-lg text-gray-700 max-w-2xl mx-auto mb-10 px-2 font-medium" data-i18n="hero.subtitle">
                 Almacenamos tu inventario, preparamos y empaquetamos los pedidos, los enviamos a través de 
                 nuestra red de transportistas y gestionamos las devoluciones. Tú ocúpate de vender; 
                 de la logística nos encargamos nosotros.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 px-4">
-                <a href="application.html" target="_blank" class="bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-800 transition shadow-md text-center">
+                <a href="application.html" target="_blank" class="bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-800 transition shadow-md text-center" data-i18n="hero.cta.primary">
                     Trabaja con nosotros
                 </a>
-                <a href="#servicios" class="border border-gray-300 px-8 py-3 rounded-lg font-semibold hover:border-indigo-400 transition text-center">
+                <a href="#servicios" class="border-2 border-indigo-500 text-indigo-700 bg-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition shadow-sm text-center" data-i18n="hero.cta.secondary">
                     Conoce nuestros servicios
                 </a>
             </div>
@@ -116,13 +126,13 @@
         <!-- Servicios -->
         <section id="servicios" class="bg-white py-16 sm:py-20" aria-label="Servicios de TrackFlow">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12">Nuestros servicios</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12" data-i18n="servicios.title">Nuestros servicios</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">🏭</div>
-                        <h3 class="text-xl font-semibold mb-2">Operaciones de almacén</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.almacen.title">Operaciones de almacén</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.almacen.desc">
                             Gestionamos tu inventario en nuestros almacenes de Los Ángeles y Zaragoza. 
                             Recepción, picking, packing y envío con seguimiento en tiempo real.
                         </p>
@@ -130,8 +140,8 @@
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">🚚</div>
-                        <h3 class="text-xl font-semibold mb-2">Última milla</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.ultimamilla.title">Última milla</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.ultimamilla.desc">
                             Red de 8 transportistas en EE.UU. y España. Asignación inteligente según 
                             destino, peso y urgencia. Tracking unificado para cada envío.
                         </p>
@@ -139,8 +149,8 @@
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">🔄</div>
-                        <h3 class="text-xl font-semibold mb-2">Logística inversa</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.logistica.title">Logística inversa</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.logistica.desc">
                             Gestión completa de devoluciones: aprobación, recogida, inspección asistida 
                             por IA y reacondicionamiento. Entre el 18 y 25% del volumen gestionado.
                         </p>
@@ -148,8 +158,8 @@
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">📞</div>
-                        <h3 class="text-xl font-semibold mb-2">Atención al cliente</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.cx.title">Atención al cliente</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.cx.desc">
                             15 agentes en Los Ángeles y Zaragoza. Soporte B2B para marcas y B2C para 
                             consumidores finales en español e inglés.
                         </p>
@@ -157,8 +167,8 @@
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">📊</div>
-                        <h3 class="text-xl font-semibold mb-2">Informes y dashboards</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.dashboards.title">Informes y dashboards</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.dashboards.desc">
                             Reportes PDF automáticos para clientes, dashboards de operaciones, 
                             rendimiento de transportistas y salud de cuenta.
                         </p>
@@ -166,8 +176,8 @@
 
                     <article class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
                         <div aria-hidden="true" class="text-4xl mb-4">🤖</div>
-                        <h3 class="text-xl font-semibold mb-2">Automatización inteligente</h3>
-                        <p class="text-gray-500 text-sm sm:text-base">
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="servicios.automatizacion.title">Automatización inteligente</h3>
+                        <p class="text-gray-500 text-sm sm:text-base" data-i18n="servicios.automatizacion.desc">
                             Motores de aprobación automática, agentes CX para consultas frecuentes, 
                             inspección asistida por IA y recomendación de transportista.
                         </p>
@@ -180,19 +190,19 @@
         <!-- Presencia -->
         <section id="presencia" class="py-16 sm:py-20" aria-label="Presencia de TrackFlow">
             <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6">Presencia internacional</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6" data-i18n="presencia.title">Presencia internacional</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <article class="bg-white p-6 rounded-xl border shadow-sm">
                         <img src="https://placehold.co/600x300/4f46e5/ffffff?text=Los+Ángeles" 
                              alt="Almacén de TrackFlow en Los Ángeles, California" 
                              class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4" 
                              loading="lazy" />
-                        <h3 class="text-lg font-semibold">🇺🇸 Los Ángeles, EE.UU.</h3>
-                        <p class="text-gray-500 text-sm mt-1">Sede central y almacén principal. Fundada en 2009 por Thomas Harry.</p>
-                        <p class="text-gray-400 text-xs mt-1">📍 7423 S Alameda St, Los Angeles, CA 90001</p>
+                        <h3 class="text-lg font-semibold" data-i18n="presencia.la.title">🇺🇸 Los Ángeles, EE.UU.</h3>
+                        <p class="text-gray-500 text-sm mt-1" data-i18n="presencia.la.desc">Sede central y almacén principal. Fundada en 2009 por Thomas Harry.</p>
+                        <p class="text-gray-400 text-xs mt-1" data-i18n="presencia.la.address">📍 7423 S Alameda St, Los Angeles, CA 90001</p>
                         <a href="https://www.google.com/maps?q=7423+S+Alameda+St+Los+Angeles+CA+90001" 
                            target="_blank" 
-                           class="inline-flex items-center gap-1 mt-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition font-medium">
+                           class="inline-flex items-center gap-1 mt-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition font-medium" data-i18n="presencia.la.map">
                             Ver en Google Maps
                         </a>
                     </article>
@@ -201,12 +211,12 @@
                              alt="Oficina de tecnología de TrackFlow en Zaragoza, España" 
                              class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4" 
                              loading="lazy" />
-                        <h3 class="text-lg font-semibold">🇪🇸 Zaragoza, España</h3>
-                        <p class="text-gray-500 text-sm mt-1">Oficina de tecnología liderada por el CTO Andrés Kim.</p>
-                        <p class="text-gray-400 text-xs mt-1">📍 Calle María Zambrano 31, 50018 Zaragoza</p>
+                        <h3 class="text-lg font-semibold" data-i18n="presencia.zaragoza.title">🇪🇸 Zaragoza, España</h3>
+                        <p class="text-gray-500 text-sm mt-1" data-i18n="presencia.zaragoza.desc">Oficina de tecnología liderada por el CTO Andrés Kim.</p>
+                        <p class="text-gray-400 text-xs mt-1" data-i18n="presencia.zaragoza.address">📍 Calle María Zambrano 31, 50018 Zaragoza</p>
                         <a href="https://www.google.com/maps?q=Calle+María+Zambrano+31+50018+Zaragoza" 
                            target="_blank" 
-                           class="inline-flex items-center gap-1 mt-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition font-medium">
+                           class="inline-flex items-center gap-1 mt-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition font-medium" data-i18n="presencia.zaragoza.map">
                             Ver en Google Maps
                         </a>
                     </article>
@@ -217,7 +227,7 @@
         <!-- Equipo directivo -->
         <section id="equipo" class="bg-white py-16 sm:py-20" aria-label="Equipo directivo de TrackFlow">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12">Equipo directivo</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12" data-i18n="equipo.title">Equipo directivo</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                     <article class="text-center p-4">
@@ -284,26 +294,26 @@
     <footer class="bg-gray-800 text-gray-300 py-10 px-4 text-sm" role="contentinfo">
         <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
             <div>
-                <h4 class="font-semibold text-white mb-2">TrackFlow</h4>
-                <p class="text-gray-400">Logística inteligente para e-commerce.</p>
+                <h4 class="font-semibold text-white mb-2" data-i18n="header.title">TrackFlow</h4>
+                <p class="text-gray-400" data-i18n="footer.tagline">Logística inteligente para e-commerce.</p>
             </div>
             <div>
-                <h4 class="font-semibold text-white mb-2">Contacto</h4>
+                <h4 class="font-semibold text-white mb-2" data-i18n="footer.contacto">Contacto</h4>
                 <p class="text-gray-400">📧 hola@trackflow-logistics.com</p>
                 <p class="text-gray-400">📞 +1 (213) 555-0100</p>
                 <p class="text-gray-400">📍 Los Ángeles, CA · Zaragoza, España</p>
             </div>
             <div>
-                <h4 class="font-semibold text-white mb-2">Enlaces</h4>
+                <h4 class="font-semibold text-white mb-2" data-i18n="footer.enlaces">Enlaces</h4>
                 <ul class="space-y-1">
-                    <li><a href="index.html" class="hover:text-white transition">Inicio</a></li>
-                    <li><a href="#servicios" class="hover:text-white transition">Servicios</a></li>
-                    <li><a href="application.html" class="hover:text-white transition">Únete al equipo</a></li>
+                    <li><a href="index.html" class="hover:text-white transition" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="#servicios" class="hover:text-white transition" data-i18n="nav.servicios">Servicios</a></li>
+                    <li><a href="application.html" class="hover:text-white transition" data-i18n="nav.unete">Empieza ahora</a></li>
                 </ul>
             </div>
         </div>
         <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-700 text-center text-gray-500">
-            <p>&copy; 2026 TrackFlow Logistics. Todos los derechos reservados.</p>
+            <p data-i18n="footer.copyright">© 2026 TrackFlow Logistics. Todos los derechos reservados.</p>
         </div>
     </footer>
 
