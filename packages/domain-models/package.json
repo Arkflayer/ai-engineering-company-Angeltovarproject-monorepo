@@ -5,10 +5,12 @@
   "description": "Modelos de dominio y utilidades de datos para TrackFlow",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "demo": "tsx src/demo.ts"
+    "demo": "tsx src/demo.ts",
+    "dev": "vite . --port 3000 --host 0.0.0.0"
   },
   "devDependencies": {
+    "tsx": "^4.16.0",
     "typescript": "^5.5.0",
-    "tsx": "^4.16.0"
+    "vite": "^8.2.2"
   }
 }
