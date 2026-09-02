@@ -1,0 +1,14 @@
+{
+  "name": "@trackflow/domain-models",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modelos de dominio y utilidades de datos para TrackFlow",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "demo": "tsx src/demo.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.16.0"
+  }
+}
