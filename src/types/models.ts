@@ -1,63 +1,95 @@
-export type Warehouse = "LOS_ANGELES" | "ZARAGOZA";
+export type ProductCategory =
+  | "Fashion"
+  | "Electronics"
+  | "Cosmetics"
+  | "Home"
+  | "Other";
 
-export type Urgency = "STANDARD" | "EXPRESS" | "SAME_DAY";
+export type WarehouseLocation = "Los Angeles" | "Zaragoza";
+
+export type ProductStatus =
+  | "Active"
+  | "Low stock"
+  | "Out of stock"
+  | "Discontinued";
+
+export type Country = "United States" | "Spain";
+
+export type ShipmentPriority = "Standard" | "Express" | "Same-day";
 
 export type ShipmentStatus =
-  | "PENDING"
-  | "IN_TRANSIT"
-  | "DELIVERED"
-  | "FAILED"
-  | "RETURNED";
+  | "Pending"
+  | "Assigned"
+  | "In transit"
+  | "Delivered"
+  | "Failed";
 
-export type ReturnStatus =
-  | "PENDING"
-  | "APPROVED"
-  | "REJECTED"
-  | "RECEIVED"
-  | "REFUNDED";
+export type MovementType =
+  | "Inbound"
+  | "Outbound"
+  | "Transfer"
+  | "Adjustment";
 
-export type Carrier = "UPS" | "FEDEX" | "DHL" | "MRW" | "SEUR";
+export interface Dimensions {
+  lengthCm: number;
+  widthCm: number;
+  heightCm: number;
+}
 
-export interface InventoryItem {
+export interface Product {
   sku: string;
-  productName: string;
-  warehouse: Warehouse;
-  country: string;
-  availableQuantity: number;
-  reservedQuantity: number;
-  reorderPoint: number;
-  updatedAt: Date;
+  name: string;
+  category: ProductCategory;
+  weightKg: number;
+  dimensions: Dimensions;
+  warehouse: WarehouseLocation;
+  stockQuantity: number;
+  minStockThreshold: number;
+  unitCostUSD: number;
+  isFragile: boolean;
+  status: ProductStatus;
+}
+
+export interface Destination {
+  city: string;
+  country: Country;
+  postalCode: string;
+  distanceKm: number;
 }
 
 export interface Shipment {
   id: string;
-  trackingNumber: string;
-  destinationCountry: string;
-  weightKg: number;
-  urgency: Urgency;
-  carrier: Carrier;
+  sku: string;
+  quantity: number;
+  origin: WarehouseLocation;
+  destination: Destination;
+  priority: ShipmentPriority;
+  declaredValueUSD: number;
+  carrier: string | null;
   status: ShipmentStatus;
   createdAt: Date;
-  estimatedDeliveryDate: Date;
 }
 
-export interface ReturnRequest {
+export interface Carrier {
   id: string;
-  shipmentId: string;
-  reason: string;
-  status: ReturnStatus;
-  requestedAt: Date;
-  approvedAt?: Date;
-  refundAmount?: number;
+  name: string;
+  operatesIn: Country[];
+  baseRateUSD: number;
+  ratePerKgUSD: number;
+  ratePerKmUSD: number;
+  avgDeliveryDays: number;
+  onTimeRate: number;
+  maxWeightKg: number;
+  handlesFragile: boolean;
+  acceptsPriority: ShipmentPriority[];
 }
 
-export interface CarrierPerformance {
-  carrier: Carrier;
-  country: string;
-  totalShipments: number;
-  onTimeDeliveries: number;
-  incidents: number;
-  totalCost: number;
-  periodStart: Date;
-  periodEnd: Date;
+export interface InventoryMovement {
+  id: string;
+  sku: string;
+  warehouse: WarehouseLocation;
+  type: MovementType;
+  quantity: number;
+  reason: string;
+  timestamp: Date;
 }

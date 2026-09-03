@@ -1,8 +1,6 @@
 import type {
   Carrier,
-  CarrierPerformance,
-  InventoryItem,
-  ReturnRequest,
+  Product,
   Shipment,
 } from "../types/models.js";
 
@@ -11,74 +9,66 @@ export interface ValidationResult {
   errors: string[];
 }
 
-const ALLOWED_CARRIERS: Carrier[] = ["UPS", "FEDEX", "DHL", "MRW", "SEUR"];
-const WAREHOUSE_COUNTRIES = {
-  LOS_ANGELES: "USA",
-  ZARAGOZA: "España",
-} as const;
-
-export function validateInventoryItem(item: InventoryItem): ValidationResult {
+export function validateProduct(product: Product): ValidationResult {
   const errors: string[] = [];
-  if (!item.sku.trim()) errors.push("SKU es obligatorio.");
-  if (!item.productName.trim()) errors.push("productName es obligatorio.");
-  if (!Number.isInteger(item.availableQuantity) || item.availableQuantity < 0) {
-    errors.push("availableQuantity debe ser un entero no negativo.");
-  }
-  if (!Number.isInteger(item.reservedQuantity) || item.reservedQuantity < 0) {
-    errors.push("reservedQuantity debe ser un entero no negativo.");
-  }
-  if (!Number.isInteger(item.reorderPoint) || item.reorderPoint < 0) {
-    errors.push("reorderPoint debe ser un entero no negativo.");
-  }
-  if (item.country !== WAREHOUSE_COUNTRIES[item.warehouse]) {
-    errors.push(`country debe ser ${WAREHOUSE_COUNTRIES[item.warehouse]} para ${item.warehouse}.`);
-  }
+
+  if (!product.sku.trim()) errors.push("sku no debe estar vacío.");
+  if (product.weightKg <= 0 || product.weightKg > 100)
+    errors.push("weightKg debe ser > 0 y <= 100.");
+  if (
+    product.dimensions.lengthCm <= 0 ||
+    product.dimensions.lengthCm > 200
+  )
+    errors.push("lengthCm debe ser > 0 y <= 200.");
+  if (
+    product.dimensions.widthCm <= 0 ||
+    product.dimensions.widthCm > 200
+  )
+    errors.push("widthCm debe ser > 0 y <= 200.");
+  if (
+    product.dimensions.heightCm <= 0 ||
+    product.dimensions.heightCm > 200
+  )
+    errors.push("heightCm debe ser > 0 y <= 200.");
+  if (product.stockQuantity < 0)
+    errors.push("stockQuantity debe ser >= 0.");
+  if (product.minStockThreshold < 0)
+    errors.push("minStockThreshold debe ser >= 0.");
+  if (product.unitCostUSD <= 0)
+    errors.push("unitCostUSD debe ser > 0.");
+
   return { valid: errors.length === 0, errors };
 }
 
 export function validateShipment(shipment: Shipment): ValidationResult {
   const errors: string[] = [];
-  if (!shipment.id.trim()) errors.push("id es obligatorio.");
-  if (!shipment.trackingNumber.trim()) errors.push("trackingNumber es obligatorio.");
-  if (shipment.weightKg <= 0) errors.push("weightKg debe ser mayor que 0.");
-  if (!ALLOWED_CARRIERS.includes(shipment.carrier)) errors.push("carrier no permitido.");
-  if (shipment.estimatedDeliveryDate < shipment.createdAt) {
-    errors.push("estimatedDeliveryDate no puede ser anterior a createdAt.");
-  }
+
+  if (shipment.quantity <= 0) errors.push("quantity debe ser > 0.");
+  if (shipment.declaredValueUSD <= 0)
+    errors.push("declaredValueUSD debe ser > 0.");
+  if (shipment.destination.distanceKm < 0)
+    errors.push("distanceKm debe ser >= 0.");
+
   return { valid: errors.length === 0, errors };
 }
 
-export function validateReturnRequest(request: ReturnRequest): ValidationResult {
+export function validateCarrier(carrier: Carrier): ValidationResult {
   const errors: string[] = [];
-  const requiresApproval = ["APPROVED", "RECEIVED", "REFUNDED"].includes(request.status);
-  if (!request.id.trim()) errors.push("id es obligatorio.");
-  if (!request.shipmentId.trim()) errors.push("shipmentId es obligatorio.");
-  if (!request.reason.trim()) errors.push("reason es obligatorio.");
-  if (!request.requestedAt) errors.push("requestedAt es obligatorio.");
-  if (request.refundAmount !== undefined && request.refundAmount < 0) {
-    errors.push("refundAmount no puede ser negativo.");
-  }
-  if (requiresApproval && !request.approvedAt) errors.push("approvedAt es obligatorio para este estado.");
-  if (request.approvedAt && request.approvedAt < request.requestedAt) {
-    errors.push("approvedAt no puede ser anterior a requestedAt.");
-  }
-  return { valid: errors.length === 0, errors };
-}
 
-export function validateCarrierPerformance(performance: CarrierPerformance): ValidationResult {
-  const errors: string[] = [];
-  if (performance.totalShipments < 0) errors.push("totalShipments no puede ser negativo.");
-  if (performance.onTimeDeliveries < 0) errors.push("onTimeDeliveries no puede ser negativo.");
-  if (performance.incidents < 0) errors.push("incidents no puede ser negativo.");
-  if (performance.totalCost < 0) errors.push("totalCost no puede ser negativo.");
-  if (performance.onTimeDeliveries > performance.totalShipments) {
-    errors.push("onTimeDeliveries no puede superar totalShipments.");
-  }
-  if (performance.incidents > performance.totalShipments) {
-    errors.push("incidents no puede superar totalShipments.");
-  }
-  if (performance.periodStart > performance.periodEnd) {
-    errors.push("periodStart no puede ser posterior a periodEnd.");
-  }
+  if (carrier.baseRateUSD < 0)
+    errors.push("baseRateUSD debe ser >= 0.");
+  if (carrier.ratePerKgUSD < 0)
+    errors.push("ratePerKgUSD debe ser >= 0.");
+  if (carrier.ratePerKmUSD < 0)
+    errors.push("ratePerKmUSD debe ser >= 0.");
+  if (carrier.avgDeliveryDays <= 0)
+    errors.push("avgDeliveryDays debe ser > 0.");
+  if (carrier.onTimeRate < 0 || carrier.onTimeRate > 100)
+    errors.push("onTimeRate debe estar entre 0 y 100.");
+  if (carrier.maxWeightKg <= 0)
+    errors.push("maxWeightKg debe ser > 0.");
+  if (carrier.operatesIn.length < 1)
+    errors.push("operatesIn debe contener al menos 1 país.");
+
   return { valid: errors.length === 0, errors };
 }
