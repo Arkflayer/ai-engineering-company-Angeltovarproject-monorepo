@@ -1,129 +1,130 @@
-# Bienvenido a TrackFlow
+# CONTEXT — TrackFlow · Hito 3: Talent Pipeline Tracker
 
-## AI Engineering · 4Geeks Academy — Briefing de empresa
-
----
-
-TrackFlow es una empresa de logística de última milla y gestión de almacenes fundada en 2009 en Los Ángeles, Estados Unidos. Opera en dos mercados — Estados Unidos y España — con almacenes en Los Ángeles y Zaragoza. La empresa cuenta con unos 130 empleados y factura alrededor de 9 millones de euros anuales.
-
-TrackFlow existe porque las marcas de e-commerce son buenas haciendo y vendiendo productos, pero no haciendo llegar esos productos a la puerta del cliente. Eso es lo que hace TrackFlow por ellas: almacena su inventario, prepara y empaqueta los pedidos, los envía a través de una red de transportistas y gestiona las devoluciones cuando los productos regresan. Para las marcas que trabajan con TrackFlow, toda la operación logística — desde el momento en que se hace un pedido hasta el momento en que se entrega o se devuelve — es responsabilidad de TrackFlow.
-
-## Cómo está organizada la empresa
-
-TrackFlow está liderada por **Thomas Harry**, fundador y CEO, con sede en Los Ángeles. La empresa tiene una oficina de tecnología en Zaragoza, España, donde están el CTO Andrés Kim y la mayor parte del equipo técnico. Los equipos de operaciones, comercial y atención al cliente están distribuidos entre los dos países.
-
-La empresa se organiza en las siguientes áreas:
-
-**Operaciones de Almacén** es donde ocurre el trabajo físico de la logística. Ana Whitfield supervisa los dos almacenes —uno en Los Ángeles, otro en Zaragoza— y los aproximadamente 70 operarios que los gestionan. Cada día, cientos de pedidos llegan, se recogen de las estanterías, se empaquetan y se entregan a los transportistas. Los dos almacenes funcionan con sistemas distintos y no tienen una visión compartida del inventario.
-
-**Última Milla y Gestión de Transportistas** gestiona la relación con los 8 transportistas con los que TrackFlow trabaja en los dos países — entre ellos UPS, FedEx, MRW y SEUR. Carlos Vega coordina qué transportista lleva cada envío, hace seguimiento de las entregas y gestiona las incidencias que inevitablemente ocurren: paquetes perdidos, entregas fallidas, direcciones incorrectas. Hoy, la mayor parte de esto se hace de forma manual, transportista por transportista.
-
-**Logística Inversa** gestiona lo que ocurre cuando un producto regresa. Sofía Ramos lidera este equipo de cinco personas. Las devoluciones representan entre el 18% y el 25% del volumen total según el cliente y el país, y cada devolución implica una cadena de decisiones — aprobar o rechazar, recoger o no, reacondicionar o desechar — que actualmente pasan todas por revisión humana.
-
-**Atención al Cliente** es la primera línea entre TrackFlow y las personas a las que sirve. Valentina Cruz gestiona 15 agentes en Los Ángeles y Zaragoza que atienden consultas tanto de las marcas (que quieren saber cómo va su operación) como de los consumidores finales (que quieren saber dónde está su paquete). La gran mayoría de las consultas son repetitivas, y ahora mismo cada una de ellas la responde una persona.
-
-**Comercial y Relación con Clientes** gestiona la cartera de clientes marca de TrackFlow. Miguel Torres lidera a los account managers y al equipo de desarrollo de negocio, responsables de retener a los clientes actuales y ganar nuevos. Los contratos son anuales, y las renovaciones se ganan o se pierden en función de si los clientes sienten que su operación logística está funcionando bien.
-
-**Tecnología** es el equipo que construye y mantiene todo. Andrés Kim lidera desde Zaragoza a un equipo de desarrolladores, data engineers y personas de sistemas. La arquitectura actual es un patchwork: dos sistemas de almacén distintos, un ERP de principios de los años 2010 e integraciones entre ellos que se construyeron con rapidez y nunca se documentaron bien. Cuando algo falla, el equipo se entera por un mensaje de WhatsApp de alguien en operaciones.
-
-**Dirección Ejecutiva** recae en Thomas, que gestiona el negocio desde Los Ángeles con un informe semanal consolidado que cada director prepara manualmente — un proceso que consume horas cada domingo por la noche y que aun así entrega datos que ya llevan uno o dos días de antigüedad.
-
-## Dónde está la empresa hoy
-
-TrackFlow tiene buenos clientes, un equipo de operaciones competente y una propuesta de valor clara. Lo que le falta es la infraestructura para gestionar una operación logística de dos países a escala. Los dos almacenes no pueden ver el inventario del otro. Los datos de rendimiento de los transportistas no existen en ninguna forma estructurada. Las devoluciones se aprueban o rechazan una por una. Las consultas de los clientes las responden agentes consultando un documento de Word en Google Drive. El CEO toma decisiones basándose en un informe ensamblado a mano.
-
-La consecuencia es que TrackFlow es más lenta, más propensa a errores y menos rentable de lo que necesita ser — y la brecha crece mientras los competidores invierten en automatización.
-
-Daniel ha creado una unidad interna llamada **TrackFlow Tech** con un mandato claro: construir los sistemas, las integraciones y las automatizaciones inteligentes que permitan a TrackFlow operar como la empresa logística moderna que necesita ser.
-
-**Tú formas parte de esa unidad.**
+> **Ruta en el repositorio:** `03-talent-pipeline-tracker/CONTEXT-trackflow.md`
 
 ---
 
-## Los departamentos y sus problemas
+El departamento de **People & Talent** de tu empresa está en medio de una campaña de selección activa. La posición abierta ha recibido más de 100 candidaturas en menos de dos semanas y el equipo está desbordado: llevan el seguimiento de los candidatos en una hoja de cálculo compartida, escriben las notas de las entrevistas en documentos separados y actualizan los estados manualmente por hilos de correo. El proceso se está desmoronando.
 
-### 🚚 Operaciones de almacén
-
-**Responsable:** Ana Whitfield (~70 operarios + 2 responsables de almacén)
-
-El almacén de Los Ángeles y el de Zaragoza utilizan sistemas de gestión de almacén (SGA) diferentes — uno es software comercial, el otro es una hoja de cálculo avanzada. No existe visibilidad de inventario en tiempo real a nivel global. Los pedidos entrantes llegan por email en formatos distintos según el cliente y se transcriben manualmente. El picking se hace con listas en papel. Las discrepancias de inventario son frecuentes y se detectan tarde.
-
-**Qué necesitan:** Una API de inventario unificada que devuelva el stock en tiempo real de cualquier SKU en cualquiera de los dos almacenes, un pipeline de ingesta de pedidos que parsee los emails automáticamente, un dashboard de operaciones de almacén, y alertas de stock bajo que notifiquen al cliente y al equipo de compras.
+El equipo de Tecnología ya ha construido y expuesto una **API REST** para gestionar el pipeline de candidaturas. Tu trabajo es construir el **frontend** que el equipo de People empezará a usar el lunes. El sistema debe permitir ver todas las candidaturas de un vistazo, filtrarlas por estado y por etapa, y acceder al detalle de cada una sin perder el contexto del listado.
 
 ---
 
-### 📦 Última milla y gestión de transportistas
+## Tu empresa
 
-**Responsable:** Carlos Vega (6 coordinadores logísticos)
-
-TrackFlow trabaja con 8 transportistas en ambos países (UPS, FedEx y DHL en Estados Unidos; MRW, SEUR y DHL en España, más dos transportistas locales). La asignación de transportista por envío es manual. El seguimiento de paquetes obliga a consultar múltiples portales de cada transportista por separado. No hay datos históricos de rendimiento: sin tasa de entrega a tiempo, sin incidencias por ruta, sin coste por kg.
-
-**Qué necesitan:** Un motor de selección de transportista que recomiende la opción óptima dado el destino, peso y urgencia; un endpoint unificado de tracking que agregue el estado desde cualquier transportista; un portal de seguimiento público para el destinatario; y un dashboard de rendimiento de transportistas.
+Eres parte del equipo **TrackFlow Tech**, la unidad tecnológica interna de TrackFlow, una empresa de logística de última milla y gestión de almacenes con operaciones en Los Ángeles y Zaragoza. El equipo está en plena transformación digital y cada herramienta que construyes tiene impacto directo en las operaciones del día siguiente.
 
 ---
 
-### 🔄 Logística inversa
+## El encargo
 
-**Responsable:** Sofía Ramos (equipo de 5 personas)
+Ana Whitfield, Head of Warehouse Operations, ha enviado el siguiente correo con copia a Andrés Kim, CTO:
 
-Las devoluciones representan entre el 18% y el 25% del volumen según cliente y país. Cada devolución pasa por revisión manual — no existen criterios de aprobación automáticos. La inspección del producto devuelto es subjetiva e inconsistente entre operarios. No hay visibilidad sobre qué productos se devuelven más ni por qué.
+> **Para:** Andrés Kim (CTO) **CC:** Equipo TrackFlow Tech **Asunto:** URGENTE — Herramienta de gestión de candidaturas — necesaria ya
+> 
+> Andrés,
+> 
+> Te escribo con copia al equipo porque esto no puede esperar más. Estamos gestionando el proceso de selección del **Asistente de Dirección** para la sede de Zaragoza en una hoja de Excel que ya nadie controla. Tenemos más de cien candidaturas, tres personas tocando el archivo y esta mañana hemos descubierto que alguien sobreescribió las notas de dos entrevistas de la semana pasada.
+> 
+> Javier me confirmó ayer que el backend está listo. Necesito que alguien del equipo monte el frontend esta semana. El proceso de selección no se puede parar.
+> 
+#### Lo que la herramienta debe hacer
 
-**Qué necesitan:** Un motor de aprobación automática de devoluciones con reglas configurables por cliente, un flujo automatizado de recogida (aprobación → etiqueta → instrucciones al cliente → programación con transportista), un sistema de inspección asistido por IA donde el operario fotografía el producto y la IA clasifica su estado, y un dashboard de devoluciones con análisis de patrones.
-
----
-
-### 📞 Experiencia del cliente
-
-**Responsable:** Valentina Cruz (15 agentes en Los Ángeles y Zaragoza)
-
-TrackFlow atiende a dos tipos de cliente: las marcas (B2B) que contratan sus servicios y los consumidores finales (B2C) que reciben los paquetes. Los 15 agentes gestionan ambos a través de email, WhatsApp y teléfono sin un sistema unificado de tickets. El 80% de las consultas podría resolverse automáticamente. No hay base de conocimiento. La cobertura fuera del horario de oficina es cero.
-
-**Qué necesitan:** Un agente de CX de primera línea que resuelva automáticamente consultas de seguimiento y estado de devoluciones, una base de conocimiento semántica indexada para RAG, un sistema unificado de tickets, un dashboard de CX en tiempo real, y análisis de sentimiento para detectar clientes frustrados antes de que escalen. El soporte multiidioma (español + inglés) es opcional pero altamente recomendado, empezando por un idioma base.
-
----
-
-### 🤝 Comercial y relación con clientes
-
-**Responsable:** Miguel Torres (4 account managers + 4 desarrollo de negocio)
-
-Los account managers gestionan sus cuentas en hojas de cálculo personales e hilos de email — no hay CRM. Los informes a clientes son manuales: cada mes un account manager consolida datos de distintos sistemas para enviar a cada cliente un informe en PDF. No hay visibilidad sobre qué clientes corren riesgo de no renovar.
-
-**Qué necesitan:** Integración con CRM con perfil unificado de cliente, informes PDF para clientes generados automáticamente por un agente, un dashboard de salud de cliente con puntuación de riesgo de renovación, alertas a 90 y 30 días del vencimiento del contrato, y un agente comercial que sugiera el servicio y la estructura de precios más relevantes para cada prospecto.
+- Mostrar todas las candidaturas en un listado — nombre, puesto, estado actual y etapa actual de un vistazo.
+- Permitir filtrar por estado y por etapa, y buscar por nombre o email sin recargar la página.
+- Abrir la vista de detalle de un candidato y, desde ahí, cambiar su estado o etapa con una sola interacción.
+- Añadir notas internas a una candidatura y eliminarlas cuando ya no sean relevantes.
+- Registrar nuevas candidaturas directamente desde la interfaz y editar los datos de una cuando haya que corregir algo.
+> Gracias, Ana
 
 ---
 
-### 💻 Tecnología
+## Contexto del proceso de selección
 
-**CTO:** Andrés Kim (equipo de 7 personas en Zaragoza)
-
-La arquitectura tecnológica de TrackFlow es el resultado de años de crecimiento no planificado: dos SGA diferentes, un ERP corporativo de principios de la década de 2010, scripts de Python punto a punto sin documentar, y bases de datos en dos proveedores cloud distintos. No hay telemetría centralizada. Cuando un endpoint falla en Los Ángeles, el equipo de Zaragoza se entera por WhatsApp. Desplegar una nueva funcionalidad lleva entre una y dos semanas.
-
-**Qué necesitan:** Telemetría y logging centralizados de ambos países, un pipeline de datos que alimente todos los dashboards de la empresa, monitorización en tiempo real con alertas automáticas, un agente de documentación técnica, y automatización de tareas de operaciones (backups, health checks, notificaciones de incidencias con contexto).
-
----
-
-### 📊 Dirección Ejecutiva
-
-**CEO:** Daniel Espinoza
-
-Daniel recibe un informe consolidado cada lunes que sus directores preparan el domingo por la tarde combinando datos de distintos sistemas — 3 o 4 horas de trabajo por director. A las 10 de la mañana del lunes, algunos datos ya tienen dos días de antigüedad. No hay una visión unificada del negocio por país. Las decisiones estratégicas se toman con datos parciales.
-
-**Qué necesita:** Un dashboard ejecutivo global con KPIs de ambas operaciones en tiempo real (volumen de envíos, tasa de entrega a tiempo, coste operativo, devoluciones, satisfacción del cliente), un informe semanal generado automáticamente los lunes a las 7 de la mañana, comparativas por país, alertas por umbrales, y un asistente de IA al que pueda consultar en lenguaje natural.
+| Campo | Valor |
+|-------|-------|
+| Puesto | Asistente de Dirección |
+| Empresa | TrackFlow |
+| Ubicación | Sede Zaragoza |
+| Perfil buscado | Experiencia en asistencia ejecutiva, gestión de agenda y viajes, inglés profesional, manejo de herramientas ofimáticas |
 
 ---
 
-## ¿Por qué elegir TrackFlow?
+## API y datos
 
-Elige TrackFlow si te atraen:
+La API ya está lista y está documentada en [https://playground.4geeks.com/tracker/api/v1/docs](https://playground.4geeks.com/tracker/api/v1/docs). Todas las peticiones deben gestionarse de forma asíncrona — la interfaz debe comunicar los estados de carga y manejar los errores con claridad. El equipo no puede permitirse una herramienta que falle en silencio o que deje al usuario sin saber qué está pasando.
 
-- **Logística y operaciones físicas** — cada línea de código que escribas está conectada a un paquete que se mueve de una estantería de almacén a la puerta de alguien.
-- **Complejidad transfronteriza** — dos países, dos idiomas, dos entornos regulatorios y dos stacks tecnológicos separados que hay que unificar.
-- **Ingeniería de datos en su forma más concreta** — métricas de rendimiento de transportistas, inventario a nivel de SKU, streams de eventos de envío y clasificación de devoluciones son todos estructurados, medibles y visualmente impactantes en dashboards.
-- **Sistemas que funcionan 24/7** — los clientes de TrackFlow no dejan de esperar sus paquetes después de las 18:00. El agente de CX, el portal de seguimiento y el dashboard de operaciones deben estar siempre disponibles.
+Esta es una herramienta interna real que va a usar gente real desde el primer día. Constrúyela como tal.
 
-Los retos de IA en TrackFlow incluyen clasificación de estado de productos devueltos por imagen, búsqueda semántica sobre políticas logísticas en dos idiomas, selección inteligente de transportista con recomendaciones explicables, y un agregador de tracking en tiempo real que extrae datos de 8 APIs de transportistas distintas. Si quieres construir sistemas que manejen complejidad del mundo físico a escala, TrackFlow es tu empresa.
+Los campos, valores y estructura son los definidos en la especificación técnica del backend. No es necesario adaptarlos.
+
+### Valores de `status`
+
+| Valor API | Etiqueta en la UI |
+|-----------|-------------------|
+| `received` | Recibida |
+| `in_progress` | En proceso |
+| `selected` | Seleccionada |
+| `discarded` | Descartada |
+
+### Valores de `stage`
+
+| Valor API | Etiqueta en la UI |
+|-----------|-------------------|
+| `pending` | Pendiente de revisión |
+| `review` | En revisión |
+| `personal_interview` | Entrevista personal |
+| `technical_interview` | Entrevista técnica |
+| `offer_presented` | Oferta presentada |
+
+> Los valores crudos de la API (`in_progress`, `personal_interview`, etc.) no deben aparecer nunca en la interfaz. Usa siempre las etiquetas de esta tabla.
 
 ---
 
-_Documento interno — 4Geeks Academy · AI Engineering Track_
-_Uso exclusivo para la generación de proyectos del programa_
+## Cómo iniciar el proyecto
+
+Este hito forma parte del monorepo del curso. No necesitas clonar ningún repositorio nuevo — el tuyo ya existe.
+
+1. Abre el monorepo en el que has trabajado durante el curso en **GitHub Codespaces** o clónalo localmente si prefieres trabajar en tu máquina.
+2. Navega a la carpeta `/uis` y crea el directorio de este hito:
+
+```
+/uis/talent-pipeline-tracker/
+```
+
+3. Inicializa un proyecto Next.js con TypeScript dentro de esa carpeta:
+
+```
+cd uis/talent-pipeline-tracker
+npx create-next-app@latest . --typescript --app --tailwind --eslint
+```
+
+4. Crea un archivo `.env.local` en la raíz de tu app con la URL base de la API:
+
+```
+NEXT_PUBLIC_API_URL=https://playground.4geeks.com/tracker/api/v1
+```
+
+5. Instala las dependencias:
+
+```
+npm install
+```
+
+6. Arranca el servidor de desarrollo:
+
+```
+npm run dev
+```
+
+---
+
+## Criterios de aceptación específicos
+
+- Los estados y etapas muestran etiquetas legibles, nunca valores de API.
+- Las notas internas son visibles únicamente en el detalle del candidato.
+- El formulario de registro incluye todos los campos requeridos por la API.
+
+---
+
+*Documento interno — 4Geeks Academy · AI Engineering Track* *Contexto de uso exclusivo en la generación de proyectos del programa*

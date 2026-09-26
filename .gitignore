@@ -5,3 +5,7 @@ node_modules/
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+
+# Archivos de entorno local (credenciales, API keys, etc.)
+.env*.local
+.env.local
