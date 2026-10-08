@@ -15,7 +15,7 @@ Implementa un cambio de interfaz acotado en la aplicación correcta de TrackFlow
 
 ## Procedimiento
 
-1. Lee `AGENTS.md`, `.agents/rules/interfaces.md`, `memory-bank/README.md`, `memory-bank/contexto-tecnico.md`, `uis/README.md` y el README de la aplicación objetivo, si existe. Antes de editar, inspecciona la página y los recursos o scripts relacionados.
+1. Lee `AGENTS.md`, `.agents/rules/interfaces.md`, `memory-bank/README.md`, `memory-bank/techContext.md`, `uis/README.md` y el README de la aplicación objetivo, si existe. Antes de editar, inspecciona la página y los recursos o scripts relacionados.
 2. Comprueba `git status --short --branch`. No sobrescribas ni prepares cambios existentes del usuario.
 3. Define un plan breve y comprobaciones de aceptación concretas. Limita el alcance a la aplicación y funcionalidad solicitadas.
 4. Implementa con la tecnología y las convenciones existentes. Mantén separadas la navegación y la estructura pública e interna; usa rutas relativas para los recursos. Asegúrate de que los controles tengan nombres accesibles, los formularios tengan etiquetas, el foco de teclado sea visible y el diseño sea utilizable en pantallas estrechas.

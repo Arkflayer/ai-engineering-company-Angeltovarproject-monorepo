@@ -23,17 +23,17 @@ const i18n = {
         /* Servicios */
         'servicios.title': 'Nuestros servicios',
         'servicios.almacen.title': 'Operaciones de almacén',
-        'servicios.almacen.desc': 'Gestionamos tu inventario en nuestros almacenes de Los Ángeles y Zaragoza. Recepción, picking, packing y envío con seguimiento en tiempo real.',
+        'servicios.almacen.desc': 'Gestionamos inventario en nuestros almacenes de Los Ángeles y Zaragoza: recepción, picking, packing y preparación de envíos. La visibilidad global en tiempo real aún está pendiente de integración.',
         'servicios.ultimamilla.title': 'Última milla',
-        'servicios.ultimamilla.desc': 'Red de 8 transportistas en EE.UU. y España. Asignación inteligente según destino, peso y urgencia. Tracking unificado para cada envío.',
+        'servicios.ultimamilla.desc': 'Trabajamos con 8 transportistas en EE.UU. y España. La asignación y la consulta de seguimiento se realizan actualmente de forma manual en los portales de cada transportista.',
         'servicios.logistica.title': 'Logística inversa',
-        'servicios.logistica.desc': 'Gestión completa de devoluciones: aprobación, recogida, inspección asistida por IA y reacondicionamiento. Entre el 18 y 25% del volumen gestionado.',
+        'servicios.logistica.desc': 'Gestionamos devoluciones que representan entre el 18% y el 25% del volumen, según cliente y país. La aprobación e inspección requieren revisión humana; la inspección con IA no está implementada.',
         'servicios.cx.title': 'Atención al cliente',
         'servicios.cx.desc': '15 agentes en Los Ángeles y Zaragoza. Soporte B2B para marcas y B2C para consumidores finales en español e inglés.',
         'servicios.dashboards.title': 'Informes y dashboards',
-        'servicios.dashboards.desc': 'Reportes PDF automáticos para clientes, dashboards de operaciones, rendimiento de transportistas y salud de cuenta.',
+        'servicios.dashboards.desc': 'La información operativa se consolida actualmente de forma manual. Los dashboards integrados y los reportes PDF automáticos están pendientes de implementación.',
         'servicios.automatizacion.title': 'Automatización inteligente',
-        'servicios.automatizacion.desc': 'Motores de aprobación automática, agentes CX para consultas frecuentes, inspección asistida por IA y recomendación de transportista.',
+        'servicios.automatizacion.desc': 'La aprobación automática, los agentes CX, la inspección asistida por IA y la recomendación de transportistas son capacidades propuestas; todavía no están implementadas.',
 
         /* Presencia */
         'presencia.title': 'Presencia internacional',
@@ -57,9 +57,9 @@ const i18n = {
 
         /* Application page */
         'app.title': 'Empieza a enviar con TrackFlow',
-        'app.subtitle': 'Cuéntanos sobre tu empresa y te enviaremos una propuesta personalizada en menos de 48 horas.',
-        'app.success.title': '✅ ¡Solicitud enviada con éxito!',
-        'app.success.desc': 'Gracias por confiar en TrackFlow. Nuestro equipo comercial se pondrá en contacto contigo en menos de 48 horas.',
+        'app.subtitle': 'Cuéntanos sobre tu empresa. Este formulario es una demostración local: los datos no se envían ni se guardan.',
+        'app.success.title': '✅ Validación de demostración completada',
+        'app.success.desc': 'El formulario solo se validó en este navegador. No se envió ninguna solicitud a TrackFlow.',
         'app.success.back': 'Volver al inicio',
 
         /* Form - Company section */
@@ -156,17 +156,17 @@ const i18n = {
         /* Servicios */
         'servicios.title': 'Our services',
         'servicios.almacen.title': 'Warehouse operations',
-        'servicios.almacen.desc': 'We manage your inventory in our Los Angeles and Zaragoza warehouses. Receiving, picking, packing, and shipping with real-time tracking.',
+        'servicios.almacen.desc': 'We manage inventory across our Los Angeles and Zaragoza warehouses: receiving, picking, packing, and shipment preparation. Global real-time visibility is still pending integration.',
         'servicios.ultimamilla.title': 'Last mile',
-        'servicios.ultimamilla.desc': 'Network of 8 carriers in the US and Spain. Smart assignment based on destination, weight, and urgency. Unified tracking for every shipment.',
+        'servicios.ultimamilla.desc': 'We work with 8 carriers in the US and Spain. Carrier assignment and tracking lookups are currently handled manually through each carrier portal.',
         'servicios.logistica.title': 'Reverse logistics',
-        'servicios.logistica.desc': 'Complete returns management: approval, pickup, AI-assisted inspection, and refurbishment. Between 18% and 25% of managed volume.',
+        'servicios.logistica.desc': 'We manage returns representing 18% to 25% of volume, depending on client and country. Approvals and inspections require human review; AI-assisted inspection is not implemented.',
         'servicios.cx.title': 'Customer support',
         'servicios.cx.desc': '15 agents in Los Angeles and Zaragoza. B2B support for brands and B2C for end consumers in Spanish and English.',
         'servicios.dashboards.title': 'Reports & dashboards',
-        'servicios.dashboards.desc': 'Automated PDF reports for clients, operations dashboards, carrier performance, and account health.',
+        'servicios.dashboards.desc': 'Operational information is currently consolidated manually. Integrated dashboards and automated PDF reports are pending implementation.',
         'servicios.automatizacion.title': 'Smart automation',
-        'servicios.automatizacion.desc': 'Automatic approval engines, CX agents for FAQs, AI-assisted inspection, and carrier recommendation.',
+        'servicios.automatizacion.desc': 'Automatic approvals, CX agents, AI-assisted inspection, and carrier recommendations are proposed capabilities; they are not implemented yet.',
 
         /* Presencia */
         'presencia.title': 'International presence',
@@ -190,9 +190,9 @@ const i18n = {
 
         /* Application page */
         'app.title': 'Start shipping with TrackFlow',
-        'app.subtitle': 'Tell us about your company and we\'ll send you a custom proposal within 48 hours.',
-        'app.success.title': '✅ Request sent successfully!',
-        'app.success.desc': 'Thank you for trusting TrackFlow. Our sales team will contact you within 48 hours.',
+        'app.subtitle': 'Tell us about your company. This is a local demonstration form: data is not sent or stored.',
+        'app.success.title': '✅ Demo validation complete',
+        'app.success.desc': 'The form was validated only in this browser. No request was sent to TrackFlow.',
         'app.success.back': 'Back to home',
 
         /* Form - Company section */
