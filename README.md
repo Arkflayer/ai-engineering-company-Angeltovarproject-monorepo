@@ -39,7 +39,9 @@ You are building **one company** across many milestones and projects. Each top-l
 | **Company context** | `CONTEXT.md`                      | Domain facts, field names, constraints for your assigned company |
 | **User-facing**     | `uis/`, `services/`               | Frontends and backends users (or operators) interact with        |
 | **Data**            | `data/`                           | Raw files, pipelines, processed datasets, evaluation sets        |
-| **AI**              | `agents/`, `skills/`, `mcps/`     | Agents, reusable agent capabilities, MCP tool servers            |
+| **AI product**      | `agents/`, `skills/`, `mcps/`     | Agents, reusable product capabilities, MCP tool servers          |
+| **Agent guidance**  | `AGENTS.md`, `.agents/`           | Development workflow, repository rules, reusable agent instructions |
+| **Company memory**  | `CONTEXT.md`, `memory-bank/`      | Business and technical context for TrackFlow                      |
 | **Automation**      | `workflows/`                      | n8n flows and cross-system orchestration                         |
 | **Reuse**           | `packages/`, `shared/`            | Shared types, SDKs, schemas, templates                           |
 | **Operations**      | `infra/`, `scripts/`, `internal/` | Docker, deploy configs, one-off scripts, internal CLIs           |
@@ -51,10 +53,11 @@ You are building **one company** across many milestones and projects. Each top-l
 
 ## Current status of the template
 
-> 💡 This repository currently provides a **base folder structure and documentation skeleton** only. It does not include runnable apps or global scripts yet.
+> 💡 This repository began as a base template and now also includes the TrackFlow company context, agent-development guidance, and static public and internal interface prototypes. The interfaces do not have a live backend integration.
 >
-> - `CONTEXT.md` is a placeholder and must be replaced with your assigned company context.
-> - There is no root `AGENTS.md` yet.
+> - Read `CONTEXT.md` and `memory-bank/` for company and technical context before starting work.
+> - `AGENTS.md` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
+> - The public website and backoffice are in `uis/website/` and `uis/backoffice/`; both are static prototypes.
 > - Shared package metadata exists in `packages/shared/package.json` (`@repo/shared-types`), but no workspace runner is configured at root.
 
 ---
@@ -129,7 +132,7 @@ Read the linked `README.md` inside each folder before you start coding there.
 
 ### `skills/` — reusable agent capabilities
 
-**Purpose:** Packaged instructions + scripts that agents (or you in Cursor) reuse across the repo.
+**Purpose:** Product capabilities — packaged instructions and scripts that TrackFlow agents reuse. Development-agent configuration belongs in `.agents/`.
 
 **Put here:**
 
@@ -250,7 +253,8 @@ Is it raw or transformed data?             → data/raw/ or data/process/
 Does it move data between systems?         → data/pipelines/
 Do you measure AI/pipeline quality?        → data/eval/
 Is it an AI assistant with a goal?         → agents/
-Is it a reusable AI capability/instruction?→ skills/
+Is it a reusable TrackFlow product capability?→ skills/
+Does it configure the development agent?      → .agents/
 Does AI need to call external tools/APIs?  → mcps/
 Is it n8n / scheduled automation?          → workflows/
 Will 2+ folders import the same code?      → packages/
@@ -270,6 +274,9 @@ Is it a CLI tool with its own package?     → internal/
 ai-engineering-company-project-monorepo/
 ├── README.md / README.es.md   # This guide
 ├── CONTEXT.md                 # ← Replace with your company briefing
+├── AGENTS.md                  # Development-agent workflow
+├── .agents/                   # Development-agent rules and skills
+├── memory-bank/               # Persistent business and technical context
 ├── docker-compose.yml         # ← Local dev orchestration (repo root)
 ├── uis/                       # Frontends (website, backoffice, dashboards)
 ├── services/                  # Centralized FastAPI company API
@@ -279,7 +286,7 @@ ai-engineering-company-project-monorepo/
 │   ├── process/               # Clean / intermediate outputs
 │   └── eval/                  # Evaluation sets and metrics
 ├── agents/                    # AI agents (+ _template/ starter)
-├── skills/                    # Reusable agent skills
+├── skills/                    # Reusable TrackFlow product capabilities
 ├── mcps/                      # MCP servers for tool access
 ├── workflows/                 # n8n and automation flows
 ├── packages/                  # Shared libraries (@repo/shared-types, …)
