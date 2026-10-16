@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Análisis local de reportes de incidencias de TrackFlow.">
+  <title>Análisis de incidencias | TrackFlow Backoffice</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="incidents.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación del backoffice">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">T</span><span>TrackFlow<span class="brand-subtitle">OPERACIONES</span></span></a>
+      <p class="nav-label">ESPACIO DE TRABAJO</p>
+      <nav aria-label="Principal">
+        <a class="nav-item" href="index.html"><span aria-hidden="true">▦</span> Resumen</a>
+        <a class="nav-item active" href="incidents.html" aria-current="page"><span aria-hidden="true">!</span> Análisis de incidencias</a>
+      </nav>
+      <div class="sidebar-footer"><span class="avatar" aria-hidden="true">TF</span><span><strong>Equipo TrackFlow</strong><small>Vista interna</small></span></div>
+    </aside>
+
+    <main id="main-content" class="main-content incident-main">
+      <header class="topbar"><div class="breadcrumb">TrackFlow <span aria-hidden="true">/</span> Experiencia del cliente <span aria-hidden="true">/</span> Incidencias</div><span class="status-pill"><span aria-hidden="true"></span> Herramienta interna</span></header>
+      <section class="page-heading"><div><p class="eyebrow">EXPERIENCIA DEL CLIENTE</p><h1 id="page-title">Análisis de incidencias</h1><p class="page-description">Carga un CSV para validar su calidad y consultar métricas agregadas.</p></div></section>
+      <section class="incident-privacy" aria-label="Aviso de privacidad"><strong>Datos sensibles:</strong> el CSV se envía al servidor configurado para su análisis. Los correos nunca se muestran ni se incluyen en la exportación de resultados. Usa solo un entorno autorizado.</section>
+
+      <section class="content-card upload-card" aria-labelledby="upload-title">
+        <div class="card-heading"><div><h2 id="upload-title">Cargar reporte CSV</h2><p>Formato UTF-8 con encabezados de TrackFlow</p></div></div>
+        <form id="upload-form" enctype="multipart/form-data">
+          <label class="file-drop" for="csv-file"><span class="upload-icon" aria-hidden="true">↑</span><strong>Selecciona un archivo CSV</strong><span>o arrástralo hasta aquí · máximo 25 MiB</span><input id="csv-file" name="file" type="file" accept=".csv,text/csv" required></label>
+          <div class="upload-actions"><p id="file-name" class="file-name">Ningún archivo seleccionado</p><button id="analyze-button" class="primary-button" type="submit">Analizar archivo</button></div>
+        </form>
+        <p id="analysis-message" class="analysis-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="results" class="results-section" hidden aria-labelledby="results-title">
+        <div class="results-heading"><div><p class="eyebrow">RESULTADO DEL ARCHIVO</p><h2 id="results-title">Resumen del análisis</h2><p id="result-source" class="page-description"></p></div><button id="export-button" class="secondary-button" type="button">Descargar CSV</button></div>
+        <div id="invalid-notice" class="invalid-notice" role="status"></div>
+        <div id="summary-metrics" class="metrics-grid" aria-label="Métricas generales"></div>
+        <div class="incident-breakdowns">
+          <section class="content-card" aria-labelledby="category-title"><div class="card-heading"><div><h2 id="category-title">Por categoría</h2><p>Solo registros válidos</p></div></div><div id="category-breakdown" class="breakdown-list"></div></section>
+          <section class="content-card" aria-labelledby="status-title"><div class="card-heading"><div><h2 id="status-title">Por estado</h2><p>Solo registros válidos</p></div></div><div id="status-breakdown" class="breakdown-list"></div></section>
+          <section class="content-card" aria-labelledby="country-title"><div class="card-heading"><div><h2 id="country-title">Por país</h2><p>Solo registros válidos</p></div></div><div id="country-breakdown" class="breakdown-list"></div></section>
+          <section class="content-card" aria-labelledby="satisfaction-title"><div class="card-heading"><div><h2 id="satisfaction-title">Satisfacción</h2><p>Incidencias cerradas con puntuación válida</p></div></div><div id="satisfaction-breakdown" class="breakdown-list"></div></section>
+          <section class="content-card invalid-card" aria-labelledby="invalid-title"><div class="card-heading"><div><h2 id="invalid-title">Registros inválidos</h2><p>Excluidos de las métricas principales</p></div></div><div id="invalid-breakdown" class="breakdown-list"></div></section>
+        </div>
+      </section>
+      <footer class="page-footer">TrackFlow Tech <span aria-hidden="true">·</span> Analizador interno de reportes</footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,6 +1,11 @@
-# Carpeta `scripts`
+# Scripts del proyecto
 
-Esta carpeta contiene **scripts auxiliares** del monorepo: automatizaciones de desarrollo, utilidades de mantenimiento, tareas repetitivas (setup, lint, migraciones, generación de datos, etc.) y tooling interno.
+## Analizador de incidencias TrackFlow
 
-- **Propósito principal**: agrupar herramientas de soporte que no pertenecen a una app/agente/pipeline específico, pero facilitan el trabajo del equipo.
-- **Recomendación**: documenta cada script (qué hace, parámetros, requisitos, ejemplos de uso) y procura que sean reproducibles (y seguros) en distintos entornos.
+`analyze.py` recibe la ruta de un CSV UTF-8, valida el esquema de TrackFlow, excluye los registros inválidos, muestra métricas agregadas y ofrece exportar `resultados.csv`. Nunca imprime ni exporta filas de origen, identificadores personales ni correos.
+
+```sh
+python scripts/analyze.py incidencias-trackflow.csv
+```
+
+La lógica compartida con la interfaz de programación de aplicaciones vive en `services/api/app/domains/incidents/analysis.py`. Las pruebas se ejecutan desde la raíz con `python -m unittest discover -s scripts/tests`.
