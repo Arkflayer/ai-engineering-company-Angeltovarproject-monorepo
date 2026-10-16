@@ -39,7 +39,9 @@ Estás construyendo **una sola empresa** a lo largo de muchos hitos y proyectos.
 | **Contexto de empresa** | `CONTEXT.md`                      | Datos del dominio, nombres de campos y restricciones de tu empresa asignada |
 | **Cara al usuario**     | `uis/`, `services/`               | Frontends y backends con los que interactúan usuarios u operadores          |
 | **Datos**               | `data/`                           | Archivos crudos, pipelines, datasets procesados y conjuntos de evaluación   |
-| **IA**                  | `agents/`, `skills/`, `mcps/`     | Agentes, capacidades reutilizables para agentes y servidores MCP            |
+| **Producto de IA**      | `agents/`, `skills/`, `mcps/`     | Agentes, capacidades reutilizables de producto y servidores MCP              |
+| **Guía de agentes**     | `AGENTS.md`, `.agents/`           | Flujo de programación, reglas del repo e instrucciones reutilizables          |
+| **Memoria de empresa**  | `CONTEXT.md`, `memory-bank/`      | Contexto empresarial y técnico persistente de TrackFlow                      |
 | **Automatización**      | `workflows/`                      | Flujos n8n y orquestación entre sistemas                                    |
 | **Reutilización**       | `packages/`, `shared/`            | Tipos compartidos, SDKs, esquemas, plantillas                               |
 | **Operaciones**         | `infra/`, `scripts/`, `internal/` | Docker, despliegue, scripts puntuales, CLIs internas                        |
@@ -51,10 +53,11 @@ Estás construyendo **una sola empresa** a lo largo de muchos hitos y proyectos.
 
 ## Estado actual de la plantilla
 
-> 💡 Actualmente el repositorio ofrece solo una **estructura base de carpetas y documentación**. Todavía no incluye aplicaciones ejecutables ni scripts globales en la raíz.
+> 💡 Este repositorio comenzó como una plantilla base y ahora también incluye el contexto de TrackFlow, guías para agentes de programación y prototipos estáticos de las interfaces pública e interna. Las interfaces no tienen integración con un backend en vivo.
 >
-> - `CONTEXT.md` es un placeholder y debe sustituirse por el contexto de la empresa asignada.
-> - No existe todavía un `AGENTS.md` en la raíz.
+> - Lee `CONTEXT.md` y `memory-bank/` para consultar el contexto empresarial y técnico antes de empezar.
+> - `AGENTS.md` y `.agents/` definen el flujo, las reglas y las instrucciones reutilizables para agentes de programación; son distintos del código de producto en `agents/` y `skills/`.
+> - El sitio público y el backoffice están en `uis/website/` y `uis/backoffice/`; ambos son prototipos estáticos.
 > - Existe metadata del paquete compartido en `packages/shared/package.json` (`@repo/shared-types`), pero aún no hay runner de workspace en raíz.
 
 ---
@@ -129,7 +132,7 @@ Lee el `README.md` enlazado dentro de cada carpeta antes de empezar a programar 
 
 ### `skills/` — capacidades reutilizables para agentes
 
-**Propósito:** Instrucciones empaquetadas + scripts que agentes (o tú en Cursor) reutilizan en todo el repo.
+**Propósito:** Capacidades de producto — instrucciones empaquetadas y scripts que reutilizan los agentes de TrackFlow. La configuración del agente de programación va en `.agents/`.
 
 **Pon aquí:**
 
@@ -250,7 +253,8 @@ Guía rápida de decisión:
 ¿Mueve datos entre sistemas?               → data/pipelines/
 ¿Mides calidad de IA/pipelines?            → data/eval/
 ¿Es un asistente de IA con un objetivo?    → agents/
-¿Es una capacidad/instrucción reutilizable?→ skills/
+¿Es una capacidad reutilizable del producto TrackFlow?→ skills/
+¿Configura al agente de programación?                  → .agents/
 ¿La IA necesita llamar tools/APIs externas?→ mcps/
 ¿Es n8n / automatización programada?       → workflows/
 ¿2+ carpetas importan el mismo código?     → packages/
@@ -270,6 +274,9 @@ Guía rápida de decisión:
 ai-engineering-company-project-monorepo/
 ├── README.md / README.es.md   # Esta guía
 ├── CONTEXT.md                 # ← Reemplazar con el briefing de tu empresa
+├── AGENTS.md                  # Flujo de trabajo del agente de programación
+├── .agents/                   # Reglas y skills del agente de programación
+├── memory-bank/               # Contexto empresarial y técnico persistente
 ├── docker-compose.yml         # ← Orquestación local (raíz del repo)
 ├── uis/                       # Frontends (website, backoffice, dashboards)
 ├── services/                  # API FastAPI centralizada de la empresa
@@ -279,7 +286,7 @@ ai-engineering-company-project-monorepo/
 │   ├── process/               # Salidas limpias / intermedias
 │   └── eval/                  # Conjuntos de evaluación y métricas
 ├── agents/                    # Agentes de IA (+ plantilla _template/)
-├── skills/                    # Skills reutilizables para agentes
+├── skills/                    # Capacidades reutilizables del producto TrackFlow
 ├── mcps/                      # Servidores MCP para acceso a tools
 ├── workflows/                 # Flujos n8n y automatizaciones
 ├── packages/                  # Librerías compartidas (@repo/shared-types, …)

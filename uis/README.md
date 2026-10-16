@@ -7,6 +7,8 @@ The two main projects stored here are:
 - **`website`** — the company's public-facing web presence.
 - **`backoffice`** — the internal admin application. This is the ideal place to develop multiple solutions within a single project: authentication, people management, operations management, internal communication, and other back-office capabilities.
 
+El prototipo inicial de operaciones internas de TrackFlow está disponible en [`backoffice/`](./backoffice/README.md). Es estático y usa datos de demostración claramente identificados; no tiene integración con una API en vivo.
+
 Organize `uis/` by **different concerns** — each subfolder covers a distinct area of the company (for example, public web vs internal operations) and includes its own technical and functional documentation.
 
 - **Main purpose**: to centralize in a single place all frontend applications that support the company's use cases.

@@ -1,6 +1,7 @@
 # Carpeta `skills`
 
-Esta carpeta contiene las **skills de agentes** (capacidades reusables) que ayudan a trabajar de forma consistente en el monorepo: investigación, análisis de datos, revisión de código, scraping, matemáticas, etc.
+Esta carpeta contiene **skills de producto para agentes** (capacidades reutilizables) que se construyen como parte del monorepo: análisis de datos, revisión de código, investigación y otras.
 
-- **Propósito principal**: estandarizar cómo los agentes de IA asisten al equipo en los distintos hitos del proyecto transversal.
-- **Recomendación**: documenta cada skill que añadas (cuándo usarla, inputs/outputs esperados, ejemplos) y mantén una estructura clara por subcarpetas para facilitar su descubrimiento.
+- **Ubicación**: cada skill de producto vive en `skills/<nombre>/`, con `SKILL.md` y scripts o recursos opcionales.
+- **No confundir**: `skills/` forma parte del producto TrackFlow. Las reglas y skills que configuran al agente de programación van en `.agents/rules/` y `.agents/skills/`.
+- **Recomendación**: documenta cuándo usar cada skill, sus entradas y salidas esperadas, ejemplos y criterios de aceptación verificables.
