@@ -4,17 +4,52 @@ from __future__ import annotations
 import csv
 import io
 import os
+from contextlib import asynccontextmanager
 from threading import Lock
-from typing import Optional
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
+from app.auth import get_current_user, router as auth_router
 from app.domains.incidents.analysis import CSVFormatError, analyze_csv, write_results_csv
+from app.domains.profiles import router as profiles_router
+from app.domains.users import router as users_router
+from app.security import get_settings
+from app.storage import IdentityStore
 
-app = FastAPI(title="Análisis de incidencias de TrackFlow", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    application.state.identity = IdentityStore(get_settings().db_path)
+    application.state.summaries = {}
+    application.state.summary_lock = Lock()
+    try:
+        yield
+    finally:
+        application.state.identity.close()
+        application.state.summaries.clear()
+
+
+app = FastAPI(title="Análisis de incidencias de TrackFlow", version="1.0.0", lifespan=lifespan)
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(profiles_router)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request, exc: RequestValidationError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"detail": [
+            {"loc": error["loc"], "msg": error["msg"], "type": error["type"]}
+            for error in exc.errors()
+        ]},
+    )
+
+
 allowed_origins = [
     origin.strip()
     for origin in os.getenv(
@@ -26,12 +61,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
-_last_summary: Optional[dict] = None
-_summary_lock = Lock()
 
 
 @app.get("/health")
@@ -40,8 +73,11 @@ def health() -> dict[str, str]:
 
 
 @app.post("/api/incidents/analyze")
-async def analyze_incidents(file: UploadFile = File(...)) -> dict:
-    global _last_summary
+async def analyze_incidents(
+    request: Request,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+) -> dict:
     if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=415, detail="Sube un archivo con extensión .csv.")
     try:
@@ -66,17 +102,19 @@ async def analyze_incidents(file: UploadFile = File(...)) -> dict:
             summary = await run_in_threadpool(analyze_csv, io.StringIO(text, newline=""))
         except CSVFormatError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        with _summary_lock:
-            _last_summary = summary
+        with request.app.state.summary_lock:
+            request.app.state.summaries[current_user["id"]] = summary
         return summary
     finally:
         await file.close()
 
 
 @app.get("/api/incidents/results/export")
-def export_results() -> StreamingResponse:
-    with _summary_lock:
-        summary = _last_summary
+def export_results(
+    request: Request, current_user: dict = Depends(get_current_user)
+) -> StreamingResponse:
+    with request.app.state.summary_lock:
+        summary = request.app.state.summaries.get(current_user["id"])
     if summary is None:
         raise HTTPException(status_code=404, detail="Todavía no hay un análisis para exportar.")
     output = io.StringIO(newline="")
