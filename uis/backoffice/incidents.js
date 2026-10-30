@@ -7,8 +7,61 @@
   const message = document.querySelector('#analysis-message');
   const button = document.querySelector('#analyze-button');
   const results = document.querySelector('#results');
+  const loginForm = document.querySelector('#login-form');
+  const loginButton = document.querySelector('#login-button');
+  const authMessage = document.querySelector('#auth-message');
+  const logoutButton = document.querySelector('#logout-button');
   const URL_SERVICIO = window.TRACKFLOW_API_URL || 'http://localhost:8000';
+  let accessToken = null;
   let hasResults = false;
+
+  const setSession = (token) => {
+    accessToken = token;
+    const authenticated = Boolean(token);
+    button.disabled = !authenticated;
+    document.querySelector('#export-button').disabled = !authenticated || !hasResults;
+    loginForm.hidden = authenticated;
+    logoutButton.hidden = !authenticated;
+    authMessage.textContent = authenticated
+      ? 'Sesión iniciada. El token se conserva solo en memoria mientras esta página permanezca abierta.'
+      : 'Inicia sesión con tu cuenta de TrackFlow para habilitar el análisis.';
+    authMessage.className = 'analysis-message';
+  };
+
+  loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    loginButton.disabled = true;
+    authMessage.textContent = 'Verificando credenciales…';
+    authMessage.className = 'analysis-message';
+    try {
+      const response = await fetch(`${URL_SERVICIO}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.querySelector('#login-email').value,
+          password: document.querySelector('#login-password').value,
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.detail || 'No se pudo iniciar sesión.');
+      loginForm.reset();
+      setSession(payload.access_token);
+    } catch (error) {
+      authMessage.textContent = error instanceof TypeError
+        ? 'No fue posible conectar con el servicio de autenticación.'
+        : error.message;
+      authMessage.className = 'analysis-message error';
+    } finally {
+      loginButton.disabled = false;
+    }
+  });
+
+  logoutButton.addEventListener('click', () => {
+    accessToken = null;
+    hasResults = false;
+    results.hidden = true;
+    setSession(null);
+  });
 
   const escapeText = (value) => String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -74,6 +127,7 @@
     renderRows('#invalid-breakdown', Object.fromEntries(Object.entries(summary.invalid_breakdown || {}).map(([key, count]) => [ruleNames[key] || invalidLabels[key] || key, count])), null);
     results.hidden = false;
     hasResults = true;
+    document.querySelector('#export-button').disabled = false;
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -81,6 +135,11 @@
     event.preventDefault();
     const file = fileInput.files[0];
     if (!file) return;
+    if (!accessToken) {
+      message.textContent = 'Inicia sesión antes de analizar un archivo.';
+      message.className = 'analysis-message error';
+      return;
+    }
     if (!file.name.toLowerCase().endsWith('.csv')) {
       message.textContent = 'Selecciona un archivo con extensión .csv.';
       message.className = 'analysis-message error';
@@ -92,8 +151,14 @@
     message.textContent = 'Analizando archivo…';
     message.className = 'analysis-message';
     try {
-      const response = await fetch(`${URL_SERVICIO}/api/incidents/analyze`, { method: 'POST', body });
+      const response = await fetch(`${URL_SERVICIO}/api/incidents/analyze`, {
+        method: 'POST', body, headers: { Authorization: `Bearer ${accessToken}` },
+      });
       const payload = await response.json();
+      if (response.status === 401) {
+        setSession(null);
+        throw new Error('La sesión caducó. Inicia sesión nuevamente.');
+      }
       if (!response.ok) throw new Error(payload.detail || 'No se pudo analizar el archivo.');
       render(payload, file.name);
       message.textContent = 'Análisis completado. Los datos se muestran de forma agregada.';
@@ -112,16 +177,19 @@
     const exportButton = document.querySelector('#export-button');
     exportButton.disabled = true;
     try {
-      const response = await fetch(`${URL_SERVICIO}/api/incidents/results/export`);
+      const response = await fetch(`${URL_SERVICIO}/api/incidents/results/export`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       if (!response.ok) {
         const payload = await response.json();
+        if (response.status === 401) setSession(null);
         throw new Error(payload.detail || 'No se pudo exportar el resultado.');
       }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'resultados-analisis-incidencias.csv';
+      link.download = 'results.csv';
       document.body.append(link);
       link.click();
       link.remove();
