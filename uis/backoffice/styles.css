@@ -132,6 +132,11 @@ td { padding: 14px 19px; border-top: 1px solid #f0f1f5; color: #72778b; font-siz
 .incident-main { padding-bottom: 28px; }
 .incident-privacy, .invalid-notice { margin: 6px 0 18px; padding: 13px 15px; border: 1px solid #f1dfb8; border-radius: 8px; background: #fff9ec; color: #785b21; font-size: 12px; line-height: 1.6; }
 .upload-card { padding-bottom: 18px; }
+.auth-card { padding-bottom: 10px; }
+.login-form { display: flex; align-items: end; gap: 12px; padding: 0 19px; }
+.login-form label { display: grid; flex: 1; gap: 5px; color: #686e82; font-size: 11px; }
+.login-form input { min-width: 0; height: 38px; padding: 0 10px; border: 1px solid #e1e3eb; border-radius: 6px; color: var(--ink); font: inherit; }
+.auth-card .card-heading { padding-bottom: 12px; }
 .upload-card .card-heading { padding-bottom: 12px; }
 .file-drop { display: grid; min-height: 150px; place-content: center; justify-items: center; gap: 8px; margin: 0 19px; padding: 20px; border: 1px dashed #b8b5e8; border-radius: 8px; background: #fafaff; color: #626780; text-align: center; cursor: pointer; }
 .file-drop:hover, .file-drop.dragging { border-color: var(--accent); background: #f3f2ff; }
@@ -162,6 +167,7 @@ td { padding: 14px 19px; border-top: 1px solid #f0f1f5; color: #72778b; font-siz
   .incident-breakdowns { grid-template-columns: 1fr; }
   .file-drop { margin: 0 13px; }
   .upload-actions { align-items: flex-start; flex-direction: column; margin-inline: 13px; }
+  .login-form { align-items: stretch; flex-direction: column; padding: 0 13px; }
   .results-heading { align-items: flex-start; flex-direction: column; }
   .results-heading .secondary-button { width: 100%; }
 }
