@@ -74,7 +74,7 @@ def main() -> int:
                 break
             print("Responde s o n, por favor.")
         if answer == "s":
-            output = Path("resultados.csv")
+            output = Path("results.csv")
             with output.open("w", encoding="utf-8", newline="") as stream:
                 write_results_csv(summary, stream)
             print(f"Resultados agregados exportados a {output.resolve()}")

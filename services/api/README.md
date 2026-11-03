@@ -1,6 +1,6 @@
 # API de análisis de incidencias de TrackFlow
 
-Puntos de acceso FastAPI para analizar archivos CSV localmente. La validación y la agregación comparten la implementación de `scripts/analyze.py`, ubicada en `app/domains/incidents/analysis.py`. Ni las respuestas de la API ni las exportaciones contienen filas de origen o correos de clientes.
+Puntos de acceso FastAPI para analizar archivos CSV localmente. El dominio de incidencias mantiene sus endpoints en `app/domains/incidents/router.py` y comparte la validación y agregación en `app/domains/incidents/analysis.py` con `scripts/analyze.py`. Ni las respuestas de la API ni las exportaciones contienen filas de origen o correos de clientes.
 
 ## Ejecución local
 
@@ -18,7 +18,7 @@ Requiere Python 3.14 o superior. La aplicación carga `services/api/.env` sin re
 La clave del ejemplo se genera en la sesión de terminal, sin imprimirla. Para conservar sesiones entre reinicios, proporciona la misma clave desde un gestor de secretos; generar otra invalida los tokens anteriores. No uses la clave de las pruebas.
 
 - `POST /api/incidents/analyze` requiere sesión, acepta un campo `file` en `multipart/form-data` y devuelve un resumen JSON agregado. Tamaño máximo: 25 MiB.
-- `GET /api/incidents/results/export` requiere sesión y devuelve únicamente el último análisis del usuario autenticado como CSV agregado. Los resultados se guardan en memoria por `user_uuid`, se pierden al reiniciar y se eliminan al borrar la cuenta.
+- `GET /api/incidents/results/export` requiere sesión y devuelve únicamente el último análisis del usuario autenticado como `results.csv` agregado. Los resultados se guardan en memoria por `user_uuid`, se pierden al reiniciar y se eliminan al borrar la cuenta.
 - `GET /health` ofrece una comprobación básica del estado del servicio y devuelve `{"estado":"correcto"}`.
 
 ## Autenticación y configuración
@@ -146,4 +146,4 @@ TinyDB es la única persistencia de usuarios y perfiles. No crees tablas `User` 
 
 Las filas CSV inválidas se cuentan y se excluyen del análisis. Encabezados ausentes o incorrectos, archivos vacíos y texto UTF-8 inválido devuelven `400`; una extensión incorrecta devuelve `415` y los archivos demasiado grandes, `413`.
 
-El frontend todavía no envía tokens: sus llamadas privadas devolverán `401` hasta la siguiente fase. No se implementan refresh tokens, recuperación de contraseña, MFA ni limitación de intentos de login. Antes de exponer la API a Internet, añade HTTPS, limitación de intentos y revisión de despliegue y permisos, especialmente del acceso autenticado al directorio completo de usuarios. Esta entrega no convierte el prototipo en una plataforma lista para producción.
+La página `uis/backoffice/incidents.html` inicia sesión en `/auth/login` y envía el JWT como Bearer al analizar y exportar. El token solo se conserva en memoria de la página, sin refresh; al cerrarla se pierde. No se implementan recuperación de contraseña, MFA ni limitación de intentos de login. Antes de exponer la API a Internet, añade HTTPS, limitación de intentos y revisión de despliegue y permisos, especialmente del acceso autenticado al directorio completo de usuarios. Esta entrega no convierte el prototipo en una plataforma lista para producción.

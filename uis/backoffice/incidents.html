@@ -26,17 +26,27 @@
       <section class="page-heading"><div><p class="eyebrow">EXPERIENCIA DEL CLIENTE</p><h1 id="page-title">Análisis de incidencias</h1><p class="page-description">Carga un CSV para validar su calidad y consultar métricas agregadas.</p></div></section>
       <section class="incident-privacy" aria-label="Aviso de privacidad"><strong>Datos sensibles:</strong> el CSV se envía al servidor configurado para su análisis. Los correos nunca se muestran ni se incluyen en la exportación de resultados. Usa solo un entorno autorizado.</section>
 
+      <section class="content-card auth-card" aria-labelledby="auth-title">
+        <div class="card-heading"><div><h2 id="auth-title">Acceso seguro</h2><p>Inicia sesión para analizar y exportar informes</p></div><button id="logout-button" class="secondary-button" type="button" hidden>Cerrar sesión</button></div>
+        <form id="login-form" class="login-form">
+          <label>Correo electrónico<input id="login-email" name="email" type="email" autocomplete="username" required></label>
+          <label>Contraseña<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+          <button id="login-button" class="primary-button" type="submit">Iniciar sesión</button>
+        </form>
+        <p id="auth-message" class="analysis-message" role="status" aria-live="polite">Inicia sesión con tu cuenta de TrackFlow para habilitar el análisis.</p>
+      </section>
+
       <section class="content-card upload-card" aria-labelledby="upload-title">
         <div class="card-heading"><div><h2 id="upload-title">Cargar reporte CSV</h2><p>Formato UTF-8 con encabezados de TrackFlow</p></div></div>
         <form id="upload-form" enctype="multipart/form-data">
           <label class="file-drop" for="csv-file"><span class="upload-icon" aria-hidden="true">↑</span><strong>Selecciona un archivo CSV</strong><span>o arrástralo hasta aquí · máximo 25 MiB</span><input id="csv-file" name="file" type="file" accept=".csv,text/csv" required></label>
-          <div class="upload-actions"><p id="file-name" class="file-name">Ningún archivo seleccionado</p><button id="analyze-button" class="primary-button" type="submit">Analizar archivo</button></div>
+          <div class="upload-actions"><p id="file-name" class="file-name">Ningún archivo seleccionado</p><button id="analyze-button" class="primary-button" type="submit" disabled>Analizar archivo</button></div>
         </form>
         <p id="analysis-message" class="analysis-message" role="status" aria-live="polite"></p>
       </section>
 
       <section id="results" class="results-section" hidden aria-labelledby="results-title">
-        <div class="results-heading"><div><p class="eyebrow">RESULTADO DEL ARCHIVO</p><h2 id="results-title">Resumen del análisis</h2><p id="result-source" class="page-description"></p></div><button id="export-button" class="secondary-button" type="button">Descargar CSV</button></div>
+        <div class="results-heading"><div><p class="eyebrow">RESULTADO DEL ARCHIVO</p><h2 id="results-title">Resumen del análisis</h2><p id="result-source" class="page-description"></p></div><button id="export-button" class="secondary-button" type="button" disabled>Descargar CSV</button></div>
         <div id="invalid-notice" class="invalid-notice" role="status"></div>
         <div id="summary-metrics" class="metrics-grid" aria-label="Métricas generales"></div>
         <div class="incident-breakdowns">

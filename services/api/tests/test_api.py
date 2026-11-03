@@ -47,6 +47,7 @@ class IncidentApiTests(support.ApiTestCase):
         self.assertNotIn("private@example.com", response.text)
         exported = self.client.get("/api/incidents/results/export", headers=self.headers)
         self.assertEqual(exported.status_code, 200)
+        self.assertIn('filename="results.csv"', exported.headers["content-disposition"])
         self.assertIn("total_registros,todos,1", exported.text)
         self.assertIn("categoría,Paquete perdido,1", exported.text)
         self.assertIn("estado,Cerrada,1", exported.text)
@@ -76,6 +77,11 @@ class IncidentApiTests(support.ApiTestCase):
     def test_export_before_analysis_returns_404(self):
         response = self.client.get("/api/incidents/results/export", headers=self.headers)
         self.assertEqual(response.status_code, 404)
+
+    def test_incident_routes_are_registered_from_domain_router(self):
+        paths = app.openapi()["paths"]
+        self.assertIn("/api/incidents/analyze", paths)
+        self.assertIn("/api/incidents/results/export", paths)
 
     def test_incident_routes_reject_missing_or_invalid_session(self):
         for headers in ({}, {"Authorization": "Bearer invalido"}):
