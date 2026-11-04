@@ -13,6 +13,8 @@ from fastapi.responses import JSONResponse
 from app.auth import router as auth_router
 from app.domains.incidents.router import router as incidents_router
 from app.domains.profiles import router as profiles_router
+from app.domains.suppliers.router import router as suppliers_router
+from app.domains.suppliers.storage import SupplierStore
 from app.domains.users import router as users_router
 from app.security import get_settings
 from app.storage import IdentityStore
@@ -21,12 +23,14 @@ from app.storage import IdentityStore
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     application.state.identity = IdentityStore(get_settings().db_path)
+    application.state.suppliers = SupplierStore(get_settings().supplier_db_path)
     application.state.summaries = {}
     application.state.summary_lock = Lock()
     try:
         yield
     finally:
         application.state.identity.close()
+        application.state.suppliers.close()
         application.state.summaries.clear()
 
 
@@ -34,6 +38,7 @@ app = FastAPI(title="Análisis de incidencias de TrackFlow", version="1.0.0", li
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)
+app.include_router(suppliers_router)
 app.include_router(incidents_router)
 
 

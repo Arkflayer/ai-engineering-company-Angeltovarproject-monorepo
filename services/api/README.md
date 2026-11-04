@@ -2,6 +2,12 @@
 
 Puntos de acceso FastAPI para analizar archivos CSV localmente. El dominio de incidencias mantiene sus endpoints en `app/domains/incidents/router.py` y comparte la validación y agregación en `app/domains/incidents/analysis.py` con `scripts/analyze.py`. Ni las respuestas de la API ni las exportaciones contienen filas de origen o correos de clientes.
 
+## Directorio de proveedores
+
+El dominio `app/domains/suppliers/` añade un directorio persistente en TinyDB con los campos y los 15 proveedores de demostración del briefing de TrackFlow. Ejecuta `uv run seed` desde `services/api/` para insertar solo nombres aún no presentes; volver a ejecutarlo no duplica proveedores y muestra el número añadido. La base usa `TRACKFLOW_SUPPLIER_DB_PATH` si se define; por defecto se guarda en `~/.local/share/trackflow/suppliers.json`, fuera del árbol servido por HTTP. `POST`, `GET`, `PATCH` y `DELETE /suppliers` requieren una sesión Bearer existente. `GET /suppliers/{id}/status-history` devuelve las transiciones de estado registradas; los cambios de estado no alteran `updated_at`, que corresponde a la última actualización de tarifa.
+
+El backoffice disponible en `uis/backoffice/suppliers.html` se conecta a `http://localhost:8000` por defecto. Si el host de API es otro, define `window.TRACKFLOW_API_URL` antes de `suppliers.js`. El directorio contiene datos de demostración; requiere una cuenta válida de la API y no implica integración con un sistema de compras real.
+
 ## Ejecución local
 
 ```sh
