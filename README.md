@@ -65,12 +65,12 @@ You are building **one company** across many milestones and projects. Each top-l
 
 ## Current status of the template
 
-> 💡 This repository began as a base template and now includes the TrackFlow company context, a Next.js frontend, a FastAPI backend, agent-development guidance, and static public and internal interface prototypes. Verify each application's actual integrations before claiming it is connected.
+> 💡 This repository began as a base template and now includes the TrackFlow company context, a Next.js frontend, a FastAPI backend, agent-development guidance, a static public website, and a Next.js internal backoffice. Verify each application's actual integrations before claiming it is connected.
 >
 > - Read `CONTEXT.md` and `memory-bank/` for company and technical context before starting work.
 > - `AGENTS.md`, `.github/instructions/` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
 > - The default frontend for new development is `uis/talent-pipeline-tracker/`, using Next.js, TypeScript and Tailwind. The backend uses FastAPI and uv in `services/api/`.
-> - The public website and backoffice are in `uis/website/` and `uis/backoffice/`; both are static prototypes.
+> - The public website is static in `uis/website/`; the internal backoffice is a Next.js app in `uis/backoffice/` with demo operations and authenticated supplier and incident workflows.
 > - Shared package metadata exists in `packages/shared/package.json` (`@repo/shared-types`), but no workspace runner is configured at root.
 
 ---

@@ -8,7 +8,7 @@ The applications stored here are:
 - **`website`** — the company's public-facing web presence.
 - **`backoffice`** — the internal admin application. This is the ideal place to develop multiple solutions within a single project: authentication, people management, operations management, internal communication, and other back-office capabilities.
 
-El prototipo inicial de operaciones internas de TrackFlow está disponible en [`backoffice/`](./backoffice/README.md). Es estático y usa datos de demostración claramente identificados; no tiene integración con una API en vivo.
+La aplicación de operaciones internas de TrackFlow está disponible en [`backoffice/`](./backoffice/README.md). Usa Next.js, datos de demostración en el dashboard y flujos autenticados de API para proveedores y análisis de incidencias.
 
 For new frontend work, reuse the Next.js application; do not create standalone HTML pages or JavaScript scripts. Change `website` or `backoffice` only when explicitly requested, keeping their static implementation. Follow [`AGENTS.md`](../AGENTS.md) for dependency approval and the [frontend instructions](../.github/instructions/frontend.instructions.md) for application conventions. Backend APIs and business logic belong in [`services/api/`](../services/api/README.md), using FastAPI and uv.
 
