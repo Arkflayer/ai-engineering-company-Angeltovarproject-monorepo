@@ -2,12 +2,14 @@
 
 ## Estado actual
 
+- El frontend activo para desarrollo nuevo es `uis/talent-pipeline-tracker/`, con Next.js App Router, React, TypeScript y Tailwind; el backend usa FastAPI con uv. Esta actualización de reglas no verifica ni añade integraciones entre ambos.
 - La web pública y el backoffice siguen siendo interfaces estáticas; el backend de incidencias y autenticación vive en `services/api/`.
 - AUTH-01 usa JWT stateless, usuarios y perfiles exclusivamente en TinyDB y no utiliza cookies ni sesiones de servidor. La clave y `ACCESS_TOKEN_EXPIRE_MINUTES` se exigen por entorno.
 - `/users` permite registro público solo en `POST`; las demás rutas de usuarios requieren JWT y GET por ID es solo propio/admin. Perfiles e incidencias requieren JWT; acceso ajeno devuelve `403`, y el perfil no se puede eliminar sin borrar su usuario.
 - Los hashes nuevos usan `bcrypt` de libpass. `/docs` sirvió Swagger UI; el flujo HTTP de registro, login y ruta protegida se verificó localmente con datos ficticios.
-- Verificación actual: 71 pruebas de API y 4 del analizador, todas aprobadas. No existe runner global de pruebas.
-- Cambios en `feature/auth-api`; no se creó commit ni pull request.
+- Verificación previa registrada: 71 pruebas de API y 4 del analizador, todas aprobadas; no se volvieron a ejecutar al actualizar instrucciones. No existe runner global de pruebas.
+- Las instrucciones globales y por carpeta establecen aprobación previa para añadir, eliminar o actualizar dependencias. La sincronización de paquetes ya declarados requiere lockfile compatible sin cambios de versiones.
+- Actualización de reglas y documentación en `migration-to-nextjs`; no se creó commit ni pull request. Las comprobaciones de carga automática en VS Code y comportamiento del agente en nuevas solicitudes quedan pendientes de validación manual.
 
 ## Próximos pasos previstos
 1. Adaptar las llamadas del backoffice al login y al envío de tokens sin inferir contratos de sistemas heredados que no están documentados.

@@ -2,11 +2,12 @@
 
 ## Stack actual
 
+- Frontend activo y destino predeterminado para nuevas funcionalidades: `uis/talent-pipeline-tracker/`, con Next.js App Router, React, TypeScript y Tailwind CSS como primera opción. Usa las versiones declaradas en su `package.json`, sin cambiarlas por iniciativa propia.
 - Sitio público: HTML, CSS y JavaScript sin framework en `uis/website/`; interfaz español/inglés, recursos locales y páginas estáticas.
 - Aplicación interna: prototipo HTML/CSS estático en `uis/backoffice/`, con diseño separado y datos de demostración.
-- Ejecución local: `npm run dev` desde la raíz usa `npx serve . -l 3000`.
+- Ejecución frontend desde la raíz: `npm --prefix uis/talent-pipeline-tracker run dev`; lint y build usan el mismo prefijo con `run lint` y `run build`. `npm run dev` desde la raíz usa `npx serve . -l 3000`: sirve archivos estáticos, no inicia Next.js. No lo uses para probar esta aplicación ni para descargar herramientas sin aprobación.
 - `packages/shared/` contiene una estructura inicial para un paquete TypeScript. No hay runner de workspaces ni suite de pruebas global configurada.
-- Backend: FastAPI en `services/api/`, con análisis de incidencias y autenticación JWT; usuarios y perfiles se guardan exclusivamente en TinyDB. Las interfaces aún no envían tokens. Toda API o lógica de servidor nueva pertenece a `services/`.
+- Backend: FastAPI en `services/api/`, con entornos y ejecución gestionados por uv y dependencias declaradas en `pyproject.toml`. Incluye análisis de incidencias y autenticación JWT; usuarios y perfiles se guardan exclusivamente en TinyDB. Toda API y lógica de negocio nueva pertenece a este backend; no la dupliques en Next.js. Comprueba la integración de cada interfaz antes de afirmar que está conectada.
 - AUTH-01 usa `OAuth2PasswordBearer`, `python-jose` y hashes nuevos `bcrypt` de libpass vía `from passlib.hash import bcrypt`; verifica hashes históricos `bcrypt_sha256`. Clave JWT obligatoria cargada desde `services/api/.env` (ignorado por Git) o entorno. `ACCESS_TOKEN_EXPIRE_MINUTES` también es obligatoria (sin fallback hardcodeado). Las rutas de datos requieren JWT y respetan la propiedad del recurso. Resultados de incidencias separados por `user_uuid` en memoria. No se usan sesiones ni cookies.
 - POST `/auth/login` acepta JSON `email`/`password` o formulario con `email` (alias OAuth2 `username`) y devuelve JWT. GET `/auth/me` requiere sesión y devuelve solo email, rol actual de TinyDB y perfil propio; perfil eliminado se representa como null sin recreación. Entradas inválidas no repiten contraseñas; Swagger mantiene su formulario OAuth2 y documenta ambos formatos de login.
 - `User` se valida en `services/api/app/models.py`: `id`, `email`, `hashed_password`, `is_active`, `role`, `created_at` UTC y `auth_version`. `UserRole` admite `admin`, `manager`, `user`. POST crea cuentas activas con rol `user`; solo el alta inicial local en una base vacía crea `admin`. Cuentas inactivas no pueden autenticarse. No se migran automáticamente registros históricos.
@@ -16,18 +17,20 @@
 - Rutas privadas sin sesión responden 401; el acceso autenticado a perfiles ajenos responde 403. Público: health, login, docs y POST /users. Las rutas de perfiles e incidencias están autenticadas.
 - `services/api/app/user_service.py` ofrece creación, búsqueda por ID/email, listado, actualización y eliminación sin depender de HTTP. Comparte `UserRegistration`, `UserUpdate` y `UserAdminUpdate` y delega en `IdentityStore`; las rutas, auth y el alta inicial usan el servicio. Las búsquedas ausentes devuelven `None`; actualizar/eliminar un usuario inexistente genera `UserNotFoundError`. La opción interna `allow_role_change` solo la habilita la ruta tras comprobar admin. Autorización y filtrado de respuestas permanecen en la API.
 - TinyDB requiere un solo proceso/worker. Su archivo de identidad predeterminado está fuera del monorepo servido por HTTP. Alta inicial local con `python -m app.bootstrap`; configuración y comandos en `services/api/README.md`.
-- Pruebas de API: `uv run --project services/api python -m unittest discover -s services/api/tests -v`; regresión del analizador: `uv run --project services/api python -m unittest discover -s scripts/tests -v`.
+- Pruebas de API: `uv run --locked --project services/api python -m unittest discover -s services/api/tests -v`; regresión del analizador: `uv run --locked --project services/api python -m unittest discover -s scripts/tests -v`. Estos comandos requieren un lockfile compatible; consulta antes de resolver versiones nuevas.
 
 ## Decisiones de arquitectura
 
-- Mantener web pública y backoffice en aplicaciones independientes bajo `uis/`, cada una con su propia entrada, documentación, estilos y responsabilidades.
-- Mantener la implementación de las interfaces estáticas pequeña, sin framework ni bundler si no existe una necesidad concreta.
+- Mantener las aplicaciones independientes bajo `uis/`, cada una con su propia entrada, documentación, estilos y responsabilidades. El destino predeterminado de desarrollo es `talent-pipeline-tracker`; intervenir en `website` o `backoffice` solo cuando se solicite expresamente.
+- Mantener las interfaces estáticas pequeñas, sin framework ni bundler nuevo; no aplicar esa restricción a la aplicación Next.js ni migrar los prototipos automáticamente.
 - Mantener APIs centralizadas en `services/` hasta que una razón técnica justifique separarlas.
 - Separar agentes de producto (`agents/`) y capacidades de producto (`skills/`) de la configuración de agentes de programación (`.agents/`).
 - Mantener `CONTEXT.md` y `CONTEXT.es.md` como briefing detallado de negocio. Esta memoria resume hechos y decisiones; no los reemplaza.
 
 ## Restricciones de implementación
 
+- Seguir `AGENTS.md` para aprobar cualquier alta, baja o actualización de dependencias. Reutilizar primero las existentes; sincronizar con `npm ci` o `uv sync --locked` solo sin cambios de manifiestos ni versiones y con lockfile compatible. Si falta o hay que modificarlo, consultar; no introducir gestores paralelos ni editar lockfiles manualmente.
+- Las instrucciones por ruta están en `.github/instructions/`; `.agents/rules/interfaces.md` y la skill `ui-delivery` se limitan a las dos interfaces estáticas. Conservar las instrucciones locales de Next.js.
 - No afirmar que hay autenticación, persistencia, integración con sistemas heredados, inventario real o seguimiento en vivo sin implementación comprobable.
 - Etiquetar los valores simulados y no incluir secretos, PII ni registros operativos reales.
 - Asegurar semántica HTML, accesibilidad de teclado, foco visible, diseño adaptable y rutas locales válidas.
