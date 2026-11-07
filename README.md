@@ -28,6 +28,18 @@ This repository is the **starter template** for transversal projects. You will w
 5. **Start implementing** in the right folder — do not dump everything in the root.
 6. **Document** what you add: each new app, service, agent, or pipeline gets a subfolder + README.
 
+### Active Development Stack
+
+New frontend work belongs in [`uis/talent-pipeline-tracker/`](./uis/talent-pipeline-tracker/README.md), using Next.js App Router, React, TypeScript and Tailwind CSS first. The backend is FastAPI with uv in [`services/api/`](./services/api/README.md). Follow [`AGENTS.md`](./AGENTS.md): adding, removing or updating dependencies requires explicit approval; syncing existing dependencies must preserve declared and locked versions.
+
+Start Next.js from the repository root:
+
+```sh
+npm --prefix uis/talent-pipeline-tracker run dev
+```
+
+The root `npm run dev` serves static files with `npx serve`; it does not start Next.js. Do not use it to download a tool without approval. The existing `website` and `backoffice` prototypes remain separate and should only be changed when explicitly requested.
+
 ---
 
 ## How to think about this monorepo
@@ -53,10 +65,11 @@ You are building **one company** across many milestones and projects. Each top-l
 
 ## Current status of the template
 
-> 💡 This repository began as a base template and now also includes the TrackFlow company context, agent-development guidance, and static public and internal interface prototypes. The interfaces do not have a live backend integration.
+> 💡 This repository began as a base template and now includes the TrackFlow company context, a Next.js frontend, a FastAPI backend, agent-development guidance, and static public and internal interface prototypes. Verify each application's actual integrations before claiming it is connected.
 >
 > - Read `CONTEXT.md` and `memory-bank/` for company and technical context before starting work.
-> - `AGENTS.md` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
+> - `AGENTS.md`, `.github/instructions/` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
+> - The default frontend for new development is `uis/talent-pipeline-tracker/`, using Next.js, TypeScript and Tailwind. The backend uses FastAPI and uv in `services/api/`.
 > - The public website and backoffice are in `uis/website/` and `uis/backoffice/`; both are static prototypes.
 > - Shared package metadata exists in `packages/shared/package.json` (`@repo/shared-types`), but no workspace runner is configured at root.
 

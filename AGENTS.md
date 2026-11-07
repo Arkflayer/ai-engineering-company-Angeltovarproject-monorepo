@@ -2,6 +2,20 @@
 
 Todo agente de programación que trabaje en este repositorio debe seguir este proceso de entrega. No debe pasar directamente de una solicitud a escribir código ni del código al commit.
 
+## Stack y destino del desarrollo
+
+- El frontend predeterminado para nuevas funcionalidades es `uis/talent-pipeline-tracker/`: Next.js App Router, React, TypeScript y Tailwind CSS como primera opción para estilos. Reutiliza sus componentes; no generes páginas HTML ni scripts JavaScript independientes para sustituir esta aplicación.
+- El backend es FastAPI en `services/api/`, con entornos y ejecución gestionados por uv. Mantén las API y la lógica de negocio en este backend; no crees una API paralela en Next.js para reemplazarlo.
+- `uis/website/` y `uis/backoffice/` son prototipos de interfaz estática. Trabaja allí solo si la solicitud los identifica expresamente; no los migres ni elimines como consecuencia de una tarea en Next.js.
+- Antes de crear archivos, determina la aplicación objetivo. Sigue las instrucciones de `.github/instructions/` para frontend y backend y las reglas de `.agents/rules/` para las interfaces estáticas. Conserva las instrucciones locales generadas por Next.js.
+
+## Dependencias y entornos
+
+- Solicita aprobación expresa antes de añadir, eliminar o actualizar cualquier dependencia, incluidas herramientas de desarrollo, frameworks de estilos y bibliotecas de componentes. Explica los paquetes concretos, la necesidad, las alternativas con código o herramientas existentes, el impacto y los archivos que cambiarían. Espera la respuesta antes de modificar manifiestos o instalar.
+- Puedes sincronizar las dependencias ya declaradas mediante `npm ci` y `uv sync --locked` cuando exista un lockfile compatible, sin cambiar manifiestos ni versiones. Si falta el lockfile o hay que generarlo, actualizarlo o resolver versiones nuevas, detente y consulta. No sustituyas una sincronización fallida por `npm install` o una resolución sin bloqueo.
+- No uses `pip install`, `uv add`, `npx` con descarga, generadores ni instaladores para eludir esta aprobación. Usa los ejecutables locales existentes; para Python usa uv, sin introducir entornos paralelos con pip, Poetry o Pipenv. No edites lockfiles manualmente.
+- Reutiliza primero las dependencias existentes y las bibliotecas estándar. Una solicitud de funcionalidad no autoriza por sí sola a instalar paquetes; documenta cualquier cambio de dependencias aprobado y sus verificaciones.
+
 ## Antes de modificar archivos
 
 1. Al inicio de cada sesión, lee `memory-bank/projectbrief.md`, `memory-bank/techContext.md` y `memory-bank/progress.md`. Después lee este archivo, el `README.md` raíz y los README de cada carpeta afectada, además de los archivos directamente relacionados con la tarea.

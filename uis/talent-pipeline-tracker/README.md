@@ -1,22 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is the active frontend and default destination for new UI development: [Next.js](https://nextjs.org) App Router, React, TypeScript and Tailwind CSS. It was bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). Use the versions declared in this application's package manifest.
 
 ## Getting Started
 
-First, run the development server:
+From the repository root, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm --prefix uis/talent-pipeline-tracker run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Inside this application folder, use `npm run dev`. The repository root's `npm run dev` serves static files and does not start Next.js. Use the URL printed by Next.js, normally [http://localhost:3000](http://localhost:3000); use another port if that port is occupied.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying [`src/app/page.tsx`](./src/app/page.tsx). The page auto-updates as you edit the file.
+
+## Development Rules
+
+- Follow [`AGENTS.md`](../../AGENTS.md), the [frontend instructions](../../.github/instructions/frontend.instructions.md), and the local [`AGENTS.md`](./AGENTS.md); preserve the Next.js-generated rules and consult its version-specific documentation before coding.
+- Reuse `src/app/`, `src/components/`, `src/services/`, `src/types/` and the `@/*` alias. Use typed React components, not standalone HTML pages or JavaScript scripts.
+- Prioritize Tailwind and existing styles. Do not add CSS frameworks, component libraries or other dependencies without explicit approval.
+- Keep backend APIs and business logic in [`services/api/`](../../services/api/README.md), using FastAPI and uv. Verify actual integration before describing it as implemented.
+- Follow the root dependency policy: existing packages may be synced with `npm ci` only with a compatible lockfile and no version changes; missing or outdated lockfiles require consultation, not a silent `npm install`.
+
+For code changes, run the relevant checks from the repository root:
+
+```sh
+npm --prefix uis/talent-pipeline-tracker run lint
+npm --prefix uis/talent-pipeline-tracker run build
+```
+
+Report failed or blocked checks without installing new packages automatically.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
