@@ -23,6 +23,12 @@ class Settings:
     secret_key: str
     token_minutes: int
     db_path: str
+    supplier_db_path: str
+
+
+def get_supplier_db_path() -> str:
+    default_path = Path.home() / ".local" / "share" / "trackflow" / "suppliers.json"
+    return os.environ.get("TRACKFLOW_SUPPLIER_DB_PATH", str(default_path))
 
 
 @lru_cache
@@ -40,7 +46,12 @@ def get_settings() -> Settings:
     if not 1 <= minutes <= 1440:
         raise RuntimeError("ACCESS_TOKEN_EXPIRE_MINUTES debe ser un entero entre 1 y 1440.")
     default_path = Path.home() / ".local" / "share" / "trackflow" / "identity.json"
-    return Settings(secret, minutes, os.environ.get("TRACKFLOW_DB_PATH", str(default_path)))
+    return Settings(
+        secret,
+        minutes,
+        os.environ.get("TRACKFLOW_DB_PATH", str(default_path)),
+        get_supplier_db_path(),
+    )
 
 
 def hash_password(password: str) -> str:

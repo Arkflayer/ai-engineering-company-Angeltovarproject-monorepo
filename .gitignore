@@ -1,6 +1,7 @@
 **/.venv/
 **/__pycache__/
 *.py[cod]
+*.egg-info/
 .env
 .env.*
 !services/api/.env.example
@@ -8,6 +9,9 @@ services/api/var/
 
 # Dependencias
 node_modules/
+uis/backoffice/.next/
+uis/backoffice/next-env.d.ts
+*.tsbuildinfo
 
 # Archivos de sistema
 .DS_Store
