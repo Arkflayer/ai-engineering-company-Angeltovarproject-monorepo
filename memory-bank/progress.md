@@ -1,4 +1,4 @@
-# TrackFlow — progreso del proyecto
+@# TrackFlow — progreso del proyecto
 
 ## Integración administrativa (implementada; validación frontend pendiente)
 
