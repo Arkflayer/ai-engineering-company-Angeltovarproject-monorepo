@@ -1,4 +1,13 @@
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_TRACKFLOW_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const configuredApiBaseUrl = process.env.NEXT_PUBLIC_TRACKFLOW_API_URL?.trim();
+
+export const API_BASE_URL = (configuredApiBaseUrl || (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : '')).replace(/\/$/, '');
+
+function getApiBaseUrl(): string {
+  if (!API_BASE_URL) {
+    throw new Error('NEXT_PUBLIC_TRACKFLOW_API_URL must be configured before using supplier or incident workflows.');
+  }
+  return API_BASE_URL;
+}
 
 export class ApiError extends Error {
   constructor(message: string, public readonly status: number) {
@@ -29,7 +38,7 @@ export interface LoginResponse {
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -44,14 +53,14 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
   if (init.body && !(typeof FormData !== 'undefined' && init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
+  const response = await fetch(`${getApiBaseUrl()}${path}`, { ...init, headers });
   if (!response.ok) throw await responseError(response, 'La solicitud no se completó');
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
 export async function apiBlob(path: string, token: string): Promise<Blob> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+  const response = await fetch(`${getApiBaseUrl()}${path}`, { headers: { Authorization: `Bearer ${token}` } });
   if (!response.ok) throw await responseError(response, 'No se pudo descargar el resultado');
   return response.blob();
 }

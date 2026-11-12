@@ -24,11 +24,11 @@ Los módulos de proveedores e incidencias necesitan una cuenta válida del backe
 Usa [`.env.example`](./.env.example) como referencia. Para desarrollo local, crea manualmente `.env.local` en esta carpeta (está ignorado por Git) y configura:
 
 ```dotenv
-NEXT_PUBLIC_TRACKFLOW_API_URL=http://localhost:8000
-NEXT_PUBLIC_API_URL=https://playground.4geeksacademy.com/tracker/api/v1
+NEXT_PUBLIC_TRACKFLOW_API_URL=<backend-origin>
+NEXT_PUBLIC_API_URL=<candidate-api-base-url>
 ```
 
-La primera URL sirve a proveedores e incidencias; la segunda conserva la integración actual del pipeline de candidaturas. Si el backend usa otro host, cambia la primera y añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
+La primera URL sirve a proveedores e incidencias; la segunda configura la integración del pipeline de candidaturas. Estos valores son marcadores, no endpoints operativos: sustituye ambos por las direcciones autorizadas de tu entorno. Para desarrollo local de proveedores e incidencias puedes usar `http://localhost:8000` en el archivo local `.env.local` (nunca lo subas). En producción, `NEXT_PUBLIC_TRACKFLOW_API_URL` es obligatoria para usar proveedores e incidencias; sin ella, las solicitudes fallan con un error de configuración en vez de dirigirse a localhost. Añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
 Inside this application folder, use `npm run dev`. The repository root's `npm run dev` serves static files and does not start Next.js. Use the URL printed by Next.js, normally [http://localhost:3000](http://localhost:3000); use another port if that port is occupied.
 
 You can start editing the page by modifying [`src/app/page.tsx`](./src/app/page.tsx). The page auto-updates as you edit the file.
