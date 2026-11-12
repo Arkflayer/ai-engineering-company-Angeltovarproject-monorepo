@@ -8,6 +8,27 @@ From the repository root, run the development server:
 npm --prefix uis/talent-pipeline-tracker run dev
 ```
 
+## Áreas administrativas
+
+Esta aplicación reúne las interfaces internas que antes estaban separadas entre el pipeline y `uis/backoffice/`:
+
+- `/` — pipeline de candidaturas (API configurada de forma independiente).
+- `/operations` — resumen operativo con **datos ilustrativos**, no conectado a envíos reales.
+- `/suppliers` — directorio autenticado de proveedores mediante la API FastAPI.
+- `/incidents` — análisis autenticado de CSV y exportación agregada mediante la API FastAPI.
+
+Los módulos de proveedores e incidencias necesitan una cuenta válida del backend. El token se conserva solo en memoria mientras la página está abierta. La interfaz no se conecta a un sistema de compras, WMS, transportistas ni seguimiento en vivo.
+
+### Variables de entorno
+
+Usa [`.env.example`](./.env.example) como referencia. Para desarrollo local, crea manualmente `.env.local` en esta carpeta (está ignorado por Git) y configura:
+
+```dotenv
+NEXT_PUBLIC_TRACKFLOW_API_URL=<backend-origin>
+NEXT_PUBLIC_API_URL=<candidate-api-base-url>
+```
+
+La primera URL sirve a proveedores e incidencias; la segunda configura la integración del pipeline de candidaturas. Estos valores son marcadores, no endpoints operativos: sustituye ambos por las direcciones autorizadas de tu entorno. Para desarrollo local de proveedores e incidencias puedes usar `http://localhost:8000` en el archivo local `.env.local` (nunca lo subas). En producción, `NEXT_PUBLIC_TRACKFLOW_API_URL` es obligatoria para usar proveedores e incidencias; sin ella, las solicitudes fallan con un error de configuración en vez de dirigirse a localhost. Añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
 Inside this application folder, use `npm run dev`. The repository root's `npm run dev` serves static files and does not start Next.js. Use the URL printed by Next.js, normally [http://localhost:3000](http://localhost:3000); use another port if that port is occupied.
 
 You can start editing the page by modifying [`src/app/page.tsx`](./src/app/page.tsx). The page auto-updates as you edit the file.
