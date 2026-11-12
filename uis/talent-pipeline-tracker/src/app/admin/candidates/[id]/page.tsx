@@ -1,4 +1,4 @@
-// src/app/candidates/[id]/page.tsx
+// src/app/admin/candidates/[id]/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -149,7 +149,7 @@ export default function CandidateDetailPage() {
   if (error) return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <ErrorMessage message={error} onRetry={loadCandidate} />
-      <button onClick={() => router.push('/')} className="mt-4 text-sm text-indigo-700 underline">
+      <button onClick={() => router.push('/admin/candidates')} className="mt-4 text-sm text-indigo-700 underline">
         Volver al listado
       </button>
     </div>
@@ -166,7 +166,7 @@ export default function CandidateDetailPage() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/admin/candidates')}
               className="text-sm text-indigo-700 hover:text-indigo-800 mb-1 block"
             >
               &larr; Volver al listado

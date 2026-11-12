@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navigation = [
-  { href: '/', label: 'Candidaturas', symbol: '◎' },
-  { href: '/operations', label: 'Operaciones', symbol: '▦' },
-  { href: '/suppliers', label: 'Proveedores', symbol: '⇄' },
-  { href: '/incidents', label: 'Incidencias', symbol: '!' },
+  { href: '/admin/candidates', label: 'Candidaturas', symbol: '◎' },
+  { href: '/admin/operations', label: 'Operaciones', symbol: '▦' },
+  { href: '/admin/suppliers', label: 'Proveedores', symbol: '⇄' },
+  { href: '/admin/incidents', label: 'Incidencias', symbol: '!' },
 ];
 
 export default function AdminShell({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -17,7 +17,7 @@ export default function AdminShell({ children }: Readonly<{ children: React.Reac
     <div className="admin-shell">
       <a className="admin-skip-link" href="#admin-main">Saltar al contenido</a>
       <aside className="admin-sidebar" aria-label="Navegación administrativa">
-        <Link className="admin-brand" href="/" aria-label="TrackFlow, administración">
+        <Link className="admin-brand" href="/admin/candidates" aria-label="TrackFlow, administración">
           <span className="admin-brand-mark" aria-hidden="true">T</span>
           <span>TrackFlow<span className="admin-brand-subtitle">ADMINISTRACIÓN</span></span>
         </Link>

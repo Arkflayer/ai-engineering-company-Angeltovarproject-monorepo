@@ -12,10 +12,16 @@ npm --prefix uis/talent-pipeline-tracker run dev
 
 Esta aplicación reúne las interfaces internas que antes estaban separadas entre el pipeline y `uis/backoffice/`:
 
-- `/` — pipeline de candidaturas (API configurada de forma independiente).
-- `/operations` — resumen operativo con **datos ilustrativos**, no conectado a envíos reales.
-- `/suppliers` — directorio autenticado de proveedores mediante la API FastAPI.
-- `/incidents` — análisis autenticado de CSV y exportación agregada mediante la API FastAPI.
+- `/admin/candidates` — pipeline de candidaturas (API configurada de forma independiente).
+- `/admin/operations` — resumen operativo con **datos ilustrativos**, no conectado a envíos reales.
+- `/admin/suppliers` — directorio autenticado de proveedores mediante la API FastAPI.
+- `/admin/incidents` — análisis autenticado de CSV y exportación agregada mediante la API FastAPI.
+
+## Website público
+
+- `/` — landing pública de TrackFlow, con selector de idioma español/inglés.
+- `/application` — formulario B2B de demostración, con validación local. No envía ni guarda los datos.
+- El prototipo estático original sigue disponible en [`uis/website/`](../website/README.md) como referencia; no se conecta con el formulario de Next.js ni con una API.
 
 Los módulos de proveedores e incidencias necesitan una cuenta válida del backend. El token se conserva solo en memoria mientras la página está abierta. La interfaz no se conecta a un sistema de compras, WMS, transportistas ni seguimiento en vivo.
 

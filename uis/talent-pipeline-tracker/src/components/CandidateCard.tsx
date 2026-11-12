@@ -13,7 +13,7 @@ interface Props {
 export default function CandidateCard({ candidate }: Props) {
   return (
     <Link
-      href={`/candidates/${candidate.id}`}
+      href={`/admin/candidates/${candidate.id}`}
       className="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-indigo-300 transition-all"
     >
       <div className="flex items-start justify-between">

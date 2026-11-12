@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "./admin.css";
-import AdminShell from "@/components/AdminShell";
+import "./public.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TrackFlow — Talent Pipeline Tracker",
-  description: "Herramienta interna de gestión de candidaturas — TrackFlow Tech",
+  title: "TrackFlow — Smart e-commerce logistics",
+  description: "Fulfillment, warehousing, last-mile delivery, and reverse logistics for e-commerce businesses.",
 };
 
 export default function RootLayout({
@@ -25,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="h-full antialiased">
-      <body className="min-h-full flex flex-col"><AdminShell>{children}</AdminShell></body>
+    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
