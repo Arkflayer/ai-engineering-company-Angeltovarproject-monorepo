@@ -38,7 +38,7 @@ Start Next.js from the repository root:
 npm --prefix uis/talent-pipeline-tracker run dev
 ```
 
-The root `npm run dev` serves static files with `npx serve`; it does not start Next.js. Do not use it to download a tool without approval. The existing `website` and `backoffice` prototypes remain separate and should only be changed when explicitly requested.
+The root `npm run dev` serves static files with `npx serve`; it does not start Next.js. Do not use it to download a tool without approval. The public `website` remains separate; internal candidate, operations, supplier and incident screens share the `talent-pipeline-tracker` Next.js app. `uis/backoffice/` is retained as a legacy reference, not the destination for new UI work.
 
 ---
 
@@ -65,12 +65,12 @@ You are building **one company** across many milestones and projects. Each top-l
 
 ## Current status of the template
 
-> 💡 This repository began as a base template and now includes the TrackFlow company context, a Next.js frontend, a FastAPI backend, agent-development guidance, a static public website, and a Next.js internal backoffice. Verify each application's actual integrations before claiming it is connected.
+> 💡 This repository began as a base template and now includes the TrackFlow company context, a unified Next.js internal frontend, a FastAPI backend, agent-development guidance and a static public website. Verify each application's actual integrations before claiming it is connected.
 >
 > - Read `CONTEXT.md` and `memory-bank/` for company and technical context before starting work.
 > - `AGENTS.md`, `.github/instructions/` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
 > - The default frontend for new development is `uis/talent-pipeline-tracker/`, using Next.js, TypeScript and Tailwind. The backend uses FastAPI and uv in `services/api/`.
-> - The public website is static in `uis/website/`; the internal backoffice is a Next.js app in `uis/backoffice/` with demo operations and authenticated supplier and incident workflows.
+> - The public website is static in `uis/website/`; internal candidate, operations, supplier and incident interfaces are consolidated in `uis/talent-pipeline-tracker/`. Operations metrics remain illustrative; supplier and incident workflows use the authenticated FastAPI backend. The former `uis/backoffice/` is retained as a legacy reference.
 > - Shared package metadata exists in `packages/shared/package.json` (`@repo/shared-types`), but no workspace runner is configured at root.
 
 ---

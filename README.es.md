@@ -53,11 +53,11 @@ Estás construyendo **una sola empresa** a lo largo de muchos hitos y proyectos.
 
 ## Estado actual de la plantilla
 
-> 💡 Este repositorio comenzó como una plantilla base y ahora también incluye el contexto de TrackFlow, guías para agentes de programación, un sitio público estático y un backoffice interno Next.js. El backoffice cuenta con flujos autenticados para proveedores e incidencias; el dashboard mantiene datos de demostración.
+> 💡 Este repositorio comenzó como una plantilla base y ahora también incluye el contexto de TrackFlow, guías para agentes de programación, un sitio público estático y una interfaz administrativa privada unificada en Next.js. Incluye el pipeline y flujos autenticados para proveedores e incidencias; el dashboard de operaciones mantiene datos de demostración. `uis/backoffice/` se conserva como referencia legacy.
 >
 > - Lee `CONTEXT.md` y `memory-bank/` para consultar el contexto empresarial y técnico antes de empezar.
 > - `AGENTS.md` y `.agents/` definen el flujo, las reglas y las instrucciones reutilizables para agentes de programación; son distintos del código de producto en `agents/` y `skills/`.
-> - El sitio público está en `uis/website/`; el backoffice Next.js está en `uis/backoffice/`. Consulta el README de cada app para ejecutarlos.
+> - El sitio público está en `uis/website/`; la interfaz administrativa Next.js está en `uis/talent-pipeline-tracker/`. Consulta el README de cada app para ejecutarlos.
 > - Existe metadata del paquete compartido en `packages/shared/package.json` (`@repo/shared-types`), pero aún no hay runner de workspace en raíz.
 
 ---
