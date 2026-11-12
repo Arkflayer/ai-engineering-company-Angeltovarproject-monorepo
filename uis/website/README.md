@@ -10,7 +10,7 @@ Desde la raíz del repositorio:
 npm run dev
 ```
 
-Abre `http://localhost:3000/`; la página de entrada de la raíz redirige a `uis/website/`. También puedes abrir directamente `http://localhost:3000/uis/website/`. El backoffice Next.js se ejecuta por separado siguiendo [`uis/backoffice/README.md`](../backoffice/README.md). El selector de idioma permite elegir español e inglés. Tailwind y Google Fonts se cargan desde CDN externos; los archivos CSS y JavaScript locales permanecen en este directorio.
+Abre `http://localhost:3000/`; la página de entrada de la raíz redirige a `uis/website/`. También puedes abrir directamente `http://localhost:3000/uis/website/`. La interfaz administrativa Next.js unificada se ejecuta por separado siguiendo [`uis/talent-pipeline-tracker/README.md`](../talent-pipeline-tracker/README.md); `uis/backoffice/` se conserva como referencia legacy. El selector de idioma permite elegir español e inglés. Tailwind y Google Fonts se cargan desde CDN externos; los archivos CSS y JavaScript locales permanecen en este directorio.
 
 ## Limitaciones
 

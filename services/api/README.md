@@ -6,7 +6,7 @@ Puntos de acceso FastAPI para analizar archivos CSV localmente. El dominio de in
 
 El dominio `app/domains/suppliers/` añade un directorio persistente en TinyDB con los campos y los 15 proveedores de demostración del briefing de TrackFlow. Ejecuta `uv run seed` desde `services/api/` para insertar solo nombres aún no presentes; volver a ejecutarlo no duplica proveedores y muestra el número añadido. La base usa `TRACKFLOW_SUPPLIER_DB_PATH` si se define; por defecto se guarda en `~/.local/share/trackflow/suppliers.json`, fuera del árbol servido por HTTP. `POST`, `GET`, `PATCH` y `DELETE /suppliers` requieren una sesión Bearer existente. `GET /suppliers/{id}/status-history` devuelve las transiciones de estado registradas; los cambios de estado no alteran `updated_at`, que corresponde a la última actualización de tarifa.
 
-El backoffice Next.js en `uis/backoffice/` sirve el directorio en `/suppliers` y se conecta a `http://localhost:8000` por defecto. Si el host de API es otro, configura `NEXT_PUBLIC_TRACKFLOW_API_URL` en el entorno del frontend. El directorio contiene datos de demostración; requiere una cuenta válida de la API y no implica integración con un sistema de compras real.
+La app administrativa Next.js unificada en `uis/talent-pipeline-tracker/` sirve el directorio en `/suppliers` y se conecta a `http://localhost:8000` por defecto. Si el host de API es otro, configura `NEXT_PUBLIC_TRACKFLOW_API_URL` en el entorno del frontend. El directorio contiene datos de demostración; requiere una cuenta válida de la API y no implica integración con un sistema de compras real.
 
 ## Ejecución local
 
@@ -32,7 +32,7 @@ La clave del ejemplo se genera en la sesión de terminal, sin imprimirla. Para c
 - `TRACKFLOW_JWT_SECRET`: obligatorio, al menos 32 bytes aleatorios; guárdalo en `services/api/.env` o inyéctalo desde un gestor de secretos. La API no arranca si falta o es demasiado corto. Nunca lo escribas en el código ni lo guardes en Git.
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: obligatoria; la plantilla `.env.example` propone `30`. Admite enteros entre 1 y 1440. La API no arranca si falta: no hay expiración hardcodeada ni alias alternativo.
 - `TRACKFLOW_DB_PATH`: ubicación del JSON de TinyDB. Por defecto, `~/.local/share/trackflow/identity.json`, fuera del monorepo que sirve el frontend estático. Si cambias la ruta, usa un directorio privado fuera de cualquier árbol servido por HTTP o versionado. El archivo nuevo se crea con permisos `0600` y su directorio con `0700`.
-- `TRACKFLOW_UI_ORIGINS`: orígenes CORS explícitos separados por comas; por defecto `http://localhost:3000,http://127.0.0.1:3000`. Se admiten `Authorization`, `Content-Type` y los métodos de gestión. CORS no sustituye a la autenticación.
+- `TRACKFLOW_UI_ORIGINS`: orígenes CORS explícitos separados por comas; la plantilla `.env.example` incluye `http://localhost:3000,http://127.0.0.1:3000`, que también son los valores predeterminados. Si el frontend usa otro host o puerto, incluye el origen exacto (protocolo, host y puerto, sin ruta). Se admiten `Authorization`, `Content-Type` y los métodos de gestión. CORS no sustituye a la autenticación.
 
 `POST /auth/login` es público y acepta `application/json` con `email` y `password`:
 
@@ -152,4 +152,4 @@ TinyDB es la única persistencia de usuarios y perfiles. No crees tablas `User` 
 
 Las filas CSV inválidas se cuentan y se excluyen del análisis. Encabezados ausentes o incorrectos, archivos vacíos y texto UTF-8 inválido devuelven `400`; una extensión incorrecta devuelve `415` y los archivos demasiado grandes, `413`.
 
-La página Next.js `uis/backoffice/src/app/incidents/` inicia sesión en `/auth/login` y envía el JWT como Bearer al analizar y exportar. El token solo se conserva en memoria de la página, sin refresh; al cerrarla se pierde. No se implementan recuperación de contraseña, MFA ni limitación de intentos de login. Antes de exponer la API a Internet, añade HTTPS, limitación de intentos y revisión de despliegue y permisos, especialmente del acceso autenticado al directorio completo de usuarios. Esta entrega no convierte el prototipo en una plataforma lista para producción.
+La página Next.js `uis/talent-pipeline-tracker/src/app/incidents/` inicia sesión en `/auth/login` y envía el JWT como Bearer al analizar y exportar. El token solo se conserva en memoria de la página, sin refresh; al cerrarla se pierde. No se implementan recuperación de contraseña, MFA ni limitación de intentos de login. Antes de exponer la API a Internet, añade HTTPS, limitación de intentos y revisión de despliegue y permisos, especialmente del acceso autenticado al directorio completo de usuarios. Esta entrega no convierte el prototipo en una plataforma lista para producción.

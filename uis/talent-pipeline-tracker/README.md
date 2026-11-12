@@ -8,6 +8,33 @@ From the repository root, run the development server:
 npm --prefix uis/talent-pipeline-tracker run dev
 ```
 
+## Áreas administrativas
+
+Esta aplicación reúne las interfaces internas que antes estaban separadas entre el pipeline y `uis/backoffice/`:
+
+- `/admin/candidates` — pipeline de candidaturas (API configurada de forma independiente).
+- `/admin/operations` — resumen operativo con **datos ilustrativos**, no conectado a envíos reales.
+- `/admin/suppliers` — directorio autenticado de proveedores mediante la API FastAPI.
+- `/admin/incidents` — análisis autenticado de CSV y exportación agregada mediante la API FastAPI.
+
+## Website público
+
+- `/` — landing pública de TrackFlow, con selector de idioma español/inglés.
+- `/application` — formulario B2B de demostración, con validación local. No envía ni guarda los datos.
+- El prototipo estático original sigue disponible en [`uis/website/`](../website/README.md) como referencia; no se conecta con el formulario de Next.js ni con una API.
+
+Los módulos de proveedores e incidencias necesitan una cuenta válida del backend. El token se conserva solo en memoria mientras la página está abierta. La interfaz no se conecta a un sistema de compras, WMS, transportistas ni seguimiento en vivo.
+
+### Variables de entorno
+
+Usa [`.env.example`](./.env.example) como referencia. Para desarrollo local, crea manualmente `.env.local` en esta carpeta (está ignorado por Git) y configura:
+
+```dotenv
+NEXT_PUBLIC_TRACKFLOW_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=https://playground.4geeksacademy.com/tracker/api/v1
+```
+
+La primera URL sirve a proveedores e incidencias; la segunda conserva la integración actual del pipeline de candidaturas. Si el backend usa otro host, cambia la primera y añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
 Inside this application folder, use `npm run dev`. The repository root's `npm run dev` serves static files and does not start Next.js. Use the URL printed by Next.js, normally [http://localhost:3000](http://localhost:3000); use another port if that port is occupied.
 
 You can start editing the page by modifying [`src/app/page.tsx`](./src/app/page.tsx). The page auto-updates as you edit the file.
