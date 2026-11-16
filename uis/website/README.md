@@ -1,17 +1,26 @@
 # Sitio web público de TrackFlow
 
-Sitio público estático de TrackFlow, construido con HTML, CSS y JavaScript en el navegador. Las páginas son `index.html` (página principal de la empresa y sus servicios) y `application.html` (formulario de consulta para posibles clientes). `lang.js`, `styles.css` y `validation.js` son recursos locales compartidos.
+Aplicación pública de TrackFlow construida con **Next.js App Router, React, TypeScript y Tailwind CSS 4**. Contiene la landing de la empresa en `/` y el formulario B2B de demostración en `/application`, con interfaz en español e inglés. Es un proyecto independiente del backoffice privado ubicado en [`../backoffice/`](../backoffice/README.md).
 
 ## Ejecución local
 
 Desde la raíz del repositorio:
 
 ```sh
-npm run dev
+npm --prefix uis/website ci
+npm --prefix uis/website run dev
 ```
 
-Abre `http://localhost:3000/`; la página de entrada de la raíz redirige a `uis/website/`. También puedes abrir directamente `http://localhost:3000/uis/website/`. El backoffice Next.js se ejecuta por separado siguiendo [`uis/backoffice/README.md`](../backoffice/README.md). El selector de idioma permite elegir español e inglés. Tailwind y Google Fonts se cargan desde CDN externos; los archivos CSS y JavaScript locales permanecen en este directorio.
+Abre la URL que muestra Next.js, normalmente <http://localhost:3000>. Ejecuta lint, comprobación de tipos y compilación con:
+
+```sh
+npm --prefix uis/website run lint
+npm --prefix uis/website run typecheck
+npm --prefix uis/website run build
+```
+
+El selector de idioma permite elegir español e inglés. Para ejecutar simultáneamente el backoffice, usa otro puerto, por ejemplo `npm --prefix uis/backoffice run dev -- --port 3001`.
 
 ## Limitaciones
 
-El sitio público es un prototipo estático. La validación del formulario se ejecuta en el navegador; el formulario no envía datos a un backend ni guarda consultas. No hay conexión con sistemas de seguimiento, inventario o clientes.
+La landing y el formulario son un prototipo. El formulario valida los datos en el navegador, pero **no envía ni almacena solicitudes**; no introduzcas información personal o confidencial. El sitio no está conectado a sistemas de seguimiento, inventario o clientes. Algunas imágenes del prototipo se cargan desde servicios externos.

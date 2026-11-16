@@ -4,21 +4,19 @@ This folder contains **all projects with a user interface** for the cross-functi
 
 The applications stored here are:
 
-- **[`talent-pipeline-tracker`](./talent-pipeline-tracker/README.md)** — the active frontend and default destination for new UI development, using Next.js App Router, React, TypeScript and Tailwind CSS first.
-- **`website`** — the company's public-facing web presence.
-- **`backoffice`** — the internal admin application. This is the ideal place to develop multiple solutions within a single project: authentication, people management, operations management, internal communication, and other back-office capabilities.
+- **[`website`](./website/README.md)** — the public-facing Next.js website and B2B demo application form.
+- **[`backoffice`](./backoffice/README.md)** — the single private Next.js admin app, with operations, candidates, suppliers and incidents.
 
-La aplicación de operaciones internas de TrackFlow está disponible en [`backoffice/`](./backoffice/README.md). Usa Next.js, datos de demostración en el dashboard y flujos autenticados de API para proveedores y análisis de incidencias.
+For internal UI work, reuse `backoffice`; do not create a second admin project under `uis/`. Keep the public `website` separate. Follow [`AGENTS.md`](../AGENTS.md) for dependency approval and the [frontend instructions](../.github/instructions/frontend.instructions.md) for application conventions. Backend APIs and business logic belong in [`services/api/`](../services/api/README.md), using FastAPI and uv.
 
-For new frontend work, reuse the Next.js application; do not create standalone HTML pages or JavaScript scripts. Change `website` or `backoffice` only when explicitly requested, keeping their static implementation. Follow [`AGENTS.md`](../AGENTS.md) for dependency approval and the [frontend instructions](../.github/instructions/frontend.instructions.md) for application conventions. Backend APIs and business logic belong in [`services/api/`](../services/api/README.md), using FastAPI and uv.
-
-From the repository root, start Next.js with:
+Run each app separately from the repository root:
 
 ```sh
-npm --prefix uis/talent-pipeline-tracker run dev
+npm --prefix uis/website run dev
+npm --prefix uis/backoffice run dev
 ```
 
-The root `npm run dev` starts a static file server, not this application. See the application's README for lint and build commands.
+Each app has its own package manifest, lockfile, lint, typecheck (where configured) and build commands.
 
 Organize `uis/` by **different concerns** — each subfolder covers a distinct area of the company (for example, public web vs internal operations) and includes its own technical and functional documentation.
 

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import type { Candidate, CandidateStatus, CandidateStage } from '@/types';
+import type { Candidate } from '@/types';
 import { STATUS_LABELS, STAGE_LABELS } from '@/types';
 import { fetchCandidates } from '@/services/api';
 import CandidateCard from '@/components/CandidateCard';
@@ -49,7 +49,7 @@ function HomePageContent() {
   }, []);
 
   useEffect(() => {
-    loadCandidates();
+    void Promise.resolve().then(loadCandidates);
   }, [loadCandidates]);
 
   // Actualizar query params sin recargar
@@ -105,9 +105,10 @@ function HomePageContent() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <div id="candidate-content" className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-20 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-indigo-700 focus:shadow" href="#candidate-content">Saltar al contenido</a>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">TrackFlow — Talent Pipeline</h1>
@@ -238,7 +239,7 @@ function HomePageContent() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 
