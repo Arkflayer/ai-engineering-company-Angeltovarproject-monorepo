@@ -1,19 +1,19 @@
 @# TrackFlow — progreso del proyecto
 
-## Integración administrativa (implementada; validación frontend pendiente)
+## Integración administrativa (validación pendiente)
 
 - PR #5 (`feat(suppliers): add supplier directory`) verificado como fusionado en `main`; repositorio local actualizado desde `main` antes de comenzar esta integración.
 - Rama de trabajo: `feature/unified-admin-ui` (sin commit ni push).
-- Se están unificando las pantallas internas bajo `uis/talent-pipeline-tracker/`: pipeline `/`, operaciones `/operations`, proveedores `/suppliers` e incidencias `/incidents`.
-- Las métricas operativas son ilustrativas; proveedores e incidencias usan autenticación FastAPI. El antiguo `uis/backoffice/` se conserva como referencia, sin borrarlo.
-- Las plantillas `.env.example` documentan configuración; el archivo local `.env.local` debe crearse manualmente y no compartirse.
-- Se creó `uis/talent-pipeline-tracker/.env.example` y se permitió su seguimiento con una excepción en el `.gitignore` del tracker; `.env.local` sigue ignorado. `services/api/.env.example` documenta `TRACKFLOW_UI_ORIGINS`.
-- Se ejecutaron 76 pruebas de API y 7 del analizador; todas pasaron. Los checks de lint y build frontend no se pudieron ejecutar porque Node.js/npm no están disponibles en este entorno. No se cambiaron dependencias.
+- En la rama `feature/unified-admin-ui` se consolidan las interfaces privadas en `uis/backoffice/`: operaciones `/`, candidaturas `/candidates` y `/candidates/[id]`, proveedores `/suppliers` e incidencias `/incidents`.
+- Las métricas de operaciones son ilustrativas; proveedores e incidencias usan autenticación FastAPI. La aplicación de candidaturas mantiene su API configurada por separado.
+- Los `.env.example` documentan configuración; los archivos locales `.env.local` deben crearse manualmente y no compartirse. `services/api/.env.example` documenta `TRACKFLOW_UI_ORIGINS`.
+- Se ejecutaron anteriormente 76 pruebas de API y 7 del analizador; todas pasaron. La validación de lint/build frontend para esta reorganización está pendiente.
+- Se añadieron Tailwind CSS 4.3.3 y su plugin PostCSS a las dependencias de `backoffice`, a petición/aprobación del usuario; `npm ci` sincronizó el lockfile correctamente.
 
 ## Estado actual
 
-- El frontend activo para desarrollo nuevo es `uis/talent-pipeline-tracker/`, con Next.js App Router, React, TypeScript y Tailwind; el backend usa FastAPI con uv. Esta actualización de reglas no verifica ni añade integraciones entre ambos.
-- La web pública sigue siendo estática. La app administrativa unificada usa Next.js App Router; el dashboard de operaciones es ilustrativo y proveedores/análisis CSV consumen la API autenticada en `services/api/`.
+- El frontend administrativo activo para nuevas interfaces es `uis/backoffice/`, con Next.js App Router, React, TypeScript y Tailwind; el backend usa FastAPI con uv.
+- La web pública sigue siendo estática. En `backoffice`, el dashboard de operaciones es ilustrativo y proveedores/análisis CSV consumen la API autenticada en `services/api/`.
 - AUTH-01 usa JWT stateless, usuarios y perfiles exclusivamente en TinyDB y no utiliza cookies ni sesiones de servidor. La clave y `ACCESS_TOKEN_EXPIRE_MINUTES` se exigen por entorno.
 - `/users` permite registro público solo en `POST`; las demás rutas de usuarios requieren JWT y GET por ID es solo propio/admin. Perfiles e incidencias requieren JWT; acceso ajeno devuelve `403`, y el perfil no se puede eliminar sin borrar su usuario.
 - Los hashes nuevos usan `bcrypt` de libpass. `/docs` sirvió Swagger UI; el flujo HTTP de registro, login y ruta protegida se verificó localmente con datos ficticios.
@@ -23,11 +23,10 @@
 - Las comprobaciones de carga automática en VS Code y comportamiento del agente en nuevas solicitudes quedan pendientes de validación manual.
 
 ## Próximos pasos previstos
-1. Cuando Node.js/npm estén disponibles, instalar exclusivamente desde el lockfile (`npm ci`) y ejecutar lint/build; validar visualmente la interfaz unificada. Publicar solo tras autorización.
-2. Validar en navegador los flujos de proveedores y análisis CSV contra la API local, con una cuenta y archivos de prueba ficticios.
-3. Para una primera integración, acordar fuente de datos, propietario, contrato API, autenticación, privacidad, manejo de errores y criterios de aceptación antes de implementarla bajo `services/`.
-4. Validar la interfaz administrativa con usuarios de operaciones y decidir qué módulo aporta más valor (inventario, transportistas, devoluciones o experiencia de cliente).
-5. Establecer pruebas automatizadas y observabilidad conforme se incorporen servicios reales.
+1. Ejecutar lint, typecheck y build desde `uis/backoffice/`; validar visualmente las cuatro áreas y revisar compatibilidad de la versión destino de Next.js.
+2. Consolidación de interfaces privadas en `uis/backoffice/`; en `uis/` deben quedar únicamente `website/` y `backoffice/`.
+3. Validar en navegador los flujos de proveedores y análisis CSV contra la API local, con una cuenta y archivos de prueba ficticios.
+4. Para nuevas integraciones, acordar fuente de datos, propietario, contrato API, autenticación, privacidad, manejo de errores y criterios de aceptación antes de implementarlas bajo `services/`.
 
 ## Limitaciones conocidas
 

@@ -4,7 +4,8 @@
 
 Respeta las responsabilidades existentes de las carpetas principales:
 
-- `uis/talent-pipeline-tracker/` — frontend activo y destino predeterminado de nuevas funcionalidades; interfaz administrativa privada unificada para pipeline, operaciones, proveedores e incidencias, con Next.js App Router, React, TypeScript y Tailwind CSS. `uis/backoffice/` se conserva como referencia legacy; el nuevo desarrollo interno va en el tracker.
+- `uis/backoffice/` — única interfaz administrativa privada y destino predeterminado de nuevas funcionalidades; reúne candidaturas, operaciones, proveedores e incidencias mediante Next.js App Router, React, TypeScript y Tailwind CSS.
+- `uis/website/` — sitio público e interfaces web para clientes.
 - `uis/website/` — sitio público e interfaces web para clientes.
 - `services/` — API de backend y servicios en segundo plano. Mantén las API centralizadas hasta que exista una razón clara para separarlas.
 - `agents/` — asistentes de IA concretos, con instrucciones, herramientas, pruebas y un README por agente.
@@ -15,7 +16,7 @@ Respeta las responsabilidades existentes de las carpetas principales:
 
 ## Implementación conocida actualmente
 
-- La aplicación Next.js usa `src/app/`, componentes React tipados y Tailwind como primera opción para estilos. Desde la raíz se inicia con `npm --prefix uis/talent-pipeline-tracker run dev`; lint y build usan ese prefijo con `run lint` y `run build`.
+- La aplicación Next.js usa `src/app/`, componentes React tipados y Tailwind como primera opción para estilos. Desde la raíz se inicia con `npm --prefix uis/backoffice run dev`; lint, typecheck y build usan ese prefijo con `run lint`, `run typecheck` y `run build`.
 - El sitio público de TrackFlow es estático y usa HTML, CSS y JavaScript sin framework en `uis/website/`; ofrece la interfaz en español e inglés y usa recursos locales.
 - El `package.json` de la raíz inicia un servidor estático con `npx serve . -l 3000`, no Next.js. No hay ejecutor de workspaces ni suite global configurada; la API sí tiene pruebas unittest y el frontend tiene scripts de lint y build.
 - El backend centralizado usa FastAPI en `services/api/`, con uv para entornos y ejecución y `pyproject.toml` como manifiesto de referencia. Los comandos y requisitos locales están en [`services/api/README.md`](../services/api/README.md); usa ejecución bloqueada (`uv run --locked`) para evitar resolver versiones sin aprobación.

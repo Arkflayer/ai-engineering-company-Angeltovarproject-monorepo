@@ -30,15 +30,15 @@ This repository is the **starter template** for transversal projects. You will w
 
 ### Active Development Stack
 
-New frontend work belongs in [`uis/talent-pipeline-tracker/`](./uis/talent-pipeline-tracker/README.md), using Next.js App Router, React, TypeScript and Tailwind CSS first. The backend is FastAPI with uv in [`services/api/`](./services/api/README.md). Follow [`AGENTS.md`](./AGENTS.md): adding, removing or updating dependencies requires explicit approval; syncing existing dependencies must preserve declared and locked versions.
+New frontend work belongs in [`uis/backoffice/`](./uis/backoffice/README.md), the single private Next.js app for operations, candidates, suppliers and incidents. The public site remains in [`uis/website/`](./uis/website/README.md), and the backend is FastAPI with uv in [`services/api/`](./services/api/README.md). There are only two UI projects in `uis/`: `website` and `backoffice`. Follow [`AGENTS.md`](./AGENTS.md): adding, removing or updating dependencies requires explicit approval; syncing existing dependencies must preserve declared and locked versions.
 
 Start Next.js from the repository root:
 
 ```sh
-npm --prefix uis/talent-pipeline-tracker run dev
+npm --prefix uis/backoffice run dev
 ```
 
-The root `npm run dev` serves static files with `npx serve`; it does not start Next.js. Do not use it to download a tool without approval. The public `website` remains separate; internal candidate, operations, supplier and incident screens share the `talent-pipeline-tracker` Next.js app. `uis/backoffice/` is retained as a legacy reference, not the destination for new UI work.
+The root `npm run dev` serves static files with `npx serve`; it does not start Next.js. Do not use it to download a tool without approval.
 
 ---
 
@@ -69,8 +69,8 @@ You are building **one company** across many milestones and projects. Each top-l
 >
 > - Read `CONTEXT.md` and `memory-bank/` for company and technical context before starting work.
 > - `AGENTS.md`, `.github/instructions/` and `.agents/` define the development-agent workflow, rules, and reusable instructions; these are separate from product code in `agents/` and `skills/`.
-> - The default frontend for new development is `uis/talent-pipeline-tracker/`, using Next.js, TypeScript and Tailwind. The backend uses FastAPI and uv in `services/api/`.
-> - The public website is static in `uis/website/`; internal candidate, operations, supplier and incident interfaces are consolidated in `uis/talent-pipeline-tracker/`. Operations metrics remain illustrative; supplier and incident workflows use the authenticated FastAPI backend. The former `uis/backoffice/` is retained as a legacy reference.
+> - The default frontend for new development is `uis/backoffice/`, using Next.js, TypeScript and Tailwind. The backend uses FastAPI and uv in `services/api/`.
+> - `uis/` has two projects: the public static website at `uis/website/` and the private backoffice at `uis/backoffice/`. The backoffice includes candidate, operations, supplier and incident screens. Operations metrics remain illustrative; supplier and incident workflows use the authenticated FastAPI backend.
 > - Shared package metadata exists in `packages/shared/package.json` (`@repo/shared-types`), but no workspace runner is configured at root.
 
 ---

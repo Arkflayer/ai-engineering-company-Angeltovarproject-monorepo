@@ -66,12 +66,12 @@ export default function CandidateDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    loadCandidate();
+    void Promise.resolve().then(loadCandidate);
   }, [loadCandidate]);
 
   useEffect(() => {
     if (candidate) {
-      loadNotes();
+      void Promise.resolve().then(loadNotes);
     }
   }, [candidate, loadNotes]);
 
@@ -149,7 +149,7 @@ export default function CandidateDetailPage() {
   if (error) return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <ErrorMessage message={error} onRetry={loadCandidate} />
-      <button onClick={() => router.push('/')} className="mt-4 text-sm text-indigo-700 underline">
+      <button onClick={() => router.push('/candidates')} className="mt-4 text-sm text-indigo-700 underline">
         Volver al listado
       </button>
     </div>
@@ -160,13 +160,14 @@ export default function CandidateDetailPage() {
   const stageValues = Object.entries(STAGE_LABELS) as [CandidateStage, string][];
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <div id="candidate-content" className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
+        <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-20 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-indigo-700 focus:shadow" href="#candidate-content">Saltar al contenido</a>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/candidates')}
               className="text-sm text-indigo-700 hover:text-indigo-800 mb-1 block"
             >
               &larr; Volver al listado
@@ -381,6 +382,6 @@ export default function CandidateDetailPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

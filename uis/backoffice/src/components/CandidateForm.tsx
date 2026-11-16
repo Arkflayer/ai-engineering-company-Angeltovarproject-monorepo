@@ -1,11 +1,10 @@
 // src/components/CandidateForm.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type {
   Candidate,
   CreateCandidatePayload,
-  UpdateCandidatePayload,
   CandidateStatus,
   CandidateStage,
 } from '@/types';
@@ -30,28 +29,21 @@ const emptyForm: CreateCandidatePayload = {
 
 export default function CandidateForm({ candidate, onSuccess, onCancel }: Props) {
   const isEditing = !!candidate;
-  const [form, setForm] = useState<CreateCandidatePayload>(emptyForm);
+  const [form, setForm] = useState<CreateCandidatePayload>(() => candidate ? {
+    full_name: candidate.full_name,
+    email: candidate.email,
+    phone: candidate.phone,
+    position: candidate.position,
+    linkedin_url: candidate.linkedin_url,
+    cv_url: candidate.cv_url,
+    experience_years: candidate.experience_years,
+  } : emptyForm);
   const [status, setStatus] = useState<CandidateStatus | ''>(candidate?.status ?? '');
   const [stage, setStage] = useState<CandidateStage | ''>(candidate?.stage ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (candidate) {
-      setForm({
-        full_name: candidate.full_name,
-        email: candidate.email,
-        phone: candidate.phone,
-        position: candidate.position,
-        linkedin_url: candidate.linkedin_url,
-        cv_url: candidate.cv_url,
-        experience_years: candidate.experience_years,
-      });
-      setStatus(candidate.status);
-      setStage(candidate.stage);
-    }
-  }, [candidate]);
 
   const validate = (): boolean => {
     const errors: Record<string, string> = {};

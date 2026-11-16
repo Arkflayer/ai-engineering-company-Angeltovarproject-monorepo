@@ -19,7 +19,7 @@
   text-rendering: optimizeLegibility;
 }
 
-.admin-shell *, .admin-shell *::before, .admin-shell *::after { box-sizing: border-box; }
+.admin-shell, .admin-shell *, .admin-shell *::before, .admin-shell *::after { box-sizing: border-box; }
 .admin-shell button, .admin-shell input, .admin-shell select, .admin-shell textarea { font: inherit; }
 .admin-shell button { cursor: pointer; }
 .admin-shell a { color: inherit; text-decoration: none; }
@@ -28,7 +28,7 @@
 .admin-shell .admin-main h1 { font-size: 28px; font-weight: 700; line-height: 1.2; }
 .admin-shell .admin-main h2 { font-size: 14px; font-weight: 700; }
 
-.admin-skip-link { position: fixed; z-index: 20; top: 8px; left: 8px; padding: 10px 14px; transform: translateY(-150%); border-radius: 4px; background: #fff; color: var(--ink); }
+.admin-shell .admin-skip-link { position: fixed; z-index: 20; top: 8px; left: 8px; padding: 10px 14px; transform: translateY(-150%); border-radius: 4px; background: #fff; color: var(--ink); }
 .admin-skip-link:focus { transform: translateY(0); }
 .admin-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 2; display: flex; width: 244px; flex-direction: column; padding: 26px 16px 18px; border-right: 1px solid var(--line); background: var(--surface); }
 .admin-brand { display: flex; align-items: center; gap: 11px; padding: 0 9px; font-size: 17px; font-weight: 800; }
@@ -91,7 +91,6 @@
 .admin-footer { padding: 25px 0; color: #75867f; font-size: 9px; }
 .admin-footer span { padding: 0 5px; }
 /* Isolate legacy backoffice component and responsive styles from the candidate pipeline. */
-@scope (.admin-shell) {
 .admin-main .topbar { display: flex; min-height: 66px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); color: #71817b; font-size: 11px; }
 .admin-main .breadcrumb span { padding: 0 8px; color: #a5b2ac; }
 .admin-main .status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 20px; background: #fff; color: #566a62; white-space: nowrap; }
@@ -255,5 +254,4 @@
 @media (max-width: 370px) {
   .admin-main { padding: 0 11px; }
   .admin-metrics-grid, .admin-main .metrics-grid { grid-template-columns: 1fr; }
-}
 }

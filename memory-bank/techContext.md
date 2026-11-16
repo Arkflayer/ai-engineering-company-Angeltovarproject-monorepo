@@ -2,13 +2,13 @@
 
 ## Stack actual
 
-- Frontend activo y destino predeterminado para nuevas funcionalidades: `uis/talent-pipeline-tracker/`, con Next.js App Router, React, TypeScript y Tailwind CSS como primera opción. Usa las versiones declaradas en su `package.json`, sin cambiarlas por iniciativa propia.
+- Frontend privado y destino para nuevas interfaces internas: `uis/backoffice/`, con Next.js App Router, React, TypeScript y Tailwind CSS. Usa las versiones declaradas en su `package.json`, sin cambiarlas por iniciativa propia.
 - Sitio público: HTML, CSS y JavaScript sin framework en `uis/website/`; interfaz español/inglés, recursos locales y páginas estáticas.
-- Interfaz interna unificada: Next.js App Router en `uis/talent-pipeline-tracker/`, con pipeline, vista de operaciones, proveedores e incidencias; `uis/backoffice/` se conserva como referencia anterior.
-- Ejecución frontend desde la raíz: `npm --prefix uis/talent-pipeline-tracker run dev`; lint y build usan el mismo prefijo con `run lint` y `run build`. `npm run dev` desde la raíz usa `npx serve . -l 3000`: sirve archivos estáticos, no inicia Next.js. No lo uses para probar esta aplicación ni para descargar herramientas sin aprobación.
+- La única interfaz administrativa está en `uis/backoffice/` y reúne operaciones (`/`, datos ilustrativos), candidaturas (`/candidates` y `/candidates/[id]`), proveedores (`/suppliers`) e incidencias (`/incidents`).
+- Ejecución frontend desde la raíz: `npm --prefix uis/backoffice run dev`; lint, typecheck y build usan el mismo prefijo con `run lint`, `run typecheck` y `run build`. `npm run dev` desde la raíz usa `npx serve . -l 3000`: sirve archivos estáticos, no inicia Next.js. No lo uses para probar esta aplicación ni para descargar herramientas sin aprobación.
 - `packages/shared/` contiene una estructura inicial para un paquete TypeScript. No hay runner de workspaces ni suite de pruebas global configurada.
 - Backend: FastAPI en `services/api/`, con entornos y ejecución gestionados por uv y dependencias declaradas en `pyproject.toml`. Incluye análisis de incidencias, proveedores y autenticación JWT; usuarios y perfiles se guardan exclusivamente en TinyDB. Toda API y lógica de negocio nueva pertenece a este backend; no la dupliques en Next.js. Comprueba la integración de cada interfaz antes de afirmar que está conectada.
-- La app unificada usa `NEXT_PUBLIC_TRACKFLOW_API_URL` para proveedores/incidencias (`http://localhost:8000` por defecto) y conserva `NEXT_PUBLIC_API_URL` para el pipeline de candidaturas. La plantilla pública de configuración local es `uis/talent-pipeline-tracker/.env.example`; no guardar secretos en variables `NEXT_PUBLIC_*`.
+- La app administrativa usa `NEXT_PUBLIC_TRACKFLOW_API_URL` para proveedores/incidencias y conserva `NEXT_PUBLIC_API_URL` para el pipeline de candidaturas. La configuración local se documenta en `uis/backoffice/.env.example`; no guardar secretos en variables `NEXT_PUBLIC_*`.
 - El CORS de FastAPI usa `TRACKFLOW_UI_ORIGINS`, una lista separada por comas de orígenes completos (esquema, host y puerto, sin ruta). La plantilla `services/api/.env.example` incluye los orígenes locales `http://localhost:3000,http://127.0.0.1:3000`; actualízala si el frontend usa otro origen.
 - AUTH-01 usa `OAuth2PasswordBearer`, `python-jose` y hashes nuevos `bcrypt` de libpass vía `from passlib.hash import bcrypt`; verifica hashes históricos `bcrypt_sha256`. Clave JWT obligatoria cargada desde `services/api/.env` (ignorado por Git) o entorno. `ACCESS_TOKEN_EXPIRE_MINUTES` también es obligatoria (sin fallback hardcodeado). Las rutas de datos requieren JWT y respetan la propiedad del recurso. Resultados de incidencias separados por `user_uuid` en memoria. No se usan sesiones ni cookies.
 - POST `/auth/login` acepta JSON `email`/`password` o formulario con `email` (alias OAuth2 `username`) y devuelve JWT. GET `/auth/me` requiere sesión y devuelve solo email, rol actual de TinyDB y perfil propio; perfil eliminado se representa como null sin recreación. Entradas inválidas no repiten contraseñas; Swagger mantiene su formulario OAuth2 y documenta ambos formatos de login.
@@ -23,7 +23,7 @@
 
 ## Decisiones de arquitectura
 
-- Mantener la web pública estática y consolidar las interfaces administrativas privadas en `talent-pipeline-tracker`; `backoffice` queda como referencia legacy hasta decidir su retiro.
+- Mantener la web pública estática en `uis/website/` y todas las interfaces administrativas privadas en el único proyecto `uis/backoffice/`.
 - Mantener APIs centralizadas en `services/` hasta que una razón técnica justifique separarlas.
 - Separar agentes de producto (`agents/`) y capacidades de producto (`skills/`) de la configuración de agentes de programación (`.agents/`).
 - Mantener `CONTEXT.md` y `CONTEXT.es.md` como briefing detallado de negocio. Esta memoria resume hechos y decisiones; no los reemplaza.

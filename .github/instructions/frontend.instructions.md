@@ -1,11 +1,11 @@
 ---
-description: "Usar al desarrollar pantallas, componentes, estilos, rutas o llamadas API del frontend Next.js, React, TypeScript y Tailwind de talent-pipeline-tracker."
-applyTo: "uis/talent-pipeline-tracker/**"
+description: "Usar al desarrollar pantallas, componentes, estilos, rutas o llamadas API del frontend Next.js, React, TypeScript y Tailwind de backoffice."
+applyTo: "uis/backoffice/**"
 ---
 
 # Frontend Next.js
 
-- Sigue `AGENTS.md` raiz, especialmente la politica de aprobacion de dependencias, y `uis/talent-pipeline-tracker/AGENTS.md`. Antes de escribir codigo Next.js consulta la guia pertinente de su version en `node_modules/next/dist/docs/`; si no esta disponible, informa del limite sin instalar paquetes automaticamente.
+- Sigue `AGENTS.md` raíz, especialmente la política de aprobación de dependencias, y `uis/backoffice/AGENTS.md`. Antes de escribir código Next.js consulta la guía pertinente de su versión en `node_modules/next/dist/docs/`; si no está disponible, informa del límite sin instalar paquetes automáticamente.
 - Usa las versiones declaradas por la aplicacion y npm como gestor existente. No cambies framework, gestor ni estructura para una tarea pequena.
 - Implementa rutas en `src/app/` con App Router y componentes React en TypeScript (`.tsx`). Reutiliza `src/components/`, `src/types/` y el alias `@/*`. No crees entradas HTML ni scripts JS independientes para nuevas pantallas.
 - Tailwind CSS es la primera opcion para estilos. Reutiliza las utilidades y estilos existentes; usa CSS global solo cuando haya una necesidad concreta no resuelta. No incorpores otro framework CSS o biblioteca de componentes sin aprobacion.
@@ -17,9 +17,9 @@ applyTo: "uis/talent-pipeline-tracker/**"
 ## Comandos Desde La Raiz
 
 ```sh
-npm --prefix uis/talent-pipeline-tracker run dev
-npm --prefix uis/talent-pipeline-tracker run lint
-npm --prefix uis/talent-pipeline-tracker run build
+npm --prefix uis/backoffice run dev
+npm --prefix uis/backoffice run lint
+npm --prefix uis/backoffice run build
 ```
 
 El comando `npm run dev` de la raiz sirve archivos estaticos, no Next.js. Para cambios de codigo ejecuta las comprobaciones pertinentes de lint y build; informa de fallos o requisitos no verificables sin instalar paquetes nuevos. Comprueba el diff antes de entregar.

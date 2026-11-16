@@ -4,14 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navigation = [
-  { href: '/', label: 'Candidaturas', symbol: '◎' },
-  { href: '/operations', label: 'Operaciones', symbol: '▦' },
+  { href: '/', label: 'Operaciones', symbol: '▦' },
+  { href: '/candidates', label: 'Candidaturas', symbol: '◎' },
   { href: '/suppliers', label: 'Proveedores', symbol: '⇄' },
   { href: '/incidents', label: 'Incidencias', symbol: '!' },
 ];
 
 export default function AdminShell({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname();
+
+  if (pathname.startsWith('/candidates')) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="admin-shell">
