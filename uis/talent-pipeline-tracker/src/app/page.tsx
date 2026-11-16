@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import type { Candidate, CandidateStatus, CandidateStage } from '@/types';
+import type { Candidate } from '@/types';
 import { STATUS_LABELS, STAGE_LABELS } from '@/types';
 import { fetchCandidates } from '@/services/api';
 import CandidateCard from '@/components/CandidateCard';
@@ -12,6 +12,7 @@ import FilterSelect from '@/components/FilterSelect';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import CandidateForm from '@/components/CandidateForm';
+import LogoutButton from '@/components/LogoutButton';
 
 const statusOptions = Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label }));
 const stageOptions = Object.entries(STAGE_LABELS).map(([value, label]) => ({ value, label }));
@@ -26,7 +27,7 @@ function HomePageContent() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Filtros y búsqueda desde query params
+  // Filtros y bÃºsqueda desde query params
   const statusFilter = searchParams.get('status') || '';
   const stageFilter = searchParams.get('stage') || '';
   const searchQuery = searchParams.get('q') || '';
@@ -49,7 +50,8 @@ function HomePageContent() {
   }, []);
 
   useEffect(() => {
-    loadCandidates();
+    const timer = window.setTimeout(() => { void loadCandidates(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [loadCandidates]);
 
   // Actualizar query params sin recargar
@@ -67,7 +69,7 @@ function HomePageContent() {
     [searchParams, router]
   );
 
-  // Filtrado en cliente (búsqueda por nombre/email)
+  // Filtrado en cliente (bÃºsqueda por nombre/email)
   const filteredCandidates = useMemo(() => {
     let result = candidates;
 
@@ -110,15 +112,18 @@ function HomePageContent() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">TrackFlow — Talent Pipeline</h1>
-            <p className="text-sm text-gray-500">Gestión de candidaturas · Asistente de Dirección · Zaragoza</p>
+            <h1 className="text-xl font-bold text-gray-900">TrackFlow â€” Talent Pipeline</h1>
+            <p className="text-sm text-gray-500">GestiÃ³n de candidaturas Â· Asistente de DirecciÃ³n Â· Zaragoza</p>
           </div>
+          <div className="flex items-center gap-3">
+          <LogoutButton />
           <button
             onClick={() => setShowForm(true)}
             className="px-4 py-2 text-sm font-semibold text-white bg-indigo-700 rounded-lg hover:bg-indigo-800 transition-colors shadow-md"
           >
             + Nueva candidatura
           </button>
+          </div>
         </div>
       </header>
 
@@ -133,7 +138,7 @@ function HomePageContent() {
           </div>
         )}
 
-        {/* Filtros y búsqueda */}
+        {/* Filtros y bÃºsqueda */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
@@ -157,7 +162,7 @@ function HomePageContent() {
           </div>
         </div>
 
-        {/* Estados de carga/error/vacío/resultados */}
+        {/* Estados de carga/error/vacÃ­o/resultados */}
         {loading ? (
           <LoadingSpinner message="Cargando candidaturas..." />
         ) : error ? (
@@ -166,7 +171,7 @@ function HomePageContent() {
           <div className="text-center py-12">
             <p className="text-gray-500 text-sm">
               {candidates.length === 0
-                ? 'No hay candidaturas registradas todavía.'
+                ? 'No hay candidaturas registradas todavÃ­a.'
                 : 'No se encontraron candidaturas con los filtros seleccionados.'}
             </p>
           </div>
@@ -174,12 +179,12 @@ function HomePageContent() {
           <>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
               <p className="text-sm text-gray-500">
-                Mostrando {Math.min((safePage - 1) * pageSize + 1, filteredCandidates.length)}–
+                Mostrando {Math.min((safePage - 1) * pageSize + 1, filteredCandidates.length)}â€“
                 {Math.min(safePage * pageSize, filteredCandidates.length)} de {filteredCandidates.length} candidaturas
                 {filteredCandidates.length !== candidates.length && ` (${candidates.length} totales)`}
               </p>
               <label className="flex items-center gap-2 text-sm text-gray-600">
-                Por página
+                Por pÃ¡gina
                 <select
                   value={pageSize}
                   onChange={(event) => {
@@ -202,7 +207,7 @@ function HomePageContent() {
               ))}
             </div>
             {totalPages > 1 && (
-              <nav className="flex items-center justify-center gap-2 mt-8" aria-label="Paginación de candidaturas">
+              <nav className="flex items-center justify-center gap-2 mt-8" aria-label="PaginaciÃ³n de candidaturas">
                 <button
                   onClick={() => goToPage(safePage - 1)}
                   disabled={safePage === 1}

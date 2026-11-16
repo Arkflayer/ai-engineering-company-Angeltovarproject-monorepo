@@ -66,13 +66,14 @@ export default function CandidateDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    loadCandidate();
+    const timer = window.setTimeout(() => { void loadCandidate(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [loadCandidate]);
 
   useEffect(() => {
-    if (candidate) {
-      loadNotes();
-    }
+    if (!candidate) return;
+    const timer = window.setTimeout(() => { void loadNotes(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [candidate, loadNotes]);
 
   // ─── Actualizar estado ───

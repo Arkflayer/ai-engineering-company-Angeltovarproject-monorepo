@@ -31,6 +31,14 @@ Report failed or blocked checks without installing new packages automatically.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Autenticación del Tracker
+
+El login del Tracker usa la API de identidad de TrackFlow (`NEXT_PUBLIC_TRACKFLOW_API_URL`, por defecto `http://localhost:8000`). Las llamadas de candidaturas pasan por el proxy del servidor Next.js en `/api/tracker/*`: este valida el JWT con `GET /auth/me` antes de contactar la API externa. El token de TrackFlow nunca se reenvía al servicio externo.
+
+En despliegues, configura `TRACKFLOW_API_URL` como URL interna/de servidor para la API de identidad y `TRACKER_API_URL` como URL de servidor para la API de candidaturas (por defecto, `https://playground.4geeks.com/tracker/api/v1`). `NEXT_PUBLIC_TRACKFLOW_API_URL` solo se usa en el navegador para login, registro y validación inicial del guard.
+
+El proxy verifica identidad, pero la API externa no ofrece autorización por usuario en este contrato: si el endpoint externo es público, el proxy no convierte sus datos en privados por usuario y no debe presentarse como aislamiento de datos ni protección contra abuso del endpoint externo. Para una autorización real por propietario, el backend de candidaturas debe validar y aplicar el usuario del token.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

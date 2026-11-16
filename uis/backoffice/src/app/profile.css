@@ -1,0 +1,20 @@
+.auth-fields { display: grid; gap: 14px; padding: 0 19px; }
+.auth-fields label, .auth-panel label { display: grid; gap: 6px; color: #52675e; font-size: 11px; }
+.auth-fields input, .auth-panel input { min-height: 40px; width: 100%; padding: 9px 11px; border: 1px solid #cad8d1; border-radius: 4px; color: var(--ink); background: #fff; }
+.auth-fields input:focus, .auth-panel input:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
+.auth-fields input[readonly] { background: #f1f5f2; color: #64746d; }
+.auth-fields .primary-button, .auth-panel .primary-button { justify-self: start; }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--canvas); }
+.auth-panel { width: min(100%, 460px); padding: 28px 0 20px; }
+.auth-panel .eyebrow, .auth-panel h1, .auth-panel > .page-description { margin-left: 24px; margin-right: 24px; }
+.auth-panel h1 { font-size: 25px; }
+.auth-panel .auth-fields { margin-top: 24px; }
+.auth-switch { margin: 17px 24px 0; color: var(--muted); font-size: 11px; }
+.auth-switch a { color: var(--accent-dark); font-weight: 700; text-decoration: underline; }
+.profile-route { min-height: 100vh; padding: 34px 20px; background: var(--canvas); }
+.profile-width { width: min(100%, 760px); margin: 0 auto; }
+.profile-route .topbar { min-height: 54px; }
+.profile-route .profile-card { max-width: 720px; margin: 18px auto; padding-bottom: 18px; }
+.frame-logout { margin-left: auto; border: 0; background: transparent; color: var(--accent-dark); font-size: 10px; font-weight: 700; }
+
+.profile-card .analysis-message { margin-bottom: 5px; }

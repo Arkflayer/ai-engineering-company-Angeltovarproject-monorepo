@@ -28,6 +28,25 @@ export interface LoginResponse {
   expires_in: number;
 }
 
+const TOKEN_KEY = "trackflow-access-token";
+
+export function setStoredToken(token: string) {
+  if (typeof window !== "undefined") window.localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearStoredToken() {
+  if (typeof window !== "undefined") window.localStorage.removeItem(TOKEN_KEY);
+}
+
+export async function register(input: { email: string; password: string; name?: string; phone?: string; address?: string }): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) throw await responseError(response, "No se pudo crear la cuenta");
+}
+
 export async function login(email: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
@@ -46,6 +65,7 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
+  if (response.status === 401 && typeof window !== "undefined") window.dispatchEvent(new Event("trackflow:unauthorized"));
   if (!response.ok) throw await responseError(response, "La solicitud no se completó");
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
@@ -55,6 +75,7 @@ export async function apiBlob(path: string, token: string): Promise<Blob> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  if (response.status === 401 && typeof window !== "undefined") window.dispatchEvent(new Event("trackflow:unauthorized"));
   if (!response.ok) throw await responseError(response, "No se pudo descargar el resultado");
   return response.blob();
 }

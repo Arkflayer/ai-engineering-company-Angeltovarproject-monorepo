@@ -1,11 +1,10 @@
 // src/components/CandidateForm.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type {
   Candidate,
   CreateCandidatePayload,
-  UpdateCandidatePayload,
   CandidateStatus,
   CandidateStage,
 } from '@/types';
@@ -13,7 +12,7 @@ import { STATUS_LABELS, STAGE_LABELS } from '@/types';
 import { createCandidate, updateCandidate } from '@/services/api';
 
 interface Props {
-  candidate?: Candidate; // si existe, es modo edición (PUT); si no, es creación (POST)
+  candidate?: Candidate; // si existe, es modo ediciÃ³n (PUT); si no, es creaciÃ³n (POST)
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -22,7 +21,7 @@ const emptyForm: CreateCandidatePayload = {
   full_name: '',
   email: '',
   phone: '',
-  position: 'Asistente de Dirección',
+  position: 'Asistente de DirecciÃ³n',
   linkedin_url: '',
   cv_url: '',
   experience_years: 0,
@@ -30,35 +29,28 @@ const emptyForm: CreateCandidatePayload = {
 
 export default function CandidateForm({ candidate, onSuccess, onCancel }: Props) {
   const isEditing = !!candidate;
-  const [form, setForm] = useState<CreateCandidatePayload>(emptyForm);
+  const [form, setForm] = useState<CreateCandidatePayload>(() => candidate ? {
+    full_name: candidate.full_name,
+    email: candidate.email,
+    phone: candidate.phone,
+    position: candidate.position,
+    linkedin_url: candidate.linkedin_url,
+    cv_url: candidate.cv_url,
+    experience_years: candidate.experience_years,
+  } : emptyForm);
   const [status, setStatus] = useState<CandidateStatus | ''>(candidate?.status ?? '');
   const [stage, setStage] = useState<CandidateStage | ''>(candidate?.stage ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (candidate) {
-      setForm({
-        full_name: candidate.full_name,
-        email: candidate.email,
-        phone: candidate.phone,
-        position: candidate.position,
-        linkedin_url: candidate.linkedin_url,
-        cv_url: candidate.cv_url,
-        experience_years: candidate.experience_years,
-      });
-      setStatus(candidate.status);
-      setStage(candidate.stage);
-    }
-  }, [candidate]);
 
   const validate = (): boolean => {
     const errors: Record<string, string> = {};
     if (!form.full_name.trim()) errors.full_name = 'El nombre es obligatorio';
     if (!form.email.trim()) errors.email = 'El email es obligatorio';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = 'Email no válido';
-    if (!form.phone.trim()) errors.phone = 'El teléfono es obligatorio';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = 'Email no vÃ¡lido';
+    if (!form.phone.trim()) errors.phone = 'El telÃ©fono es obligatorio';
     if (!form.position.trim()) errors.position = 'El puesto es obligatorio';
     if (!form.linkedin_url.trim()) errors.linkedin_url = 'La URL de LinkedIn es obligatoria';
     if (!form.cv_url.trim()) errors.cv_url = 'La URL del CV es obligatoria';
@@ -117,7 +109,7 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         {/* Nombre completo */}
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">Nombre completo *</label>
-          <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass('full_name')} placeholder="Ej: María García" />
+          <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass('full_name')} placeholder="Ej: MarÃ­a GarcÃ­a" />
           {fieldErrors.full_name && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.full_name}</p>}
         </div>
 
@@ -128,9 +120,9 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
           {fieldErrors.email && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.email}</p>}
         </div>
 
-        {/* Teléfono */}
+        {/* TelÃ©fono */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Teléfono *</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">TelÃ©fono *</label>
           <input name="phone" value={form.phone} onChange={handleChange} className={inputClass('phone')} placeholder="Ej: +34 612 345 678" />
           {fieldErrors.phone && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.phone}</p>}
         </div>
@@ -138,7 +130,7 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         {/* Puesto */}
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">Puesto *</label>
-          <input name="position" value={form.position} onChange={handleChange} className={inputClass('position')} placeholder="Asistente de Dirección" />
+          <input name="position" value={form.position} onChange={handleChange} className={inputClass('position')} placeholder="Asistente de DirecciÃ³n" />
           {fieldErrors.position && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.position}</p>}
         </div>
 
@@ -156,14 +148,14 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
           {fieldErrors.cv_url && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.cv_url}</p>}
         </div>
 
-        {/* Años de experiencia */}
+        {/* AÃ±os de experiencia */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Años de experiencia *</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">AÃ±os de experiencia *</label>
           <input name="experience_years" type="number" min={0} value={form.experience_years} onChange={handleChange} className={inputClass('experience_years')} />
           {fieldErrors.experience_years && <p className="text-xs text-red-500 mt-0.5">{fieldErrors.experience_years}</p>}
         </div>
 
-        {/* Solo en edición: estado y etapa */}
+        {/* Solo en ediciÃ³n: estado y etapa */}
         {isEditing && (
           <>
             <div>

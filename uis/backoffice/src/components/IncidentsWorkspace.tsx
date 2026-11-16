@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type DragEvent, type FormEvent } from "react";
-import { apiBlob, apiRequest, ApiError, login } from "@/lib/api";
+import { useState, type DragEvent } from "react";
+import { apiBlob, apiRequest } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import type { IncidentSummary } from "@/lib/types";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -43,45 +44,17 @@ function Breakdown({ title, description, values, total }: {
 }
 
 export default function IncidentsWorkspace() {
-  const [token, setToken] = useState("");
+  const { token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [summary, setSummary] = useState<IncidentSummary | null>(null);
-  const [authBusy, setAuthBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [authMessage, setAuthMessage] = useState("Inicia sesión con tu cuenta de TrackFlow para habilitar el análisis.");
   const [analysisMessage, setAnalysisMessage] = useState("");
   const [analysisError, setAnalysisError] = useState(false);
 
   const canAnalyze = Boolean(token && file && !busy);
   const canExport = Boolean(token && summary && !busy);
 
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    setAuthBusy(true);
-    setAuthMessage("Verificando credenciales…");
-    try {
-      const session = await login(String(data.get("email") || ""), String(data.get("password") || ""));
-      setToken(session.access_token);
-      form.reset();
-      setAuthMessage("Sesión iniciada. El token solo se conserva en esta página mientras esté abierta.");
-      setAnalysisMessage(file ? "Archivo listo para analizar." : "Selecciona un CSV para habilitar el análisis.");
-    } catch (error) {
-      setAuthMessage(errorText(error, "No se pudo iniciar sesión."));
-    } finally {
-      setAuthBusy(false);
-    }
-  }
-
-  function logout() {
-    setToken("");
-    setSummary(null);
-    setAuthMessage("Sesión cerrada. Inicia sesión para analizar un archivo.");
-    setAnalysisMessage("");
-    setAnalysisError(false);
-  }
 
   function selectFile(nextFile: File | undefined) {
     if (busy) return;
@@ -132,10 +105,6 @@ export default function IncidentsWorkspace() {
       setSummary(result);
       setAnalysisMessage("Análisis completado. Los datos se muestran de forma agregada.");
     } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        setToken("");
-        setAuthMessage("La sesión caducó. Inicia sesión nuevamente.");
-      }
       setAnalysisMessage(errorText(error, "No se pudo analizar el archivo."));
       setAnalysisError(true);
     } finally {
@@ -159,11 +128,7 @@ export default function IncidentsWorkspace() {
       setAnalysisMessage("CSV agregado descargado.");
       setAnalysisError(false);
     } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        setToken("");
-        setSummary(null);
-        setAuthMessage("La sesión caducó. Inicia sesión nuevamente.");
-      }
+      if (error instanceof Error) setSummary(null);
       setAnalysisMessage(errorText(error, "No se pudo descargar el resultado."));
       setAnalysisError(true);
     } finally {
@@ -186,16 +151,6 @@ export default function IncidentsWorkspace() {
       </header>
       <section className="page-heading"><div><p className="eyebrow">EXPERIENCIA DEL CLIENTE</p><h1>Análisis de incidencias</h1><p className="page-description">Carga un CSV para validar su calidad y consultar métricas agregadas.</p></div></section>
       <section className="incident-privacy" aria-label="Aviso de privacidad"><strong>Datos sensibles:</strong> el CSV se envía al servidor configurado para su análisis. Las filas de origen y los correos no se muestran ni se incluyen en la exportación. Usa solo un entorno autorizado.</section>
-
-      <section className="content-card auth-card" aria-labelledby="incident-auth-title">
-        <div className="card-heading"><div><h2 id="incident-auth-title">Acceso seguro</h2><p>Inicia sesión para analizar y exportar informes</p></div>{token && <button className="secondary-button" type="button" onClick={logout}>Cerrar sesión</button>}</div>
-        {!token && <form className="login-form" onSubmit={handleLogin}>
-          <label htmlFor="incident-login-email">Correo electrónico<input id="incident-login-email" name="email" type="email" autoComplete="username" required /></label>
-          <label htmlFor="incident-login-password">Contraseña<input id="incident-login-password" name="password" type="password" autoComplete="current-password" required /></label>
-          <button className="primary-button" type="submit" disabled={authBusy}>{authBusy ? "Verificando…" : "Iniciar sesión"}</button>
-        </form>}
-        <p className={`analysis-message${authMessage.toLowerCase().includes("no se pudo") ? " error" : ""}`} role="status" aria-live="polite">{authMessage}</p>
-      </section>
 
       <section className="content-card upload-card" aria-labelledby="upload-title">
         <div className="card-heading"><div><h2 id="upload-title">Cargar reporte CSV</h2><p>Formato UTF-8 con encabezados de TrackFlow</p></div></div>

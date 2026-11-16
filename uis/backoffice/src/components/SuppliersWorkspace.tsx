@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, type FormEvent, type SyntheticEvent } from "react";
-import { apiRequest, ApiError, login } from "@/lib/api";
+import { useEffect, useState, type FormEvent, type SyntheticEvent } from "react";
+import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import type { Supplier, SupplierCategory, SupplierCountry, SupplierStatus, SupplierStatusHistoryEntry } from "@/lib/types";
 
 const categories: { value: SupplierCategory; label: string }[] = [
-  { value: "carrier_last_mile", label: "Última milla" },
+  { value: "carrier_last_mile", label: "Ãšltima milla" },
   { value: "carrier_international", label: "Internacional" },
-  { value: "warehouse_supplies", label: "Suministros de almacén" },
+  { value: "warehouse_supplies", label: "Suministros de almacÃ©n" },
   { value: "packaging_materials", label: "Embalaje" },
-  { value: "reverse_logistics", label: "Logística inversa" },
+  { value: "reverse_logistics", label: "LogÃ­stica inversa" },
   { value: "fleet_maintenance", label: "Mantenimiento de flota" },
   { value: "it_and_wms_software", label: "Software IT/WMS" },
   { value: "cleaning_and_facilities", label: "Limpieza e instalaciones" },
@@ -25,15 +26,13 @@ function errorText(error: unknown, fallback: string) {
 }
 
 export default function SuppliersWorkspace() {
-  const [token, setToken] = useState("");
+  const { token } = useAuth();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [countryFilter, setCountryFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [formCountry, setFormCountry] = useState<SupplierCountry>("USA");
-  const [authBusy, setAuthBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formBusy, setFormBusy] = useState(false);
-  const [authMessage, setAuthMessage] = useState("El directorio requiere una sesión autenticada.");
   const [listMessage, setListMessage] = useState("");
   const [formMessage, setFormMessage] = useState("");
   const [history, setHistory] = useState<Record<number, SupplierStatusHistoryEntry[]>>({});
@@ -53,49 +52,24 @@ export default function SuppliersWorkspace() {
       setListMessage("Directorio actualizado.");
     } catch (error) {
       setListMessage(errorText(error, "No se pudo cargar el directorio."));
-      if (error instanceof ApiError && error.status === 401) {
-        setToken("");
-        setSuppliers([]);
-        setAuthMessage("La sesión caducó. Inicia sesión de nuevo.");
-      }
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    setAuthBusy(true);
-    setAuthMessage("Verificando credenciales…");
-    try {
-      const session = await login(String(data.get("email") || ""), String(data.get("password") || ""));
-      setToken(session.access_token);
-      form.reset();
-      setAuthMessage("Sesión iniciada. El token solo se conserva en esta página mientras esté abierta.");
-      await loadSuppliers(session.access_token);
-    } catch (error) {
-      setAuthMessage(errorText(error, "No se pudo iniciar sesión."));
-    } finally {
-      setAuthBusy(false);
-    }
-  }
+  useEffect(() => {
+    if (!token) return;
+    const timer = window.setTimeout(() => { void loadSuppliers(token); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [token]);
 
-  function logout() {
-    setToken("");
-    setSuppliers([]);
-    setHistory({});
-    setAuthMessage("Sesión cerrada. Inicia sesión para acceder al directorio.");
-    setListMessage("");
-  }
 
   async function updateRate(event: FormEvent<HTMLFormElement>, supplier: Supplier) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const rate = Number(formData.get("rate"));
     if (!Number.isFinite(rate) || rate <= 0) {
-      setListMessage("La tarifa debe ser un número mayor que cero.");
+      setListMessage("La tarifa debe ser un nÃºmero mayor que cero.");
       return;
     }
     try {
@@ -160,7 +134,7 @@ export default function SuppliersWorkspace() {
       notes: String(data.get("notes") || "").trim() || null,
     };
     setFormBusy(true);
-    setFormMessage("Guardando proveedor…");
+    setFormMessage("Guardando proveedorâ€¦");
     try {
       const created = await apiRequest<Supplier>("/suppliers", token, {
         method: "POST",
@@ -186,54 +160,44 @@ export default function SuppliersWorkspace() {
         <span className="status-pill"><span aria-hidden="true" /> Directorio interno</span>
       </header>
       <section className="page-heading">
-        <div><p className="eyebrow">COMPRAS Y OPERACIONES</p><h1>Directorio de proveedores</h1><p className="page-description">Proveedores de carriers, almacén y servicios para USA y España.</p></div>
+        <div><p className="eyebrow">COMPRAS Y OPERACIONES</p><h1>Directorio de proveedores</h1><p className="page-description">Proveedores de carriers, almacÃ©n y servicios para USA y EspaÃ±a.</p></div>
       </section>
-      <section className="demo-notice" aria-label="Aviso sobre los datos"><span aria-hidden="true">i</span><p><strong>Datos del briefing para demostración.</strong> El directorio persiste en TinyDB local y no representa una integración con sistemas de compras.</p></section>
+      <section className="demo-notice" aria-label="Aviso sobre los datos"><span aria-hidden="true">i</span><p><strong>Datos del briefing para demostraciÃ³n.</strong> El directorio persiste en TinyDB local y no representa una integraciÃ³n con sistemas de compras.</p></section>
 
-      <section className="content-card auth-card" aria-labelledby="supplier-auth-title">
-        <div className="card-heading"><div><h2 id="supplier-auth-title">Acceso seguro</h2><p>Inicia sesión con tu cuenta de la API</p></div>{token && <button className="secondary-button" type="button" onClick={logout}>Cerrar sesión</button>}</div>
-        {!token && <form className="login-form" onSubmit={handleLogin}>
-          <label htmlFor="supplier-login-email">Correo electrónico<input id="supplier-login-email" name="email" type="email" autoComplete="username" required /></label>
-          <label htmlFor="supplier-login-password">Contraseña<input id="supplier-login-password" name="password" type="password" autoComplete="current-password" required /></label>
-          <button className="primary-button" type="submit" disabled={authBusy}>{authBusy ? "Verificando…" : "Iniciar sesión"}</button>
-        </form>}
-        <p className={`analysis-message${authMessage.includes("no se pudo") || authMessage.includes("No se pudo") ? " error" : ""}`} role="status" aria-live="polite">{authMessage}</p>
-      </section>
-
-      {token && <div className="supplier-workspace">
+      <div className="supplier-workspace">
         <section className="content-card" aria-labelledby="filter-title">
           <div className="card-heading"><div><h2 id="filter-title">Filtrar proveedores</h2><p>Los filtros actualizan el listado al instante, sin recargar ni consultar de nuevo la API.</p></div></div>
           <div className="supplier-filters">
-            <label htmlFor="country-filter">País<select id="country-filter" value={countryFilter} onChange={(event) => setCountryFilter(event.target.value)}><option value="">Todos</option><option value="USA">USA</option><option value="Spain">España</option></select></label>
-            <label htmlFor="category-filter">Categoría<select id="category-filter" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option value="">Todas</option>{categories.map((category) => <option value={category.value} key={category.value}>{category.label}</option>)}</select></label>
+            <label htmlFor="country-filter">PaÃ­s<select id="country-filter" value={countryFilter} onChange={(event) => setCountryFilter(event.target.value)}><option value="">Todos</option><option value="USA">USA</option><option value="Spain">EspaÃ±a</option></select></label>
+            <label htmlFor="category-filter">CategorÃ­a<select id="category-filter" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option value="">Todas</option>{categories.map((category) => <option value={category.value} key={category.value}>{category.label}</option>)}</select></label>
             <button className="secondary-button" type="button" onClick={() => { setCountryFilter(""); setCategoryFilter(""); }}>Limpiar filtros</button>
           </div>
         </section>
 
         <section className="content-card supplier-table-card" aria-labelledby="supplier-list-title">
-          <div className="card-heading"><div><h2 id="supplier-list-title">Proveedores</h2><p aria-live="polite">{loading ? "Cargando directorio…" : `${filteredSuppliers.length} de ${suppliers.length} proveedores`}</p></div><button className="secondary-button" type="button" onClick={() => void loadSuppliers(token)} disabled={loading}>{loading ? "Actualizando…" : "Actualizar lista"}</button></div>
+          <div className="card-heading"><div><h2 id="supplier-list-title">Proveedores</h2><p aria-live="polite">{loading ? "Cargando directorioâ€¦" : `${filteredSuppliers.length} de ${suppliers.length} proveedores`}</p></div><button className="secondary-button" type="button" onClick={() => void loadSuppliers(token)} disabled={loading}>{loading ? "Actualizandoâ€¦" : "Actualizar lista"}</button></div>
           {listMessage && <p className="analysis-message" role="status" aria-live="polite">{listMessage}</p>}
-          <div className="table-wrap"><table className="supplier-table"><thead><tr><th scope="col">PROVEEDOR</th><th scope="col">PAÍS</th><th scope="col">CATEGORÍAS</th><th scope="col">TARIFA / UNIDAD</th><th scope="col">ESTADO</th><th scope="col">ACTUALIZACIÓN DE TARIFA</th><th scope="col">ACCIONES</th></tr></thead>
-            <tbody>{loading && suppliers.length === 0 ? <tr><td colSpan={7}>Cargando proveedores…</td></tr> : filteredSuppliers.length === 0 ? <tr><td colSpan={7}>No hay proveedores que coincidan con los filtros.</td></tr> : filteredSuppliers.map((supplier) => <SupplierRows key={supplier.id} supplier={supplier} history={history[supplier.id]} historyLoading={Boolean(historyLoading[supplier.id])} onRateUpdate={updateRate} onStatusUpdate={updateStatus} onHistoryToggle={handleHistoryToggle} />)}</tbody>
+          <div className="table-wrap"><table className="supplier-table"><thead><tr><th scope="col">PROVEEDOR</th><th scope="col">PAÃS</th><th scope="col">CATEGORÃAS</th><th scope="col">TARIFA / UNIDAD</th><th scope="col">ESTADO</th><th scope="col">ACTUALIZACIÃ“N DE TARIFA</th><th scope="col">ACCIONES</th></tr></thead>
+            <tbody>{loading && suppliers.length === 0 ? <tr><td colSpan={7}>Cargando proveedoresâ€¦</td></tr> : filteredSuppliers.length === 0 ? <tr><td colSpan={7}>No hay proveedores que coincidan con los filtros.</td></tr> : filteredSuppliers.map((supplier) => <SupplierRows key={supplier.id} supplier={supplier} history={history[supplier.id]} historyLoading={Boolean(historyLoading[supplier.id])} onRateUpdate={updateRate} onStatusUpdate={updateStatus} onHistoryToggle={handleHistoryToggle} />)}</tbody>
           </table></div>
         </section>
 
         <section className="content-card supplier-form-card" aria-labelledby="create-title">
-          <div className="card-heading"><div><h2 id="create-title">Registrar proveedor</h2><p>Los campos obligatorios coinciden con las reglas de validación de la API.</p></div></div>
+          <div className="card-heading"><div><h2 id="create-title">Registrar proveedor</h2><p>Los campos obligatorios coinciden con las reglas de validaciÃ³n de la API.</p></div></div>
           <form className="supplier-form" onSubmit={createSupplier}>
             <label htmlFor="supplier-name">Nombre comercial<input id="supplier-name" name="name" maxLength={160} required /></label>
-            <label htmlFor="supplier-country">País<select id="supplier-country" name="country" value={formCountry} onChange={(event) => setFormCountry(event.target.value as SupplierCountry)}><option value="USA">USA</option><option value="Spain">España</option></select></label>
-            <label htmlFor="supplier-currency">Moneda<input id="supplier-currency" value={currencyFor(formCountry)} readOnly aria-describedby="currency-help" /><span id="currency-help" className="field-help">USD para USA; EUR para España.</span></label>
-            <label htmlFor="supplier-rate">Tarifa por envío/unidad<input id="supplier-rate" name="rate_per_shipment" type="number" min="0.0001" step="any" required /></label>
+            <label htmlFor="supplier-country">PaÃ­s<select id="supplier-country" name="country" value={formCountry} onChange={(event) => setFormCountry(event.target.value as SupplierCountry)}><option value="USA">USA</option><option value="Spain">EspaÃ±a</option></select></label>
+            <label htmlFor="supplier-currency">Moneda<input id="supplier-currency" value={currencyFor(formCountry)} readOnly aria-describedby="currency-help" /><span id="currency-help" className="field-help">USD para USA; EUR para EspaÃ±a.</span></label>
+            <label htmlFor="supplier-rate">Tarifa por envÃ­o/unidad<input id="supplier-rate" name="rate_per_shipment" type="number" min="0.0001" step="any" required /></label>
             <label htmlFor="supplier-status">Estado<select id="supplier-status" name="status"><option value="active">Activo</option><option value="suspended">Suspendido</option></select></label>
-            <label htmlFor="supplier-categories">Categorías<span className="field-help">Puedes seleccionar varias.</span><select id="supplier-categories" name="categories" multiple required size={5}>{categories.map((category) => <option value={category.value} key={category.value}>{category.label}</option>)}</select></label>
+            <label htmlFor="supplier-categories">CategorÃ­as<span className="field-help">Puedes seleccionar varias.</span><select id="supplier-categories" name="categories" multiple required size={5}>{categories.map((category) => <option value={category.value} key={category.value}>{category.label}</option>)}</select></label>
             <label htmlFor="supplier-zone">Zona de servicio (opcional)<input id="supplier-zone" name="service_zone" maxLength={160} /></label>
             <label htmlFor="supplier-email">Email de contacto (opcional)<input id="supplier-email" name="contact_email" type="email" /></label>
             <label className="supplier-notes" htmlFor="supplier-notes">Notas (opcional)<textarea id="supplier-notes" name="notes" maxLength={1000} rows={3} /></label>
-            <div className="supplier-form-actions"><button className="primary-button" type="submit" disabled={formBusy}>{formBusy ? "Guardando…" : "Guardar proveedor"}</button><p className="analysis-message" role="status" aria-live="polite">{formMessage}</p></div>
+            <div className="supplier-form-actions"><button className="primary-button" type="submit" disabled={formBusy}>{formBusy ? "Guardandoâ€¦" : "Guardar proveedor"}</button><p className="analysis-message" role="status" aria-live="polite">{formMessage}</p></div>
           </form>
         </section>
-      </div>}
+      </div>
     </>
   );
 }
@@ -256,7 +220,7 @@ function SupplierRows({
   return (
     <>
       <tr>
-        <td className="reference">{supplier.name}</td><td>{supplier.country === "Spain" ? "España" : supplier.country}</td>
+        <td className="reference">{supplier.name}</td><td>{supplier.country === "Spain" ? "EspaÃ±a" : supplier.country}</td>
         <td>{supplier.categories.map((category) => categoryLabels[category]).join(", ")}</td>
         <td>{rateFormatter.format(supplier.rate_per_shipment)} {supplier.currency}</td>
         <td><span className={`supplier-status ${supplier.status}`}>{supplier.status === "active" ? "Activo" : "Suspendido"}</span></td>
@@ -273,7 +237,7 @@ function SupplierRows({
       <tr className="supplier-history-row"><td colSpan={7}>
         <details onToggle={(event) => onHistoryToggle(event, supplier.id)}>
           <summary>Historial de suspensiones y reactivaciones</summary>
-          {historyLoading ? <p>Cargando historial…</p> : history ? history.length ? <ul className="supplier-status-history">{history.map((item, index) => <li key={`${item.changed_at}-${index}`}>{item.previous_status === "active" ? "Activo" : "Suspendido"} → {item.status === "active" ? "Activo" : "Suspendido"} · {dateFormatter.format(new Date(item.changed_at))}</li>)}</ul> : <p>Sin cambios de estado registrados.</p> : <p>Abre para consultar el historial.</p>}
+          {historyLoading ? <p>Cargando historialâ€¦</p> : history ? history.length ? <ul className="supplier-status-history">{history.map((item, index) => <li key={`${item.changed_at}-${index}`}>{item.previous_status === "active" ? "Activo" : "Suspendido"} â†’ {item.status === "active" ? "Activo" : "Suspendido"} Â· {dateFormatter.format(new Date(item.changed_at))}</li>)}</ul> : <p>Sin cambios de estado registrados.</p> : <p>Abre para consultar el historial.</p>}
         </details>
       </td></tr>
     </>
