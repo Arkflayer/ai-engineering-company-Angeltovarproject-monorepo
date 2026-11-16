@@ -3,9 +3,9 @@
 ## Stack actual
 
 - Frontend privado y destino para nuevas interfaces internas: `uis/backoffice/`, con Next.js App Router, React, TypeScript y Tailwind CSS. Usa las versiones declaradas en su `package.json`, sin cambiarlas por iniciativa propia.
-- Sitio público: HTML, CSS y JavaScript sin framework en `uis/website/`; interfaz español/inglés, recursos locales y páginas estáticas.
+- Sitio público: `uis/website/`, Next.js App Router, React, TypeScript y Tailwind CSS; landing en `/` y formulario de demostración en `/application`, en español e inglés.
 - La única interfaz administrativa está en `uis/backoffice/` y reúne operaciones (`/`, datos ilustrativos), candidaturas (`/candidates` y `/candidates/[id]`), proveedores (`/suppliers`) e incidencias (`/incidents`).
-- Ejecución frontend desde la raíz: `npm --prefix uis/backoffice run dev`; lint, typecheck y build usan el mismo prefijo con `run lint`, `run typecheck` y `run build`. `npm run dev` desde la raíz usa `npx serve . -l 3000`: sirve archivos estáticos, no inicia Next.js. No lo uses para probar esta aplicación ni para descargar herramientas sin aprobación.
+- Ejecución frontend desde la raíz: `npm --prefix uis/website run dev` para el sitio público y `npm --prefix uis/backoffice run dev` para la app privada; lint/build usan su respectivo prefijo, y ambos tienen typecheck. `npm run dev` desde la raíz usa `npx serve . -l 3000`: sirve archivos estáticos, no inicia Next.js. No lo uses para probar estas aplicaciones ni para descargar herramientas sin aprobación.
 - `packages/shared/` contiene una estructura inicial para un paquete TypeScript. No hay runner de workspaces ni suite de pruebas global configurada.
 - Backend: FastAPI en `services/api/`, con entornos y ejecución gestionados por uv y dependencias declaradas en `pyproject.toml`. Incluye análisis de incidencias, proveedores y autenticación JWT; usuarios y perfiles se guardan exclusivamente en TinyDB. Toda API y lógica de negocio nueva pertenece a este backend; no la dupliques en Next.js. Comprueba la integración de cada interfaz antes de afirmar que está conectada.
 - La app administrativa usa `NEXT_PUBLIC_TRACKFLOW_API_URL` para proveedores/incidencias y conserva `NEXT_PUBLIC_API_URL` para el pipeline de candidaturas. La configuración local se documenta en `uis/backoffice/.env.example`; no guardar secretos en variables `NEXT_PUBLIC_*`.
@@ -23,7 +23,7 @@
 
 ## Decisiones de arquitectura
 
-- Mantener la web pública estática en `uis/website/` y todas las interfaces administrativas privadas en el único proyecto `uis/backoffice/`.
+- Mantener la web pública Next.js en `uis/website/` y todas las interfaces administrativas privadas en el único proyecto `uis/backoffice/`.
 - Mantener APIs centralizadas en `services/` hasta que una razón técnica justifique separarlas.
 - Separar agentes de producto (`agents/`) y capacidades de producto (`skills/`) de la configuración de agentes de programación (`.agents/`).
 - Mantener `CONTEXT.md` y `CONTEXT.es.md` como briefing detallado de negocio. Esta memoria resume hechos y decisiones; no los reemplaza.
@@ -31,7 +31,7 @@
 ## Restricciones de implementación
 
 - Seguir `AGENTS.md` para aprobar cualquier alta, baja o actualización de dependencias. Reutilizar primero las existentes; sincronizar con `npm ci` o `uv sync --locked` solo sin cambios de manifiestos ni versiones y con lockfile compatible. Si falta o hay que modificarlo, consultar; no introducir gestores paralelos ni editar lockfiles manualmente.
-- Las instrucciones por ruta están en `.github/instructions/`; `.agents/rules/interfaces.md` y la skill `ui-delivery` se limitan a las dos interfaces estáticas. Conservar las instrucciones locales de Next.js.
+- Las instrucciones por ruta están en `.github/instructions/`; `.agents/rules/interfaces.md` y la skill `ui-delivery` se limitan a las interfaces estáticas existentes. El website usa las instrucciones locales de Next.js.
 - No afirmar que hay autenticación, persistencia, integración con sistemas heredados, inventario real o seguimiento en vivo sin implementación comprobable.
 - Etiquetar los valores simulados y no incluir secretos, PII ni registros operativos reales.
 - Asegurar semántica HTML, accesibilidad de teclado, foco visible, diseño adaptable y rutas locales válidas.

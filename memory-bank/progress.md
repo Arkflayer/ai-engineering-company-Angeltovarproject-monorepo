@@ -1,6 +1,8 @@
 @# TrackFlow — progreso del proyecto
 
-## Integración administrativa (validación pendiente)
+## Integración administrativa del PR #7 (preservada)
+
+- El estado y las verificaciones indicados en esta sección corresponden a la rama original `feature/unified-admin-ui`; esta adaptación no la modifica.
 
 - PR #5 (`feat(suppliers): add supplier directory`) verificado como fusionado en `main`; repositorio local actualizado desde `main` antes de comenzar esta integración.
 - Rama de trabajo: `feature/unified-admin-ui` (sin commit ni push).
@@ -10,10 +12,20 @@
 - Se ejecutaron anteriormente 76 pruebas de API y 7 del analizador; todas pasaron. La validación de lint/build frontend para esta reorganización está pendiente.
 - Se añadieron Tailwind CSS 4.3.3 y su plugin PostCSS a las dependencias de `backoffice`, a petición/aprobación del usuario; `npm ci` sincronizó el lockfile correctamente.
 
+## Adaptación del PR #8 — validada localmente
+
+- La rama `feature/pr8-public-website` parte de la punta de `feature/unified-admin-ui` (`0a08b17`); el PR #7 y su rama permanecen intactos.
+- La experiencia pública Next.js del PR #8 está adaptada a `uis/website/`; se conserva `uis/backoffice/` sin reintroducir `uis/talent-pipeline-tracker/`.
+- El sitio ofrece landing en `/` y formulario de demostración en `/application`; la validación ocurre en el navegador y no se envían ni almacenan datos.
+- Verificaciones finales del website: lint pasó con 3 advertencias de `<img>` frente a `next/image`, typecheck pasó y build de producción pasó. Las rutas `/`, `/_not-found` y `/application` se generaron correctamente.
+- Pruebas visuales en escritorio y viewport móvil: navegación y rutas verificadas; se probaron validación vacía, correo inválido, estado de éxito local e imágenes. No hubo desbordamiento horizontal en 390 px.
+- `git diff --check` pasó. La instalación de npm reportó previamente 11 vulnerabilidades de auditoría (7 moderadas, 3 altas y 1 crítica); no se ejecutó `npm audit fix`.
+- El PR #8 original permanece abierto y sin cambios. No se ha borrado.
+
 ## Estado actual
 
 - El frontend administrativo activo para nuevas interfaces es `uis/backoffice/`, con Next.js App Router, React, TypeScript y Tailwind; el backend usa FastAPI con uv.
-- La web pública sigue siendo estática. En `backoffice`, el dashboard de operaciones es ilustrativo y proveedores/análisis CSV consumen la API autenticada en `services/api/`.
+- La web pública está en `uis/website/` con Next.js; su formulario es de demostración, con validación local y sin envío ni almacenamiento. En `backoffice`, el dashboard de operaciones es ilustrativo y proveedores/análisis CSV consumen la API autenticada en `services/api/`.
 - AUTH-01 usa JWT stateless, usuarios y perfiles exclusivamente en TinyDB y no utiliza cookies ni sesiones de servidor. La clave y `ACCESS_TOKEN_EXPIRE_MINUTES` se exigen por entorno.
 - `/users` permite registro público solo en `POST`; las demás rutas de usuarios requieren JWT y GET por ID es solo propio/admin. Perfiles e incidencias requieren JWT; acceso ajeno devuelve `403`, y el perfil no se puede eliminar sin borrar su usuario.
 - Los hashes nuevos usan `bcrypt` de libpass. `/docs` sirvió Swagger UI; el flujo HTTP de registro, login y ruta protegida se verificó localmente con datos ficticios.

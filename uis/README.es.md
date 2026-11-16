@@ -9,7 +9,7 @@ Los proyectos que se almacenan aquí son:
 
 Organiza `uis/` por **distintas áreas de la compañía** — cada subcarpeta agrupa un ámbito diferente (por ejemplo, web pública frente a operaciones internas) e incluye su propia documentación técnica y funcional.
 
-El sitio público estático de TrackFlow vive en [`website/`](./website/README.md). Todas las interfaces privadas (operaciones, candidaturas, proveedores e incidencias) comparten [`backoffice/`](./backoffice/README.md); no mantengas una tercera aplicación dentro de `uis/`.
+El sitio público Next.js de TrackFlow vive en [`website/`](./website/README.md). Todas las interfaces privadas (operaciones, candidaturas, proveedores e incidencias) comparten [`backoffice/`](./backoffice/README.md); no mantengas una tercera aplicación dentro de `uis/`.
 
 - **Propósito principal**: centralizar en un único lugar todas las aplicaciones frontend que dan soporte a los casos de uso de la compañía.
 - **Recomendación**: documenta en este archivo (o en sub-READMEs) las aplicaciones que vayas añadiendo, su objetivo, tecnología usada y cómo ejecutarlas.
