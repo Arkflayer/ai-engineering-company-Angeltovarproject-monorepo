@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigation = [
-  { href: "/", label: "Resumen", symbol: "▦" },
+  { href: "/", label: "Operaciones", symbol: "▦" },
+  { href: "/candidates", label: "Candidaturas", symbol: "◎" },
   { href: "/suppliers", label: "Proveedores", symbol: "⇄" },
   { href: "/incidents", label: "Análisis de incidencias", symbol: "!" },
 ];

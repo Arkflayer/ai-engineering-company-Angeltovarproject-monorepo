@@ -1,29 +1,51 @@
-# Panel interno de TrackFlow
+# TrackFlow Backoffice
 
-Aplicación Next.js 16 con App Router para el espacio interno de operaciones de TrackFlow Tech. Incluye un dashboard ilustrativo, un directorio de proveedores conectado a la API autenticada y un analizador de incidencias CSV.
+La aplicación privada única de TrackFlow para operaciones, candidaturas, proveedores e incidencias. Usa Next.js App Router, React, TypeScript y Tailwind CSS; mantén la web pública separada en `uis/website/`. Usa las versiones declaradas en el manifiesto.
 
-## Ejecución local
+## Getting Started
 
-Requiere Node.js 20.9 o superior.
+From the repository root, run the development server:
 
-```sh
-cd uis/backoffice
-npm ci
-npm run dev
+```bash
+npm --prefix uis/backoffice run dev
 ```
 
-Abre `http://localhost:3000`. Las rutas principales son `/`, `/suppliers` y `/incidents`. El backoffice se inicia dentro de su carpeta; `npm run dev` desde la raíz sirve el sitio estático y no esta aplicación.
+## Áreas administrativas
 
-La API debe estar configurada y ejecutándose según [`services/api/README.md`](../../services/api/README.md), normalmente en `http://localhost:8000`. Si usa otro host, define `NEXT_PUBLIC_TRACKFLOW_API_URL` en el entorno del frontend antes de arrancarlo. La API debe permitir el origen del frontend en `TRACKFLOW_UI_ORIGINS`.
+Esta aplicación reúne todas las interfaces administrativas privadas del proyecto:
 
-## Directorio de proveedores
+- `/` — Operaciones (datos ilustrativos).
+- `/candidates` y `/candidates/[id]` — lista y detalle del pipeline de candidaturas (API configurada de forma independiente).
+- `/suppliers` — directorio autenticado de proveedores mediante la API FastAPI.
+- `/incidents` — análisis autenticado de CSV y exportación agregada mediante la API FastAPI.
 
-La ruta `/suppliers` requiere una cuenta válida de la API. Tras iniciar sesión, descarga el listado una vez y filtra por país y categoría en el cliente, sin recargar la página ni volver a consultar el servidor. Permite registrar proveedores, actualizar tarifas o estado y consultar el historial de cambios. El token Bearer solo se conserva en memoria mientras la página está abierta. Los proveedores son datos de demostración en TinyDB; no existe integración con compras o ERP.
+Los módulos de proveedores e incidencias necesitan una cuenta válida del backend. El token se conserva solo en memoria mientras la página está abierta. La interfaz no se conecta a un sistema de compras, WMS, transportistas ni seguimiento en vivo.
 
-## Análisis de incidencias
+### Variables de entorno
 
-La ruta `/incidents` permite iniciar sesión, seleccionar o arrastrar un CSV UTF-8 de hasta 25 MiB, analizarlo y descargar solo métricas agregadas. El archivo permanece en el navegador hasta pulsar «Analizar archivo»; entonces se envía a la API autenticada. El botón requiere sesión y un archivo CSV válido. Los correos y filas de origen no se muestran ni se exportan. Los resultados se guardan en memoria por usuario y proceso en la API y se pierden al reiniciarla. Usa solo datos y entornos autorizados.
+Usa [`.env.example`](./.env.example) como referencia. Para desarrollo local, crea manualmente `.env.local` en esta carpeta (está ignorado por Git) y configura:
 
-## Dashboard
+```dotenv
+NEXT_PUBLIC_TRACKFLOW_API_URL=<backend-origin>
+NEXT_PUBLIC_API_URL=<candidate-api-base-url>
+```
 
-La ruta `/` contiene métricas y envíos ficticios para demostración. No representa inventario ni seguimiento en vivo.
+La primera URL sirve a proveedores e incidencias; la segunda configura la integración del pipeline de candidaturas. Estos valores son marcadores, no endpoints operativos: sustituye ambos por las direcciones autorizadas de tu entorno. Para desarrollo local de proveedores e incidencias puedes usar `http://localhost:8000` en el archivo local `.env.local` (nunca lo subas). En producción, `NEXT_PUBLIC_TRACKFLOW_API_URL` es obligatoria para usar proveedores e incidencias; sin ella, las solicitudes fallan con un error de configuración en vez de dirigirse a localhost. Añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
+`npm run dev` desde esta carpeta inicia Next.js. Desde la raíz del repositorio usa `npm --prefix uis/backoffice run dev`; el `npm run dev` raíz solo sirve archivos estáticos. Abre la URL que muestra Next.js, normalmente [http://localhost:3000](http://localhost:3000).
+
+## Desarrollo
+
+- Sigue [`AGENTS.md`](../../AGENTS.md), las [instrucciones de frontend](../../.github/instructions/frontend.instructions.md) y el [`AGENTS.md` local](./AGENTS.md). Antes de modificar código, consulta la documentación de la versión instalada de Next.js en `node_modules/next/dist/docs/`.
+- Reutiliza `src/app/`, `src/components/`, `src/services/`, `src/types/` y el alias `@/*`. Prioriza Tailwind y los estilos existentes; no añadas frameworks, bibliotecas o dependencias sin aprobación explícita.
+- Las API y la lógica de negocio pertenecen a FastAPI en [`services/api/`](../../services/api/README.md). Comprueba cada integración antes de describirla como funcional.
+- Respeta la política de dependencias raíz; no ejecutes `npm install` para resolver lockfiles sin consultar.
+
+Ejecuta las comprobaciones desde la raíz del repositorio:
+
+```sh
+npm --prefix uis/backoffice run lint
+npm --prefix uis/backoffice run typecheck
+npm --prefix uis/backoffice run build
+```
+
+Para guías del App Router y despliegue, consulta la [documentación de Next.js](https://nextjs.org/docs).

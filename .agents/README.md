@@ -4,7 +4,7 @@ Esta carpeta configura los agentes de programación que trabajan en el repositor
 
 La regla `rules/interfaces.md` se aplica siempre que se cambie `uis/website/**` o `uis/backoffice/**`. La skill de trabajo recurrente con estas interfaces se encuentra en `skills/ui-delivery/SKILL.md` y se solicita para las tareas de interfaz compatibles con su descripción.
 
-El desarrollo frontend nuevo se dirige por defecto a `uis/talent-pipeline-tracker/` con Next.js, TypeScript y Tailwind; el backend usa FastAPI y uv en `services/api/`. Las instrucciones de Copilot en [frontend.instructions.md](../.github/instructions/frontend.instructions.md) y [backend.instructions.md](../.github/instructions/backend.instructions.md) tienen `description` y `applyTo` para adjuntarse a las tareas y archivos pertinentes. No extiendas la regla o skill estática a Next.js.
+El desarrollo frontend nuevo se dirige por defecto a `uis/backoffice/` con Next.js, TypeScript y Tailwind; el backend usa FastAPI y uv en `services/api/`. Las instrucciones de Copilot en [frontend.instructions.md](../.github/instructions/frontend.instructions.md) y [backend.instructions.md](../.github/instructions/backend.instructions.md) tienen `description` y `applyTo` para adjuntarse a las tareas y archivos pertinentes. No extiendas la regla o skill estática a Next.js.
 
 La política común de aprobación de dependencias está en [`AGENTS.md`](../AGENTS.md); estas instrucciones no la sustituyen. Para comprobar su descubrimiento en VS Code usa Add Context > Instructions o los diagnósticos de personalizaciones. Las instrucciones guían al agente, pero no bloquean técnicamente sus herramientas; si no puedes verificar su carga, informa de esa limitación.
 

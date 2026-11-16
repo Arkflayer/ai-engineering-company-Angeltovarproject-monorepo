@@ -4,10 +4,9 @@ Todo agente de programación que trabaje en este repositorio debe seguir este pr
 
 ## Stack y destino del desarrollo
 
-- El frontend predeterminado para nuevas funcionalidades es `uis/talent-pipeline-tracker/`: Next.js App Router, React, TypeScript y Tailwind CSS como primera opción para estilos. Reutiliza sus componentes; no generes páginas HTML ni scripts JavaScript independientes para sustituir esta aplicación.
+- Las interfaces web se organizan en `uis/website/` (sitio público estático) y `uis/backoffice/` (app privada Next.js App Router, React, TypeScript y Tailwind). Toda nueva interfaz interna va en `backoffice`; no crees un tercer proyecto de UI.
 - El backend es FastAPI en `services/api/`, con entornos y ejecución gestionados por uv. Mantén las API y la lógica de negocio en este backend; no crees una API paralela en Next.js para reemplazarlo.
-- `uis/website/` y `uis/backoffice/` son prototipos de interfaz estática. Trabaja allí solo si la solicitud los identifica expresamente; no los migres ni elimines como consecuencia de una tarea en Next.js.
-- Antes de crear archivos, determina la aplicación objetivo. Sigue las instrucciones de `.github/instructions/` para frontend y backend y las reglas de `.agents/rules/` para las interfaces estáticas. Conserva las instrucciones locales generadas por Next.js.
+- Trabaja en el proyecto pertinente según la solicitud. Sigue las instrucciones de `.github/instructions/` para frontend y backend y las reglas de `.agents/rules/` para las interfaces estáticas. Conserva las instrucciones locales generadas por Next.js.
 
 ## Dependencias y entornos
 
