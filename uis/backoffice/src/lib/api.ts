@@ -9,26 +9,50 @@ function getApiBaseUrl(): string {
   return API_BASE_URL;
 }
 
+export type ApiFieldErrors = Partial<Record<'email' | 'password' | 'name' | 'phone' | 'address', string>>;
+
 export class ApiError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly fieldErrors: ApiFieldErrors = {},
+  ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
+const registrationFields = new Set(['email', 'password', 'name', 'phone', 'address']);
+
 async function responseError(response: Response, fallback: string): Promise<ApiError> {
   let message = `${fallback} (HTTP ${response.status})`;
+  const fieldErrors: ApiFieldErrors = {};
   try {
     const body: unknown = await response.json();
     if (body && typeof body === 'object' && 'detail' in body) {
       const detail = body.detail;
       if (typeof detail === 'string') message = detail;
-      else if (Array.isArray(detail)) message = detail.map((item) => item.msg).filter(Boolean).join(' ') || message;
+      else if (Array.isArray(detail)) {
+        const messages: string[] = [];
+        for (const item of detail) {
+          if (!item || typeof item !== 'object' || !('msg' in item) || typeof item.msg !== 'string') continue;
+          messages.push(item.msg);
+          const location = 'loc' in item && Array.isArray(item.loc) ? item.loc : [];
+          const field = [...location].reverse().find((part): part is keyof ApiFieldErrors =>
+            typeof part === 'string' && registrationFields.has(part),
+          );
+          if (field) fieldErrors[field] = item.msg;
+        }
+        message = messages.join(' ') || message;
+      }
     }
   } catch {
     // Keep the HTTP status when the server does not return JSON.
   }
-  return new ApiError(message, response.status);
+  if (response.status === 409 && /email|correo|registrad/i.test(message)) {
+    fieldErrors.email = message;
+  }
+  return new ApiError(message, response.status, fieldErrors);
 }
 
 export interface LoginResponse {
