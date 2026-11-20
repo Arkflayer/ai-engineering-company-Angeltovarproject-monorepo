@@ -80,6 +80,37 @@ export async function register(input: { email: string; password: string; name?: 
   if (!response.ok) throw await responseError(response, "No se pudo crear la cuenta");
 }
 
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) throw await responseError(response, "No se pudo procesar la solicitud.");
+  return response.json() as Promise<{ message: string }>;
+}
+
+export async function resetPassword(token: string, password: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!response.ok) throw await responseError(response, "No se pudo restablecer la contraseña.");
+  return response.json() as Promise<{ message: string }>;
+}
+
+export async function changePassword(token: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+  if (response.status === 401 && typeof window !== "undefined") window.dispatchEvent(new Event("trackflow:unauthorized"));
+  if (!response.ok) throw await responseError(response, "No se pudo cambiar la contraseña.");
+  return response.json() as Promise<{ message: string }>;
+}
+
 export async function login(email: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${getApiBaseUrl()}/auth/login`, {
     method: 'POST',
