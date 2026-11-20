@@ -1,20 +1,134 @@
-.auth-fields { display: grid; gap: 14px; padding: 0 19px; }
-.auth-fields label, .auth-panel label { display: grid; gap: 6px; color: #52675e; font-size: 11px; }
-.auth-fields input, .auth-panel input { min-height: 40px; width: 100%; padding: 9px 11px; border: 1px solid #cad8d1; border-radius: 4px; color: var(--ink); background: #fff; }
-.auth-fields input:focus, .auth-panel input:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
-.auth-fields input[readonly] { background: #f1f5f2; color: #64746d; }
-.auth-fields .primary-button, .auth-panel .primary-button { justify-self: start; }
-.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--canvas); }
-.auth-panel { width: min(100%, 460px); padding: 28px 0 20px; }
-.auth-panel .eyebrow, .auth-panel h1, .auth-panel > .page-description { margin-left: 24px; margin-right: 24px; }
-.auth-panel h1 { font-size: 25px; }
-.auth-panel .auth-fields { margin-top: 24px; }
-.auth-switch { margin: 17px 24px 0; color: var(--muted); font-size: 11px; }
-.auth-switch a { color: var(--accent-dark); font-weight: 700; text-decoration: underline; }
-.profile-route { min-height: 100vh; padding: 34px 20px; background: var(--canvas); }
-.profile-width { width: min(100%, 760px); margin: 0 auto; }
-.profile-route .topbar { min-height: 54px; }
-.profile-route .profile-card { max-width: 720px; margin: 18px auto; padding-bottom: 18px; }
-.frame-logout { margin-left: auto; border: 0; background: transparent; color: var(--accent-dark); font-size: 10px; font-weight: 700; }
+/* ── Auth pages (login / register) ── */
+/* Only brand-specific treatments that Tailwind cannot express.
+   Everything else lives as Tailwind classes in AuthForms.tsx. */
 
-.profile-card .analysis-message { margin-bottom: 5px; }
+/* Card: exact brand shadow */
+.auth-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 10px 35px rgb(23 43 77 / 5%);
+}
+
+/* Brand link colour */
+.auth-brand {
+  color: #173c92;
+}
+
+/* Eyebrow: brand light blue */
+.eyebrow {
+  color: #5473b8;
+}
+
+/* Input focus ring: brand blue (auth pages only) */
+.auth-fields input:focus {
+  border-color: #6486e2;
+  box-shadow: 0 0 0 3px rgb(36 87 214 / 11%);
+}
+
+/* Error state on auth inputs */
+.auth-fields input[aria-invalid="true"] {
+  border-color: #d3444c;
+}
+
+.auth-fields input[readonly] {
+  background: #f1f5f2;
+  color: #64746d;
+}
+
+/* Field-level error */
+.field-error {
+  color: #b4232c;
+  font-size: 0.78rem;
+}
+
+/* Primary submit button: brand blue + hover effect */
+.auth-submit {
+  border-color: #2457d6;
+  background: #2457d6;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #1d46b4;
+  box-shadow: 0 8px 20px rgb(36 87 214 / 18%);
+}
+
+.auth-submit:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+/* Error message: brand red */
+.analysis-message.error {
+  color: #b4232c;
+}
+
+/* Switch link: brand ink + hover blue */
+.auth-switch a {
+  color: #172b4d;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.auth-switch a:hover {
+  color: #2457d6;
+}
+
+/* ── Profile page ── */
+
+/* Secondary button (logout) — brand green accent */
+.profile-secondary-btn {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #155b4c;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-secondary-btn:hover {
+  color: #237b66;
+}
+
+/* Profile card — match website card style */
+.profile-card {
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(26 56 44 / 3%);
+}
+
+/* Profile form fields — brand focus ring */
+.profile-fields input:focus {
+  border-color: #6486e2;
+  box-shadow: 0 0 0 3px rgb(36 87 214 / 11%);
+}
+
+.profile-fields input[aria-invalid="true"] {
+  border-color: #d3444c;
+}
+
+.profile-fields input[readonly] {
+  background: #f1f5f2;
+  color: #64746d;
+}
+
+/* Profile submit button — brand green (admin accent) */
+.profile-submit {
+  border-color: #237b66;
+  background: #237b66;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.profile-submit:hover:not(:disabled) {
+  background: #155b4c;
+}
+
+.profile-submit:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
