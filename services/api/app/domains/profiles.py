@@ -62,7 +62,7 @@ def create_profile(
     try:
         return store.create_profile(current_user["id"], data.model_dump())
     except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        raise HTTPException(status_code=409, detail="No se pudo crear el perfil con esos datos.") from exc
 
 
 @router.get("", response_model=list[ProfileResponse])

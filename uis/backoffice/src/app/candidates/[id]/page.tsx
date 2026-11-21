@@ -1,7 +1,7 @@
 // src/app/candidates/[id]/page.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { Candidate, CandidateStatus, CandidateStage, Note } from '@/types';
 import { STATUS_LABELS, STAGE_LABELS } from '@/types';
@@ -35,44 +35,50 @@ export default function CandidateDetailPage() {
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [stageUpdating, setStageUpdating] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [retryAction, setRetryAction] = useState<(() => void) | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const candidateRequestVersion = useRef(0);
+  const notesRequestVersion = useRef(0);
 
   // Cargar candidato
   const loadCandidate = useCallback(async () => {
+    const version = ++candidateRequestVersion.current;
     setLoading(true);
     setError(null);
     try {
       const data = await fetchCandidate(id);
-      setCandidate(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar el candidato');
+      if (version === candidateRequestVersion.current) setCandidate(data);
+    } catch {
+      if (version === candidateRequestVersion.current) setError('No se pudieron cargar los datos del candidato. Inténtalo de nuevo.');
     } finally {
-      setLoading(false);
+      if (version === candidateRequestVersion.current) setLoading(false);
     }
   }, [id]);
 
   // Cargar notas
   const loadNotes = useCallback(async () => {
+    const version = ++notesRequestVersion.current;
     setNotesLoading(true);
     setNotesError(null);
     try {
       const data = await fetchNotes(id);
-      setNotes(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setNotesError(err instanceof Error ? err.message : 'Error al cargar las notas');
+      if (version === notesRequestVersion.current) setNotes(Array.isArray(data) ? data : []);
+    } catch {
+      if (version === notesRequestVersion.current) setNotesError('No se pudieron cargar las notas. Inténtalo de nuevo.');
     } finally {
-      setNotesLoading(false);
+      if (version === notesRequestVersion.current) setNotesLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
     void Promise.resolve().then(loadCandidate);
+    return () => { candidateRequestVersion.current += 1; };
   }, [loadCandidate]);
 
   useEffect(() => {
-    if (candidate) {
-      void Promise.resolve().then(loadNotes);
-    }
+    if (!candidate) return;
+    void Promise.resolve().then(loadNotes);
+    return () => { notesRequestVersion.current += 1; };
   }, [candidate, loadNotes]);
 
   // ─── Actualizar estado ───
@@ -80,13 +86,15 @@ export default function CandidateDetailPage() {
     if (!candidate || statusUpdating) return;
     setStatusUpdating(true);
     setActionError(null);
+    setRetryAction(null);
     setActionSuccess(null);
     try {
       const updated = await patchCandidate(id, { status: newStatus });
       setCandidate(updated);
       setActionSuccess('Estado actualizado correctamente.');
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Error al actualizar estado');
+    } catch {
+      setActionError('No se pudo actualizar el estado. Inténtalo de nuevo.');
+      setRetryAction(() => () => { void handleStatusChange(newStatus); });
     } finally {
       setStatusUpdating(false);
     }
@@ -97,13 +105,15 @@ export default function CandidateDetailPage() {
     if (!candidate || stageUpdating) return;
     setStageUpdating(true);
     setActionError(null);
+    setRetryAction(null);
     setActionSuccess(null);
     try {
       const updated = await patchCandidate(id, { stage: newStage });
       setCandidate(updated);
       setActionSuccess('Etapa actualizada correctamente.');
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Error al actualizar etapa');
+    } catch {
+      setActionError('No se pudo actualizar la etapa. Inténtalo de nuevo.');
+      setRetryAction(() => () => { void handleStageChange(newStage); });
     } finally {
       setStageUpdating(false);
     }
@@ -114,14 +124,16 @@ export default function CandidateDetailPage() {
     if (!newNoteContent.trim() || addingNote) return;
     setAddingNote(true);
     setActionError(null);
+    setRetryAction(null);
     setActionSuccess(null);
     try {
       const newNote = await createNote(id, { content: newNoteContent.trim() });
       setNotes((prev) => [...prev, newNote]);
       setNewNoteContent('');
       setActionSuccess('Nota añadida correctamente.');
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Error al añadir nota');
+    } catch {
+      setActionError('No se pudo añadir la nota. Inténtalo de nuevo.');
+      setRetryAction(() => () => { void handleAddNote(); });
     } finally {
       setAddingNote(false);
     }
@@ -132,13 +144,15 @@ export default function CandidateDetailPage() {
     if (deletingNoteId) return;
     setDeletingNoteId(noteId);
     setActionError(null);
+    setRetryAction(null);
     setActionSuccess(null);
     try {
       await deleteNote(id, noteId);
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
       setActionSuccess('Nota eliminada correctamente.');
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Error al eliminar nota');
+    } catch {
+      setActionError('No se pudo eliminar la nota. Inténtalo de nuevo.');
+      setRetryAction(() => () => { void handleDeleteNote(noteId); });
     } finally {
       setDeletingNoteId(null);
     }
@@ -154,7 +168,7 @@ export default function CandidateDetailPage() {
       </button>
     </div>
   );
-  if (!candidate) return null;
+  if (!candidate) return <ErrorMessage message="No se encontraron los datos del candidato." onRetry={loadCandidate} />;
 
   const statusValues = Object.entries(STATUS_LABELS) as [CandidateStatus, string][];
   const stageValues = Object.entries(STAGE_LABELS) as [CandidateStage, string][];
@@ -188,7 +202,7 @@ export default function CandidateDetailPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         {actionError && (
-          <div className="mb-4"><ErrorMessage message={actionError} /></div>
+          <div className="mb-4"><ErrorMessage message={actionError} onRetry={retryAction ? () => retryAction() : undefined} /></div>
         )}
         {actionSuccess && (
           <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700" role="status">
@@ -298,7 +312,7 @@ export default function CandidateDetailPage() {
 
               {/* Listado de notas */}
               {notesLoading ? (
-                <p className="text-sm text-gray-400">Cargando notas...</p>
+                      <p className="text-sm text-gray-400" role="status">Cargando notas...</p>
               ) : notesError ? (
                 <ErrorMessage message={notesError} onRetry={loadNotes} />
               ) : notes.length === 0 ? (
