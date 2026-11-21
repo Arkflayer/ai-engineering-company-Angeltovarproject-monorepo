@@ -7,7 +7,7 @@ const navigation = [
   { href: "/", label: "Operaciones", symbol: "▦" },
   { href: "/candidates", label: "Candidaturas", symbol: "◎" },
   { href: "/suppliers", label: "Proveedores", symbol: "⇄" },
-  { href: "/incidents", label: "Análisis de incidencias", symbol: "!" },
+  { href: "/incidents", label: "Gestor de incidencias", symbol: "!" },
 ];
 
 export default function BackofficeNav() {

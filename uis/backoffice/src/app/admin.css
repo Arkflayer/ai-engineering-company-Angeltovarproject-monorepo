@@ -1,4 +1,4 @@
-.admin-shell {
+﻿.admin-shell {
   --ink: #1d302d;
   --muted: #6b7d78;
   --line: #dce7e2;
@@ -40,8 +40,12 @@
 .admin-nav-item > span { width: 18px; color: #71847c; font-size: 16px; text-align: center; }
 .admin-nav-item:hover, .admin-nav-item.active { background: var(--accent-soft); color: var(--accent-dark) !important; }
 .admin-nav-item.active { font-weight: 700; }
-.admin-sidebar-footer { display: flex; align-items: center; gap: 10px; margin-top: auto; padding: 15px 8px 2px; border-top: 1px solid var(--line); }
+.admin-sidebar-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; padding: 15px 8px 2px; border-top: 1px solid var(--line); }
 .admin-avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: #e7efec; color: var(--accent-dark); font-size: 11px; font-weight: 700; }
+.admin-footer-user { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.admin-footer-user .text-link { font-size: 12px; }
+.admin-logout-btn { min-height: 24px; padding: 0 6px; border: 0; background: none; color: var(--muted); font-size: 10px; cursor: pointer; text-decoration: underline; }
+.admin-logout-btn:hover { color: var(--danger); }
 .admin-sidebar-footer strong, .admin-sidebar-footer small { display: block; }
 .admin-sidebar-footer strong { font-size: 11px; }
 .admin-sidebar-footer small { margin-top: 3px; color: var(--muted); font-size: 10px; }
@@ -255,3 +259,107 @@
   .admin-main { padding: 0 11px; }
   .admin-metrics-grid, .admin-main .metrics-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Gestor de incidencias workspace ── */
+.incident-workspace { padding-bottom: 22px; }
+
+.incident-filters { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; padding: 0 19px 8px; }
+.incident-filters label { max-width: 280px; }
+.incident-filters .secondary-button { min-height: 32px; padding: 0 9px; font-size: 10px; }
+
+.incident-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 0 19px; }
+.incident-form > .incident-field { grid-column: 1 / -1; }
+.incident-form .incident-field { display: flex; flex-direction: column; gap: 6px; }
+.incident-form .incident-field label { font-size: 11px; font-weight: 600; color: var(--muted, #5e726a); }
+.incident-form .incident-field input,
+.incident-form .incident-field textarea,
+.incident-form .incident-field select { min-height: 38px; padding: 8px 10px; border: 1px solid #cad8d1; border-radius: 4px; font-size: 13px; font-family: inherit; background: #fff; width: 100%; box-sizing: border-box; color: var(--ink); }
+.incident-form .incident-field input:focus,
+.incident-form .incident-field textarea:focus,
+.incident-form .incident-field select:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
+.incident-form .form-error { grid-column: 1 / -1; color: var(--danger); font-size: 11px; margin: 0; }
+.incident-field-row { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.incident-form-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 0; }
+.incident-form-actions .primary-button { min-height: 38px; padding: 0 24px; font-size: 13px; }
+
+.incident-table { min-width: 1050px; white-space: normal; }
+.incident-table th,
+.incident-table td { vertical-align: middle; }
+.incident-table td { line-height: 1.5; }
+.incident-table .status-badge { display: inline-block; padding: 2px 9px; border-radius: 9px; font-size: 10px; font-weight: 600; }
+.incident-table .status-badge.open { background: #dff0f7; color: #1e6b8a; }
+.incident-table .status-badge.in_progress { background: #fef0d6; color: #915f15; }
+.incident-table .status-badge.resolved { background: #daf0dd; color: #236e3e; }
+.incident-table .status-badge.discarded { background: #f1e6e6; color: #7a4f4f; }
+.incident-table .incident-row-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+.incident-table .incident-row-link:hover { color: var(--accent-dark); }
+.incident-table .incident-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.incident-table .incident-actions .secondary-button { min-height: 30px; padding: 0 8px; font-size: 9px; }
+
+.incident-detail { padding: 0 19px 18px; }
+.incident-detail dl { display: grid; grid-template-columns: 140px 1fr; gap: 6px 14px; }
+.incident-detail dt { color: #5e726a; font-size: 11px; }
+.incident-detail dd { margin: 0; font-size: 13px; }
+.detail-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.detail-actions .primary-button { min-height: 36px; padding: 0 16px; }
+.detail-actions .secondary-button { min-height: 32px; padding: 0 9px; font-size: 10px; }
+
+.incident-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 7px; border-radius: 10px; background: #dff0f7; color: #1e6b8a; font-size: 11px; font-weight: 700; line-height: 20px; }
+
+/* ── Incidentes: mejoras adicionales ── */
+.incident-filters select { min-width: 140px; }
+.incident-error-bar { display: flex; align-items: center; gap: 12px; padding: 12px 19px; }
+.incident-error-bar .error-message { margin: 0; color: var(--danger); font-size: 11px; }
+.empty-state { margin: 0; padding: 22px 19px; color: var(--muted); font-size: 12px; font-style: italic; }
+.loading-text { margin: 0; padding: 22px 19px; color: var(--muted); font-size: 12px; }
+.branch-highlight { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-left: 3px solid #57917d; background: #eaf3ee; color: #425f53; font-size: 11px; line-height: 1.5; margin: 0 19px 14px; grid-column: 1 / -1; }
+.branch-highlight-icon { font-size: 16px; }
+.field-error { margin: 2px 0 0; padding: 0; color: var(--danger); font-size: 10px; }
+select.field-highlight { border-color: var(--accent); background: #eaf3ee; }
+.incident-table .status-transition { min-height: 30px; padding: 0 14px 0 8px; font-size: 9px; max-width: 150px; }
+.incident-notice { margin: 10px 0; padding: 12px 14px; border-left: 3px solid #57917d; background: #eaf3ee; color: #425f53; font-size: 11px; line-height: 1.5; }
+.incident-notice.error { border-color: var(--danger); background: #f6e8e4; color: #a34a3d; }
+.incident-table .final-status { color: var(--muted); font-size: 9px; font-style: italic; }
+.incident-summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 13px; }
+.incident-table .incident-title-cell { display: flex; flex-direction: column; }
+.incident-table .incident-title-cell strong { font-size: 12px; }
+.incident-table .incident-title-cell .incident-date { color: var(--muted); font-size: 9px; }
+
+/* ── Selector de idioma global ── */
+.admin-lang-toggle { display: inline-flex; align-items: center; gap: 3px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer; }
+.admin-lang-toggle:hover { border-color: var(--accent); color: var(--accent-dark); }
+.admin-lang-toggle .sep { color: var(--line); font-weight: 400; }
+.admin-lang-toggle .active { color: var(--accent-dark); text-decoration: underline; }
+
+/* ───── Topbar ───── */
+.admin-topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 24px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.admin-topbar-left { display: flex; align-items: center; gap: 8px; }
+.admin-topbar-brand { font-size: 13px; font-weight: 700; color: var(--accent-dark); text-transform: uppercase; letter-spacing: 0.05em; }
+.admin-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+/* ───── Modal de detalle de incidencia ───── */
+.incident-modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: rgba(0 0 0 / 40%); backdrop-filter: blur(2px); padding: 16px; }
+.incident-modal { background: var(--surface); border-radius: 12px; box-shadow: 0 8px 32px rgb(0 0 0 / 15%); max-width: 520px; width: 100%; max-height: 80vh; overflow-y: auto; animation: modalIn 0.2s ease; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.incident-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.incident-modal-header h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.incident-modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1; }
+.incident-modal-close:hover { background: var(--accent-bg); color: var(--text); }
+.incident-modal-body { padding: 20px; }
+.incident-modal-body dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 10px 16px; font-size: 13px; }
+.incident-modal-body dt { color: var(--muted); font-weight: 600; }
+.incident-modal-body dd { margin: 0; color: var(--text); word-break: break-word; }
+.incident-modal-body .incident-description { grid-column: 1 / -1; margin-top: 8px; padding: 12px; background: var(--accent-bg); border-radius: 8px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+
+/* ───── Botón de cambio de estado ───── */
+.status-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px 5px 10px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: border-color 0.15s, color 0.15s; }
+.status-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
+.status-btn .arrow { margin-left: 2px; font-size: 8px; }
+.status-menu { position: absolute; z-index: 100; top: 100%; left: 0; margin-top: 4px; min-width: 140px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 10%); padding: 4px; overflow: hidden; }
+.status-menu button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; color: var(--text); font-size: 12px; cursor: pointer; border-radius: 6px; }
+.status-menu button:hover { background: var(--accent-bg); }
+.status-btn-wrap { position: relative; display: inline-block; padding: 4px 4px 4px 0; }
+.incident-table th:last-child,
+.incident-table td:last-child { min-width: 180px; padding: 8px 50px 8px 6px; text-align: left; }
+.incident-table td:last-child { white-space: nowrap; }
+.incident-table-wrap { overflow-x: auto; padding: 0 0 8px; }

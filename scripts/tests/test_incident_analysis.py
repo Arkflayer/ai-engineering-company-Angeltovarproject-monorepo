@@ -10,7 +10,10 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "services" / "api"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-from app.domains.incidents.analysis import analyze_csv, write_results_csv
+_SHARED_PATH = Path(__file__).resolve().parents[2] / "packages" / "shared"
+if str(_SHARED_PATH) not in sys.path:
+    sys.path.insert(0, str(_SHARED_PATH))
+from validation.csv_validation import analyze_csv, write_results_csv  # noqa: E402
 from analyze import main as cli_main
 
 HEADER = "incident_id,date,country,customer_type,tracking_number,carrier,category,description,status,customer_email,satisfaction_score\n"

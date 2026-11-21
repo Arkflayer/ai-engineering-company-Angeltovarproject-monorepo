@@ -15,7 +15,7 @@ class SupplierStore:
         location = Path(path)
         location.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         location.touch(mode=0o600, exist_ok=True)
-        self.db = TinyDB(location)
+        self.db = TinyDB(location, encoding='utf-8')
         self.suppliers = self.db.table("suppliers")
         self.status_history = self.db.table("supplier_status_history")
         self.lock = RLock()

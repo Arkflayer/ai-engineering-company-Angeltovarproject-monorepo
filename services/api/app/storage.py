@@ -21,7 +21,7 @@ class IdentityStore:
         location = Path(path)
         location.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         location.touch(mode=0o600, exist_ok=True)
-        self.db = TinyDB(location)
+        self.db = TinyDB(location, encoding='utf-8')
         self.users = self.db.table("users")
         self.profiles = self.db.table("profiles")
         self.lock = RLock()
@@ -69,9 +69,12 @@ class IdentityStore:
     def update_user(self, user_uuid: str, changes: dict) -> dict:
         updates = dict(changes)
         password = updates.pop("password", None)
+        bump_reset = updates.pop("password_reset_version", None) is True
         if password is not None:
             updates["hashed_password"] = hash_password(password)
             updates["auth_version"] = str(uuid4())
+            if bump_reset or password is not None:
+                updates["password_reset_version"] = str(uuid4())
         if "role" in updates:
             updates["role"] = UserRole(updates["role"]).value
             updates["auth_version"] = str(uuid4())
