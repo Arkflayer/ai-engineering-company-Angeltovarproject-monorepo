@@ -1,4 +1,4 @@
-"""Configuración, hash de credenciales y firma de sesiones."""
+"""Configuración, hash de credenciales, firma de sesiones y restablecimiento."""
 from __future__ import annotations
 
 import os
@@ -24,6 +24,9 @@ class Settings:
     token_minutes: int
     db_path: str
     supplier_db_path: str
+    resend_api_key: str
+    reset_token_secret: str
+    ui_base_url: str
 
 
 def get_supplier_db_path() -> str:
@@ -46,11 +49,18 @@ def get_settings() -> Settings:
     if not 1 <= minutes <= 1440:
         raise RuntimeError("ACCESS_TOKEN_EXPIRE_MINUTES debe ser un entero entre 1 y 1440.")
     default_path = Path.home() / ".local" / "share" / "trackflow" / "identity.json"
+    reset_secret = os.environ.get("TRACKFLOW_RESET_TOKEN_SECRET", "")
+    if len(reset_secret.encode("utf-8")) < 32:
+        raise RuntimeError("TRACKFLOW_RESET_TOKEN_SECRET debe contener al menos 32 bytes aleatorios.")
+    ui_base_url = os.environ.get("TRACKFLOW_UI_BASE_URL", "http://localhost:3000").rstrip("/")
     return Settings(
         secret,
         minutes,
         os.environ.get("TRACKFLOW_DB_PATH", str(default_path)),
         get_supplier_db_path(),
+        os.environ.get("RESEND_API_KEY", ""),
+        reset_secret,
+        ui_base_url,
     )
 
 
@@ -83,6 +93,42 @@ def create_access_token(user_uuid: str, auth_version: str) -> str:
         },
         settings.secret_key,
         algorithm=ALGORITHM,
+    )
+
+
+RESET_TOKEN_MINUTES = 30
+
+
+def create_reset_token(user_uuid: str, reset_version: str) -> str:
+    """Token breve para restablecer contraseña (válido 30 min, uso único)."""
+    settings = get_settings()
+    now = datetime.now(timezone.utc)
+    return jwt.encode(
+        {
+            "sub": user_uuid,
+            "purpose": "reset_password",
+            "pver": reset_version,
+            "iat": now,
+            "exp": now + timedelta(minutes=RESET_TOKEN_MINUTES),
+        },
+        settings.reset_token_secret,
+        algorithm=ALGORITHM,
+    )
+
+
+def decode_reset_token(token: str) -> dict:
+    """Valida y devuelve el contenido de un token de restablecimiento."""
+    settings = get_settings()
+    return jwt.decode(
+        token,
+        settings.reset_token_secret,
+        algorithms=[ALGORITHM],
+        options={
+            "require_sub": True,
+            "require_exp": True,
+            "require_iat": True,
+            "verify_aud": False,
+        },
     )
 
 

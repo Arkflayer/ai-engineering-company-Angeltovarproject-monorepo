@@ -31,6 +31,7 @@ class User(BaseModel):
     role: UserRole = UserRole.USER
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     auth_version: str = Field(default_factory=lambda: str(uuid4()), repr=False)
+    password_reset_version: str = Field(default_factory=lambda: str(uuid4()), repr=False)
 
 
 class UserCreate(BaseModel):
