@@ -267,9 +267,20 @@
 .incident-filters label { max-width: 280px; }
 .incident-filters .secondary-button { min-height: 32px; padding: 0 9px; font-size: 10px; }
 
-.incident-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; padding: 0 19px; }
+.incident-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 0 19px; }
+.incident-form > .incident-field { grid-column: 1 / -1; }
+.incident-form .incident-field { display: flex; flex-direction: column; gap: 6px; }
+.incident-form .incident-field label { font-size: 11px; font-weight: 600; color: var(--muted, #5e726a); }
+.incident-form .incident-field input,
+.incident-form .incident-field textarea,
+.incident-form .incident-field select { min-height: 38px; padding: 8px 10px; border: 1px solid #cad8d1; border-radius: 4px; font-size: 13px; font-family: inherit; background: #fff; width: 100%; box-sizing: border-box; color: var(--ink); }
+.incident-form .incident-field input:focus,
+.incident-form .incident-field textarea:focus,
+.incident-form .incident-field select:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
 .incident-form .form-error { grid-column: 1 / -1; color: var(--danger); font-size: 11px; margin: 0; }
-.incident-form-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+.incident-field-row { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.incident-form-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 0; }
+.incident-form-actions .primary-button { min-height: 38px; padding: 0 24px; font-size: 13px; }
 
 .incident-table { min-width: 1050px; white-space: normal; }
 .incident-table th,

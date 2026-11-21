@@ -592,6 +592,15 @@ export default function IncidentsWorkspace() {
           <h1>{t("title", lang)}</h1>
           <p className="page-description">{t("subtitle", lang)}</p>
         </div>
+              {tab !== "form" && (
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={() => setTab("form")}
+                >
+                  + {t("newIncident", lang)}
+                </button>
+              )}
       </section>
 
       <div className="tab-bar" role="tablist">
