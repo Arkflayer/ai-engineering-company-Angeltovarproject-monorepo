@@ -40,8 +40,12 @@
 .admin-nav-item > span { width: 18px; color: #71847c; font-size: 16px; text-align: center; }
 .admin-nav-item:hover, .admin-nav-item.active { background: var(--accent-soft); color: var(--accent-dark) !important; }
 .admin-nav-item.active { font-weight: 700; }
-.admin-sidebar-footer { display: flex; align-items: center; gap: 10px; margin-top: auto; padding: 15px 8px 2px; border-top: 1px solid var(--line); }
+.admin-sidebar-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; padding: 15px 8px 2px; border-top: 1px solid var(--line); }
 .admin-avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: #e7efec; color: var(--accent-dark); font-size: 11px; font-weight: 700; }
+.admin-footer-user { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.admin-footer-user .text-link { font-size: 12px; }
+.admin-logout-btn { min-height: 24px; padding: 0 6px; border: 0; background: none; color: var(--muted); font-size: 10px; cursor: pointer; text-decoration: underline; }
+.admin-logout-btn:hover { color: var(--danger); }
 .admin-sidebar-footer strong, .admin-sidebar-footer small { display: block; }
 .admin-sidebar-footer strong { font-size: 11px; }
 .admin-sidebar-footer small { margin-top: 3px; color: var(--muted); font-size: 10px; }
@@ -343,4 +347,8 @@ select.field-highlight { border-color: var(--accent); background: #eaf3ee; }
 .status-menu { position: absolute; z-index: 100; top: 100%; left: 0; margin-top: 4px; min-width: 140px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 10%); padding: 4px; overflow: hidden; }
 .status-menu button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; color: var(--text); font-size: 12px; cursor: pointer; border-radius: 6px; }
 .status-menu button:hover { background: var(--accent-bg); }
-.status-btn-wrap { position: relative; display: inline-block; }
+.status-btn-wrap { position: relative; display: inline-block; padding: 4px 4px 4px 0; }
+.incident-table th:last-child,
+.incident-table td:last-child { min-width: 180px; padding: 8px 50px 8px 6px; text-align: left; }
+.incident-table td:last-child { white-space: nowrap; }
+.incident-table-wrap { overflow-x: auto; padding: 0 0 8px; }
