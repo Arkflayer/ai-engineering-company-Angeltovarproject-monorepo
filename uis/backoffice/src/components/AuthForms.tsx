@@ -74,9 +74,15 @@ function RegisterForm() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const password = String(data.get("password") || "");
-    if (new TextEncoder().encode(password).length < 12 || new TextEncoder().encode(password).length > 72) {
+    const passwordLength = new TextEncoder().encode(password).length;
+    if (password.length < 12) {
       setError("");
-      setFieldErrors({ password: "La contraseña debe tener entre 12 y 72 bytes UTF-8." });
+      setFieldErrors({ password: "La contraseña debe tener al menos 12 caracteres." });
+      return;
+    }
+    if (passwordLength > 72) {
+      setError("");
+      setFieldErrors({ password: "La contraseña es demasiado larga. Usa una más corta." });
       return;
     }
     setBusy(true); setError(""); setFieldErrors({});

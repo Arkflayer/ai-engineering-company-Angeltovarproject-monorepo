@@ -17,11 +17,16 @@ export default function ForgotPasswordForm() {
     setError("");
     try {
       await forgotPassword(email);
+      setSent(true);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Error al enviar la solicitud.");
+      const message = reason instanceof Error ? reason.message : "";
+      setError(
+        message === "Failed to fetch"
+          ? "No pudimos conectar con el servicio de correo. Inténtalo de nuevo más tarde."
+          : message || "No se pudo procesar la solicitud. Inténtalo de nuevo más tarde.",
+      );
     } finally {
       setBusy(false);
-      setSent(true);
     }
   }
 
