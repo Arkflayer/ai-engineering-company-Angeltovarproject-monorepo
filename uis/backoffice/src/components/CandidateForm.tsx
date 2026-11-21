@@ -85,8 +85,8 @@ export default function CandidateForm({ candidate, onSuccess, onCancel }: Props)
         await createCandidate(form);
       }
       onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar la candidatura');
+    } catch {
+      setError('No se pudo guardar la candidatura. Revisa los datos e inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
