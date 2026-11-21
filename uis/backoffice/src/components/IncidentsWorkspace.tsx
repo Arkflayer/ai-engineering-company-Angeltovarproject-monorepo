@@ -18,6 +18,8 @@ import { useLang, type Lang } from "@/lib/lang";
 const LOCALE: Record<string, { es: string; en: string }> = {
   title:                { es: "Gestor de incidencias", en: "Incident manager" },
   subtitle:             { es: "Registra, consulta y da seguimiento a las incidencias operativas de TrackFlow.", en: "Register, view, and track TrackFlow operational incidents." },
+  operations:           { es: "Operaciones", en: "Operations" },
+  internalTool:         { es: "Herramienta interna", en: "Internal tool" },
   newIncident:          { es: "Nueva incidencia", en: "New incident" },
   dashboard:            { es: "Panel de resumen", en: "Summary dashboard" },
   incidentList:         { es: "Incidencias recientes", en: "Recent incidents" },
@@ -50,10 +52,49 @@ const LOCALE: Record<string, { es: string; en: string }> = {
   status:               { es: "Estado", en: "Status" },
   origin:               { es: "Origen", en: "Origin" },
   branch:               { es: "Sede", en: "Branch" },
+  /* Form labels */
+  titleField:           { es: "Título", en: "Title" },
+  titlePlaceholder:     { es: "Resume la incidencia en pocas palabras", en: "Summarize the incident briefly" },
+  description:          { es: "Descripción", en: "Description" },
+  descriptionPlaceholder: { es: "Describe qué ocurrió, cuándo y dónde", en: "Describe what happened, when, and where" },
+  category:             { es: "Categoría", en: "Category" },
+  originField:          { es: "Origen", en: "Origin" },
+  branchField:          { es: "Sede", en: "Branch" },
+  /* Table headers */
+  tableTitle:           { es: "Título", en: "Title" },
+  tableCategory:        { es: "Categoría", en: "Category" },
+  tableOrigin:          { es: "Origen", en: "Origin" },
+  tableBranch:          { es: "Sede", en: "Branch" },
+  tableStatus:          { es: "Estado", en: "Status" },
+  tableAction:          { es: "Acción", en: "Action" },
+  final:                { es: "Final", en: "Final" },
+  noIncidents:          { es: "No hay incidencias registradas aún.", en: "No incidents registered yet." },
+  /* Modal detail labels */
+  detailCategory:       { es: "Categoría", en: "Category" },
+  detailOrigin:         { es: "Origen", en: "Origin" },
+  detailBranch:         { es: "Sede", en: "Branch" },
+  detailStatus:         { es: "Estado", en: "Status" },
+  detailCreated:        { es: "Creada", en: "Created" },
+  detailUpdated:        { es: "Actualizada", en: "Updated" },
 };
 
 function t(key: string, lang: Lang): string {
   return LOCALE[key]?.[lang] ?? key;
+}
+
+/** Traduce títulos de incidencias que vienen del backend en español */
+function translateTitle(title: string, lang: Lang): string {
+  if (lang === "es") return title;
+  // "Incidencia sintética NNN" -> "Synthetic incident NNN"
+  const synthMatch = title.match(/^Incidencia sintética (\d+)$/);
+  if (synthMatch) return `Synthetic incident ${synthMatch[1]}`;
+  // "Incidencia sintética NNN – descripción" -> "Synthetic incident NNN – description"
+  const synthWithDesc = title.match(/^Incidencia sintética (\d+) – (.+)$/);
+  if (synthWithDesc) return `Synthetic incident ${synthWithDesc[1]} – ${synthWithDesc[2]}`;
+  // "Incidencia NNN" -> "Incident NNN"
+  const incMatch = title.match(/^Incidencia (\d+)$/);
+  if (incMatch) return `Incident ${incMatch[1]}`;
+  return title;
 }
 
 /* ───── Constantes de dominio ───── */
@@ -273,12 +314,12 @@ function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; o
       )}
 
       <div className="incident-field">
-        <label>{lang === "es" ? "Título" : "Title"} <span aria-hidden="true">*</span></label>
+        <label>{t("titleField", lang)} <span aria-hidden="true">*</span></label>
         <input
           name="title"
           value={title}
           onChange={(e) => { setTitle(e.currentTarget.value); clearFieldError("title"); setMessage(""); }}
-          placeholder={lang === "es" ? "Resume la incidencia en pocas palabras" : "Summarize the incident briefly"}
+          placeholder={t("titlePlaceholder", lang)}
           maxLength={120}
           required
         />
@@ -286,13 +327,13 @@ function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; o
       </div>
 
       <div className="incident-field">
-        <label>{lang === "es" ? "Descripción" : "Description"} <span aria-hidden="true">*</span></label>
+        <label>{t("description", lang)} <span aria-hidden="true">*</span></label>
         <textarea
           name="description"
           value={description}
           onChange={(e) => { setDescription(e.currentTarget.value); clearFieldError("description"); setMessage(""); }}
           rows={4}
-          placeholder={lang === "es" ? "Describe qué ocurrió, cuándo y dónde" : "Describe what happened, when, and where"}
+          placeholder={t("descriptionPlaceholder", lang)}
           maxLength={5000}
           required
         />
@@ -301,7 +342,7 @@ function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; o
 
       <div className="incident-field-row">
         <div className="incident-field">
-          <label>{lang === "es" ? "Categoría" : "Category"} <span aria-hidden="true">*</span></label>
+          <label>{t("category", lang)} <span aria-hidden="true">*</span></label>
           <select
             value={category}
             onChange={(e) => { setCategory(e.currentTarget.value as IncidentCategory | ""); clearFieldError("category"); setMessage(""); }}
@@ -316,7 +357,7 @@ function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; o
         </div>
 
         <div className="incident-field">
-          <label>{lang === "es" ? "Origen" : "Origin"} <span aria-hidden="true">*</span></label>
+          <label>{t("originField", lang)} <span aria-hidden="true">*</span></label>
           <select
             value={origin}
             onChange={(e) => { setOrigin(e.currentTarget.value as IncidentOrigin | ""); clearFieldError("origin"); setMessage(""); }}
@@ -331,7 +372,7 @@ function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; o
         </div>
 
         <div className="incident-field">
-          <label>{lang === "es" ? "Sede" : "Branch"} <span aria-hidden="true">*</span></label>
+          <label>{t("branchField", lang)} <span aria-hidden="true">*</span></label>
           <select
             value={branch}
             onChange={(e) => { setBranch(e.currentTarget.value as IncidentBranch | ""); clearFieldError("branch"); setMessage(""); }}
@@ -380,12 +421,12 @@ function IncidentTable({ incidents, lang, token, onUpdated, onSelectIncident }: 
       <table className="incident-table">
         <thead>
           <tr>
-            <th>{lang === "es" ? "Título" : "Title"}</th>
-            <th>{lang === "es" ? "Categoría" : "Category"}</th>
-            <th>{lang === "es" ? "Origen" : "Origin"}</th>
-            <th>{lang === "es" ? "Sede" : "Branch"}</th>
-            <th>{lang === "es" ? "Estado" : "Status"}</th>
-            <th>{lang === "es" ? "Acción" : "Action"}</th>
+            <th>{t("tableTitle", lang)}</th>
+            <th>{t("tableCategory", lang)}</th>
+            <th>{t("tableOrigin", lang)}</th>
+            <th>{t("tableBranch", lang)}</th>
+            <th>{t("tableStatus", lang)}</th>
+            <th>{t("tableAction", lang)}</th>
           </tr>
         </thead>
         <tbody>
@@ -394,7 +435,7 @@ function IncidentTable({ incidents, lang, token, onUpdated, onSelectIncident }: 
             return (
               <tr key={inc.id}>
                 <td className="incident-title-cell" onClick={() => onSelectIncident(inc)} style={{ cursor: "pointer" }}>
-                  <strong>{inc.title}</strong>
+                  <strong>{translateTitle(inc.title, lang)}</strong>
                   <span className="incident-date">{inc.created_at.slice(0, 10)}</span>
                 </td>
                 <td>{label(CATEGORY_LABELS, inc.category, lang)}</td>
@@ -434,7 +475,7 @@ function IncidentTable({ incidents, lang, token, onUpdated, onSelectIncident }: 
                       )}
                     </span>
                   ) : (
-                    <span className="final-status">{lang === "es" ? "Final" : "Final"}</span>
+                    <span className="final-status">{t("final", lang)}</span>
                   )}
                 </td>
               </tr>
@@ -538,10 +579,10 @@ export default function IncidentsWorkspace() {
     <>
       <header className="topbar">
         <div className="breadcrumb">
-          TrackFlow <span aria-hidden="true">/</span> Operaciones <span aria-hidden="true">/</span> {t("title", lang)}
+                  TrackFlow <span aria-hidden="true">/</span> {t("operations", lang)} <span aria-hidden="true">/</span> {t("title", lang)}
         </div>
         <span className="status-pill">
-          <span aria-hidden="true" /> {lang === "es" ? "Herramienta interna" : "Internal tool"}
+                  <span aria-hidden="true" /> {t("internalTool", lang)}
         </span>
       </header>
 
@@ -653,18 +694,18 @@ export default function IncidentsWorkspace() {
                   <div className="incident-modal-overlay" onClick={() => setSelectedIncident(null)}>
                     <div className="incident-modal" onClick={(e) => e.stopPropagation()}>
                       <div className="incident-modal-header">
-                        <h3>{selectedIncident.title}</h3>
+                        <h3>{translateTitle(selectedIncident.title, lang)}</h3>
                         <button type="button" className="incident-modal-close" onClick={() => setSelectedIncident(null)}>&times;</button>
                       </div>
                       <div className="incident-modal-body">
                         <dl>
                           <dt>ID</dt><dd><code>{selectedIncident.id}</code></dd>
-                          <dt>{lang === "es" ? "Categoría" : "Category"}</dt><dd>{label(CATEGORY_LABELS, selectedIncident.category, lang)}</dd>
-                          <dt>{lang === "es" ? "Origen" : "Origin"}</dt><dd>{label(ORIGIN_LABELS, selectedIncident.origin, lang)}</dd>
-                          <dt>{lang === "es" ? "Sede" : "Branch"}</dt><dd>{label(BRANCH_LABELS, selectedIncident.branch, lang)}</dd>
-                          <dt>{lang === "es" ? "Estado" : "Status"}</dt><dd><span className={`status-badge ${STATUS_BADGE[selectedIncident.status] ?? ""}`}>{label(STATUS_LABELS, selectedIncident.status, lang)}</span></dd>
-                          <dt>{lang === "es" ? "Creada" : "Created"}</dt><dd>{selectedIncident.created_at.slice(0, 10)}</dd>
-                          <dt>{lang === "es" ? "Actualizada" : "Updated"}</dt><dd>{selectedIncident.updated_at?.slice(0, 10) ?? "-"}</dd>
+                          <dt>{t("detailCategory", lang)}</dt><dd>{label(CATEGORY_LABELS, selectedIncident.category, lang)}</dd>
+                          <dt>{t("detailOrigin", lang)}</dt><dd>{label(ORIGIN_LABELS, selectedIncident.origin, lang)}</dd>
+                          <dt>{t("detailBranch", lang)}</dt><dd>{label(BRANCH_LABELS, selectedIncident.branch, lang)}</dd>
+                          <dt>{t("detailStatus", lang)}</dt><dd><span className={`status-badge ${STATUS_BADGE[selectedIncident.status] ?? ""}`}>{label(STATUS_LABELS, selectedIncident.status, lang)}</span></dd>
+                          <dt>{t("detailCreated", lang)}</dt><dd>{selectedIncident.created_at.slice(0, 10)}</dd>
+                          <dt>{t("detailUpdated", lang)}</dt><dd>{selectedIncident.updated_at?.slice(0, 10) ?? "-"}</dd>
                         </dl>
                         <div className="incident-description">{selectedIncident.description}</div>
                       </div>
@@ -676,7 +717,7 @@ export default function IncidentsWorkspace() {
                   <p className="empty-state">
                     {filterStatus || filterOrigin || filterBranch
                       ? t("noResults", lang)
-                      : (lang === "es" ? "No hay incidencias registradas aún." : "No incidents registered yet.")}
+                      : (t("noIncidents", lang))}
                   </p>
                 )}
               </section>

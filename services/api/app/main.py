@@ -8,7 +8,7 @@ from threading import Lock
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from app.auth import router as auth_router
 from app.domains.incidents.router import router as incidents_router
@@ -38,6 +38,16 @@ async def lifespan(application: FastAPI):
 
 
 app = FastAPI(title="Análisis de incidencias de TrackFlow", version="1.0.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def add_charset_header(request, call_next):
+    """Asegura que todas las respuestas JSON incluyan charset=utf-8."""
+    response: Response = await call_next(request)
+    content_type = response.headers.get("content-type", "")
+    if content_type == "application/json" and "charset" not in content_type:
+        response.headers["content-type"] = "application/json; charset=utf-8"
+    return response
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)

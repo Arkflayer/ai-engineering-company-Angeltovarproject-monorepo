@@ -57,7 +57,7 @@ class IncidentStore:
         location_path = Path(location)
         location_path.parent.mkdir(parents=True, exist_ok=True)
         location_path.touch(mode=0o600, exist_ok=True)
-        self.db = TinyDB(location)
+        self.db = TinyDB(location, encoding='utf-8')
         self.incidents = self.db.table("incidents")
         self.lock = RLock()
 

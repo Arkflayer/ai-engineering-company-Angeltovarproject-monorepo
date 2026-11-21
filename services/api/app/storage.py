@@ -21,7 +21,7 @@ class IdentityStore:
         location = Path(path)
         location.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         location.touch(mode=0o600, exist_ok=True)
-        self.db = TinyDB(location)
+        self.db = TinyDB(location, encoding='utf-8')
         self.users = self.db.table("users")
         self.profiles = self.db.table("profiles")
         self.lock = RLock()
