@@ -1,179 +1,698 @@
-"use client";
+﻿"use client";
 
-import { useState, type DragEvent } from "react";
-import { apiBlob, apiRequest } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { apiRequest } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import type { IncidentSummary } from "@/lib/types";
+import type {
+  TrackFlowIncident,
+  IncidentCreatePayload,
+  IncidentManagerSummary,
+  IncidentStatus,
+  IncidentCategory,
+  IncidentOrigin,
+  IncidentBranch,
+} from "@/lib/types";
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
-const valueNames: Record<string, string> = {
-  LOST_PARCEL: "Paquete perdido",
-  DELAYED_DELIVERY: "Entrega retrasada",
-  WRONG_ADDRESS: "Dirección incorrecta",
-  RETURN_REQUEST: "Solicitud de devolución",
-  DAMAGE: "Daño en el paquete",
-  OPEN: "Abierta",
-  CLOSED: "Cerrada",
-  DISCARDED: "Descartada",
-  US: "Estados Unidos",
-  ES: "España",
+import { useLang, type Lang } from "@/lib/lang";
+
+const LOCALE: Record<string, { es: string; en: string }> = {
+  title:                { es: "Gestor de incidencias", en: "Incident manager" },
+  subtitle:             { es: "Registra, consulta y da seguimiento a las incidencias operativas de TrackFlow.", en: "Register, view, and track TrackFlow operational incidents." },
+  newIncident:          { es: "Nueva incidencia", en: "New incident" },
+  dashboard:            { es: "Panel de resumen", en: "Summary dashboard" },
+  incidentList:         { es: "Incidencias recientes", en: "Recent incidents" },
+  submit:               { es: "Registrar incidencia", en: "Report incident" },
+  sending:              { es: "Registrando…", en: "Sending…" },
+  required:             { es: "Campo obligatorio", en: "Required field" },
+  tooShort:             { es: "Describe la incidencia con más detalle", en: "Describe the incident in more detail" },
+  success:              { es: "Incidencia registrada correctamente.", en: "Incident reported successfully." },
+  error:                { es: "No se pudo registrar la incidencia.", en: "Could not report the incident." },
+  loading:              { es: "Cargando…", en: "Loading…" },
+  total:                { es: "Total", en: "Total" },
+  open:                 { es: "Abiertas", en: "Open" },
+  inProgress:           { es: "En progreso", en: "In progress" },
+  resolved:             { es: "Resueltas", en: "Resolved" },
+  discarded:            { es: "Descartadas", en: "Discarded" },
+  seed:                 { es: "Cargar histórico CSV", en: "Load CSV history" },
+  seeding:              { es: "Cargando…", en: "Loading…" },
+  seedResult:           { es: "Histórico cargado: {inserted} insertadas, {skipped} omitidas.", en: "History loaded: {inserted} inserted, {skipped} skipped." },
+  seedSuccess:          { es: "Histórico cargado exitosamente", en: "History loaded successfully" },
+  seedError:            { es: "Error al cargar el histórico", en: "Error loading history" },
+  updateStatus:         { es: "Cambiar estado", en: "Change status" },
+  statusUpdated:        { es: "Estado actualizado", en: "Status updated" },
+  statusError:          { es: "No se pudo actualizar el estado", en: "Could not update status" },
+  loadingIncidents:     { es: "Cargando incidencias…", en: "Loading incidents…" },
+  filter:               { es: "Filtrar", en: "Filter" },
+  all:                  { es: "Todas", en: "All" },
+  noResults:            { es: "No hay incidencias que coincidan con los filtros.", en: "No incidents match the applied filters." },
+  retry:                { es: "Reintentar", en: "Retry" },
+  branchHighlight:      { es: "Estás reportando desde una sede. La sede debe indicar tu ubicación actual.", en: "You are reporting from a branch. Select the branch matching your location." },
+  status:               { es: "Estado", en: "Status" },
+  origin:               { es: "Origen", en: "Origin" },
+  branch:               { es: "Sede", en: "Branch" },
 };
 
-function errorText(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+function t(key: string, lang: Lang): string {
+  return LOCALE[key]?.[lang] ?? key;
 }
 
-function Breakdown({ title, description, values, total }: {
-  title: string;
-  description: string;
-  values: [string, string][];
-  total?: number;
-}) {
+/* ───── Constantes de dominio ───── */
+
+const CATEGORIES: IncidentCategory[] = [
+  "lost_parcel", "delivery_failure", "inventory_discrepancy", "carrier_issue",
+  "returns_issue", "warehouse_incident", "system_failure", "client_complaint", "other",
+];
+const ORIGINS: IncidentOrigin[] = ["customer", "branch", "internal"];
+const BRANCHES: IncidentBranch[] = [
+  "central", "la_warehouse", "la_office", "zaragoza_warehouse", "zaragoza_office",
+];
+
+const CATEGORY_LABELS: Record<string, { es: string; en: string }> = {
+  lost_parcel:            { es: "Paquete extraviado", en: "Lost parcel" },
+  delivery_failure:       { es: "Fallo de entrega", en: "Delivery failure" },
+  inventory_discrepancy:  { es: "Discrepancia de inventario", en: "Inventory discrepancy" },
+  carrier_issue:          { es: "Problema con transportista", en: "Carrier issue" },
+  returns_issue:          { es: "Problema de devolución", en: "Returns issue" },
+  warehouse_incident:     { es: "Incidente en almacén", en: "Warehouse incident" },
+  system_failure:         { es: "Fallo de sistema", en: "System failure" },
+  client_complaint:       { es: "Queja de cliente", en: "Client complaint" },
+  other:                  { es: "Otro", en: "Other" },
+};
+
+const ORIGIN_LABELS: Record<string, { es: string; en: string }> = {
+  customer: { es: "Cliente", en: "Customer" },
+  branch:   { es: "Sede TrackFlow", en: "TrackFlow branch" },
+  internal: { es: "Interna", en: "Internal" },
+};
+
+const BRANCH_LABELS: Record<string, { es: string; en: string }> = {
+  central:            { es: "Central", en: "Central" },
+  la_warehouse:       { es: "Los Ángeles — Almacén", en: "Los Angeles — Warehouse" },
+  la_office:          { es: "Los Ángeles — Oficina", en: "Los Angeles — Office" },
+  zaragoza_warehouse: { es: "Zaragoza — Almacén", en: "Zaragoza — Warehouse" },
+  zaragoza_office:    { es: "Zaragoza — Oficina", en: "Zaragoza — Office" },
+};
+
+const STATUS_LABELS: Record<string, { es: string; en: string }> = {
+  open:        { es: "Abierta", en: "Open" },
+  in_progress: { es: "En progreso", en: "In progress" },
+  resolved:    { es: "Resuelta", en: "Resolved" },
+  discarded:   { es: "Descartada", en: "Discarded" },
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  open: "open",
+  in_progress: "in_progress",
+  resolved: "resolved",
+  discarded: "discarded",
+};
+
+const VALID_TRANSITIONS: Record<IncidentStatus, (IncidentStatus | undefined)[]> = {
+  open: ["in_progress", "discarded"],
+  in_progress: ["resolved", "discarded"],
+  resolved: [],
+  discarded: [],
+};
+
+/* ───── Helpers ───── */
+
+function label(
+  map: Record<string, { es: string; en: string }>,
+  value: string,
+  lang: Lang,
+): string {
+  return map[value]?.[lang] ?? value;
+}
+
+/* ───── Panel de resumen ───── */
+
+function SummaryCards({ summary, lang }: { summary: IncidentManagerSummary; lang: Lang }) {
+  const rows: [string, number, string][] = [
+    [t("open", lang), summary.by_status.open ?? 0, "badge-open"],
+    [t("inProgress", lang), summary.by_status.in_progress ?? 0, "badge-progress"],
+    [t("resolved", lang), summary.by_status.resolved ?? 0, "badge-resolved"],
+    [t("discarded", lang), summary.by_status.discarded ?? 0, "badge-discarded"],
+  ];
+
   return (
-    <section className="content-card breakdown-card" aria-label={title}>
-      <div className="card-heading"><div><h2>{title}</h2><p>{description}</p></div></div>
-      <div className="breakdown-list">
-        {values.length ? values.map(([label, value]) => {
-          const number = Number(value);
-          const percentage = total && Number.isFinite(number) ? `${(number * 100 / total).toFixed(1)}%` : "";
-          return <div className="breakdown-row" key={label}><span>{label}</span><strong>{value}{percentage && <span>{percentage}</span>}</strong></div>;
-        }) : <p className="empty-breakdown">Sin valores para mostrar.</p>}
-      </div>
-    </section>
+    <div className="incident-summary-grid">
+      <article className="metric-card">
+        <div className="metric-top">{t("total", lang)}</div>
+        <p className="metric-value">{String(summary.total)}</p>
+      </article>
+      {rows.map(([labelText, count, badge]) => (
+        <article className={`metric-card ${badge}`} key={labelText}>
+          <div className="metric-top">{labelText}</div>
+          <p className="metric-value">{String(count)}</p>
+        </article>
+      ))}
+    </div>
   );
 }
 
+/* ───── Formulario de nueva incidencia ───── */
+
+function IncidentForm({ lang, token, onCreated }: { lang: Lang; token: string; onCreated: () => void }) {
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [category, setCategory] = useState<IncidentCategory | "">("");
+  const [origin, setOrigin] = useState<IncidentOrigin | "">("");
+  const [branch, setBranch] = useState<IncidentBranch | "">("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string>("");
+  const [isError, setIsError] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  function clearFieldError(field: string) {
+    const next = { ...fieldErrors };
+    delete next[field];
+    setFieldErrors(next);
+  }
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!token) {
+      setMessage("Inicia sesión para registrar incidencias.");
+      setIsError(true);
+      return;
+    }
+    if (!category || !origin || !branch) {
+      setMessage(t("required", lang));
+      setIsError(true);
+      return;
+    }
+    if (title.trim().length < 2) {
+      setMessage(t("tooShort", lang));
+      setIsError(true);
+      return;
+    }
+    if (description.trim().length < 5) {
+      setMessage(t("tooShort", lang));
+      setIsError(true);
+      return;
+    }
+
+    setBusy(true);
+    setMessage("");
+    setFieldErrors({});
+    try {
+      const payload: IncidentCreatePayload = {
+        title: title.trim(),
+        description: description.trim(),
+        category: category as IncidentCategory,
+        origin: origin as IncidentOrigin,
+        branch: branch as IncidentBranch,
+      };
+      await apiRequest("/api/incidents", token, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      setMessage(t("success", lang));
+      setIsError(false);
+      setTitle("");
+      setDescription("");
+      setCategory("");
+      setOrigin("");
+      setBranch("");
+      onCreated();
+    } catch (err) {
+      const raw = err instanceof Error ? err.message : String(err);
+      const parsedFieldErrors: Record<string, string> = {};
+      let parsed = false;
+      try {
+        const parsedBody = JSON.parse(raw);
+              if (typeof parsedBody?.detail === "object" && !Array.isArray(parsedBody.detail)) {
+                // Nuevo formato: {"detail": {"campo": "mensaje"}}
+                for (const [field, msg] of Object.entries(parsedBody.detail)) {
+                  if (typeof msg === "string") {
+                    parsedFieldErrors[field] = msg;
+                  }
+                }
+                parsed = Object.keys(parsedFieldErrors).length > 0;
+              } else if (Array.isArray(parsedBody?.detail)) {
+          for (const d of parsedBody.detail) {
+            if (d.loc && d.msg) {
+              const locArr = d.loc as (string | number)[];
+              const field = locArr.length >= 2 ? String(locArr[locArr.length - 1]) : "body";
+              parsedFieldErrors[field] = d.msg;
+            }
+          }
+          parsed = Object.keys(parsedFieldErrors).length > 0;
+        } else if (typeof parsedBody?.detail === "string") {
+          setMessage(parsedBody.detail);
+          setIsError(true);
+          parsed = true;
+        }
+      } catch {
+        // not JSON
+      }
+      if (!parsed) {
+        setMessage(raw.length < 120 ? raw : t("error", lang));
+        setIsError(true);
+      } else if (Object.keys(parsedFieldErrors).length > 0) {
+        setFieldErrors(parsedFieldErrors);
+      } else if (!message) {
+        setMessage(t("error", lang));
+        setIsError(true);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const isBranchOrigin = origin === "branch";
+
+  return (
+    <form className="incident-form" onSubmit={(e) => void handleSubmit(e)} noValidate>
+      {isBranchOrigin && (
+        <div className="branch-highlight" role="status">
+          <span className="branch-highlight-icon" aria-hidden="true">📍</span>
+          <p>{t("branchHighlight", lang)}</p>
+        </div>
+      )}
+
+      <div className="incident-field">
+        <label>{lang === "es" ? "Título" : "Title"} <span aria-hidden="true">*</span></label>
+        <input
+          name="title"
+          value={title}
+          onChange={(e) => { setTitle(e.currentTarget.value); clearFieldError("title"); setMessage(""); }}
+          placeholder={lang === "es" ? "Resume la incidencia en pocas palabras" : "Summarize the incident briefly"}
+          maxLength={120}
+          required
+        />
+        {fieldErrors.title && <p className="field-error">{fieldErrors.title}</p>}
+      </div>
+
+      <div className="incident-field">
+        <label>{lang === "es" ? "Descripción" : "Description"} <span aria-hidden="true">*</span></label>
+        <textarea
+          name="description"
+          value={description}
+          onChange={(e) => { setDescription(e.currentTarget.value); clearFieldError("description"); setMessage(""); }}
+          rows={4}
+          placeholder={lang === "es" ? "Describe qué ocurrió, cuándo y dónde" : "Describe what happened, when, and where"}
+          maxLength={5000}
+          required
+        />
+        {fieldErrors.description && <p className="field-error">{fieldErrors.description}</p>}
+      </div>
+
+      <div className="incident-field-row">
+        <div className="incident-field">
+          <label>{lang === "es" ? "Categoría" : "Category"} <span aria-hidden="true">*</span></label>
+          <select
+            value={category}
+            onChange={(e) => { setCategory(e.currentTarget.value as IncidentCategory | ""); clearFieldError("category"); setMessage(""); }}
+            required
+          >
+            <option value="">—</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>{label(CATEGORY_LABELS, c, lang)}</option>
+            ))}
+          </select>
+          {fieldErrors.category && <p className="field-error">{fieldErrors.category}</p>}
+        </div>
+
+        <div className="incident-field">
+          <label>{lang === "es" ? "Origen" : "Origin"} <span aria-hidden="true">*</span></label>
+          <select
+            value={origin}
+            onChange={(e) => { setOrigin(e.currentTarget.value as IncidentOrigin | ""); clearFieldError("origin"); setMessage(""); }}
+            required
+          >
+            <option value="">—</option>
+            {ORIGINS.map((o) => (
+              <option key={o} value={o}>{label(ORIGIN_LABELS, o, lang)}</option>
+            ))}
+          </select>
+          {fieldErrors.origin && <p className="field-error">{fieldErrors.origin}</p>}
+        </div>
+
+        <div className="incident-field">
+          <label>{lang === "es" ? "Sede" : "Branch"} <span aria-hidden="true">*</span></label>
+          <select
+            value={branch}
+            onChange={(e) => { setBranch(e.currentTarget.value as IncidentBranch | ""); clearFieldError("branch"); setMessage(""); }}
+            required
+            className={isBranchOrigin ? "field-highlight" : ""}
+          >
+            <option value="">—</option>
+            {BRANCHES.map((b) => (
+              <option key={b} value={b}>{label(BRANCH_LABELS, b, lang)}</option>
+            ))}
+          </select>
+          {fieldErrors.branch && <p className="field-error">{fieldErrors.branch}</p>}
+        </div>
+      </div>
+
+      <div className="incident-form-actions">
+        <button className="primary-button" type="submit" disabled={busy}>
+          {busy ? t("sending", lang) : t("submit", lang)}
+        </button>
+      </div>
+
+      {message && (
+        <p className={`incident-message${isError ? " error" : ""}`} role="status" aria-live="polite">
+          {message}
+        </p>
+      )}
+    </form>
+  );
+}
+
+/* ───── Lista de incidencias ───── */
+
+function IncidentTable({ incidents, lang, token, onUpdated, onSelectIncident }: {
+  incidents: TrackFlowIncident[];
+  lang: Lang;
+  token: string;
+  onUpdated: () => void;
+  onSelectIncident: (inc: TrackFlowIncident) => void;
+}) {
+  if (!incidents.length) {
+      return null;
+  }
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  return (
+    <div className="incident-table-wrap">
+      <table className="incident-table">
+        <thead>
+          <tr>
+            <th>{lang === "es" ? "Título" : "Title"}</th>
+            <th>{lang === "es" ? "Categoría" : "Category"}</th>
+            <th>{lang === "es" ? "Origen" : "Origin"}</th>
+            <th>{lang === "es" ? "Sede" : "Branch"}</th>
+            <th>{lang === "es" ? "Estado" : "Status"}</th>
+            <th>{lang === "es" ? "Acción" : "Action"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {incidents.map((inc) => {
+            const transitions = VALID_TRANSITIONS[inc.status as IncidentStatus] ?? [];
+            return (
+              <tr key={inc.id}>
+                <td className="incident-title-cell" onClick={() => onSelectIncident(inc)} style={{ cursor: "pointer" }}>
+                  <strong>{inc.title}</strong>
+                  <span className="incident-date">{inc.created_at.slice(0, 10)}</span>
+                </td>
+                <td>{label(CATEGORY_LABELS, inc.category, lang)}</td>
+                <td>{label(ORIGIN_LABELS, inc.origin, lang)}</td>
+                <td>{label(BRANCH_LABELS, inc.branch, lang)}</td>
+                <td><span className={`status-badge ${STATUS_BADGE[inc.status] ?? ""}`}>{label(STATUS_LABELS, inc.status, lang)}</span></td>
+                <td>
+                  {transitions.length > 0 ? (
+                    <span className="status-btn-wrap">
+                      <button
+                        type="button"
+                        className="status-btn"
+                        onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === inc.id ? null : inc.id); }}
+                        onBlur={() => setTimeout(() => setOpenMenu(null), 200)}
+                      >
+                        {t("updateStatus", lang)} <span className="arrow">&#9660;</span>
+                      </button>
+                      {openMenu === inc.id && (
+                        <div className="status-menu">
+                          {transitions.map((s) => s ? (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenu(null);
+                                void apiRequest("/api/incidents/" + inc.id + "/status", token, {
+                                  method: "PATCH",
+                                  body: JSON.stringify({ status: s }),
+                                }).then(() => onUpdated()).catch(() => {});
+                              }}
+                            >
+                              {label(STATUS_LABELS, s, lang)}
+                            </button>
+                          ) : null)}
+                        </div>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="final-status">{lang === "es" ? "Final" : "Final"}</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+/* ───── Componente principal ───── */
+
 export default function IncidentsWorkspace() {
   const { token } = useAuth();
-  const [file, setFile] = useState<File | null>(null);
-  const [summary, setSummary] = useState<IncidentSummary | null>(null);
+  const { lang } = useLang();
+  const [tab, setTab] = useState<"form" | "dashboard">("dashboard");
+  const [summary, setSummary] = useState<IncidentManagerSummary | null>(null);
+  const [incidents, setIncidents] = useState<TrackFlowIncident[]>([]);
   const [busy, setBusy] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [analysisMessage, setAnalysisMessage] = useState("");
-  const [analysisError, setAnalysisError] = useState(false);
+  const [seedMessage, setSeedMessage] = useState<string>("");
+  const [seedError, setSeedError] = useState(false);
+  const [selectedIncident, setSelectedIncident] = useState<TrackFlowIncident | null>(null);
+  const [loadError, setLoadError] = useState<string>("");
 
-  const canAnalyze = Boolean(token && file && !busy);
-  const canExport = Boolean(token && summary && !busy);
+  /* ── Filtros ── */
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterOrigin, setFilterOrigin] = useState<string>("");
+  const [filterBranch, setFilterBranch] = useState<string>("");
 
-
-  function selectFile(nextFile: File | undefined) {
-    if (busy) return;
-    setSummary(null);
-    setAnalysisError(false);
-    if (!nextFile) {
-      setFile(null);
-      setAnalysisMessage("");
-      return;
-    }
-    if (!nextFile.name.toLowerCase().endsWith(".csv")) {
-      setFile(null);
-      setAnalysisMessage("Selecciona un archivo con extensión .csv.");
-      setAnalysisError(true);
-      return;
-    }
-    if (nextFile.size > MAX_FILE_SIZE) {
-      setFile(null);
-      setAnalysisMessage("El archivo supera el límite de 25 MiB.");
-      setAnalysisError(true);
-      return;
-    }
-    setFile(nextFile);
-    setAnalysisMessage(token ? "Archivo listo para analizar." : "Inicia sesión para habilitar el análisis.");
-    setAnalysisError(false);
-  }
-
-  function handleDrop(event: DragEvent<HTMLLabelElement>) {
-    event.preventDefault();
-    setDragging(false);
-    selectFile(event.dataTransfer.files[0]);
-  }
-
-  async function analyzeFile() {
-    if (!token || !file) {
-      setAnalysisMessage(!token ? "Inicia sesión antes de analizar un archivo." : "Selecciona un CSV antes de continuar.");
-      setAnalysisError(true);
-      return;
-    }
-    const body = new FormData();
-    body.append("file", file);
-    setBusy(true);
-    setSummary(null);
-    setAnalysisMessage("Analizando archivo…");
-    setAnalysisError(false);
+  async function loadSummary() {
+    if (!token) return;
     try {
-      const result = await apiRequest<IncidentSummary>("/api/incidents/analyze", token, { method: "POST", body });
-      setSummary(result);
-      setAnalysisMessage("Análisis completado. Los datos se muestran de forma agregada.");
-    } catch (error) {
-      setAnalysisMessage(errorText(error, "No se pudo analizar el archivo."));
-      setAnalysisError(true);
-    } finally {
-      setBusy(false);
+      const data = await apiRequest<IncidentManagerSummary>("/api/incidents/summary", token);
+      setSummary(data);
+    } catch {
+      /* el panel se muestra solo si hay datos */
     }
   }
 
-  async function exportResults() {
-    if (!token || !summary) return;
-    setBusy(true);
+  async function loadIncidents() {
+    if (!token) return;
+    setLoadError("");
     try {
-      const blob = await apiBlob("/api/incidents/results/export", token);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "results.csv";
-      document.body.append(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setAnalysisMessage("CSV agregado descargado.");
-      setAnalysisError(false);
-    } catch (error) {
-      if (error instanceof Error) setSummary(null);
-      setAnalysisMessage(errorText(error, "No se pudo descargar el resultado."));
-      setAnalysisError(true);
-    } finally {
-      setBusy(false);
+      const params: string[] = [];
+      if (filterStatus) params.push(`status=${encodeURIComponent(filterStatus)}`);
+      if (filterOrigin) params.push(`origin=${encodeURIComponent(filterOrigin)}`);
+      if (filterBranch) params.push(`branch=${encodeURIComponent(filterBranch)}`);
+      const url = "/api/incidents" + (params.length > 0 ? "?" + params.join("&") : "");
+      const data = await apiRequest<TrackFlowIncident[]>(url, token);
+      setIncidents(data ?? []);
+    } catch (err) {
+      if (err instanceof Error) setLoadError(err.message);
     }
   }
 
-  const summaryMetrics = summary ? [
-    ["Registros procesados", String(summary.total_records), "Total del archivo"],
-    ["Registros válidos", String(summary.valid_records), "Incluidos en métricas"],
-    ["Registros inválidos", String(summary.invalid_records), "Excluidos del análisis"],
-    ["Satisfacción media", summary.satisfaction.average === null ? "No disponible" : `${summary.satisfaction.average.toFixed(2)} / 5`, `${summary.satisfaction.scored_incidents} puntuaciones`],
-  ] : [];
+  async function loadAll() {
+    await Promise.all([loadSummary(), loadIncidents()]);
+  }
+
+  useEffect(() => {
+    if (token) {
+      setBusy(true);
+      void loadAll().finally(() => setBusy(false));
+    }
+  }, [token]);
+
+  /* Recargar incidencias al cambiar filtros */
+  useEffect(() => {
+    if (token && !busy) {
+      void loadIncidents();
+    }
+  }, [filterStatus, filterOrigin, filterBranch]);
+
+  async function seedHistory() {
+    if (!token) return;
+    setSeedMessage("");
+    setSeedError(false);
+    try {
+      const result = await apiRequest<{ inserted: number; skipped: number }>(
+        "/api/incidents/seed",
+        token,
+        { method: "POST" },
+      );
+      setSeedMessage(
+        t("seedSuccess", lang) +
+        ` — ${t("seedResult", lang)
+          .replace("{inserted}", String(result.inserted))
+          .replace("{skipped}", String(result.skipped))}`,
+      );
+      await loadAll();
+    } catch (err) {
+      setSeedMessage(
+        t("seedError", lang) +
+        (err instanceof Error ? `: ${err.message}` : ""),
+      );
+      setSeedError(true);
+    }
+  }
 
   return (
     <>
       <header className="topbar">
-        <div className="breadcrumb">TrackFlow <span aria-hidden="true">/</span> Experiencia del cliente <span aria-hidden="true">/</span> Incidencias</div>
-        <span className="status-pill"><span aria-hidden="true" /> Herramienta interna</span>
+        <div className="breadcrumb">
+          TrackFlow <span aria-hidden="true">/</span> Operaciones <span aria-hidden="true">/</span> {t("title", lang)}
+        </div>
+        <span className="status-pill">
+          <span aria-hidden="true" /> {lang === "es" ? "Herramienta interna" : "Internal tool"}
+        </span>
       </header>
-      <section className="page-heading"><div><p className="eyebrow">EXPERIENCIA DEL CLIENTE</p><h1>Análisis de incidencias</h1><p className="page-description">Carga un CSV para validar su calidad y consultar métricas agregadas.</p></div></section>
-      <section className="incident-privacy" aria-label="Aviso de privacidad"><strong>Datos sensibles:</strong> el CSV se envía al servidor configurado para su análisis. Las filas de origen y los correos no se muestran ni se incluyen en la exportación. Usa solo un entorno autorizado.</section>
 
-      <section className="content-card upload-card" aria-labelledby="upload-title">
-        <div className="card-heading"><div><h2 id="upload-title">Cargar reporte CSV</h2><p>Formato UTF-8 con encabezados de TrackFlow</p></div></div>
-        <label className={`file-drop${dragging ? " dragging" : ""}`} htmlFor="csv-file" onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={handleDrop}>
-          <span className="upload-icon" aria-hidden="true">↑</span><strong>Selecciona un archivo CSV</strong><span>o arrástralo hasta aquí · máximo 25 MiB</span>
-          <input id="csv-file" name="file" type="file" accept=".csv,text/csv" disabled={busy} onChange={(event) => selectFile(event.currentTarget.files?.[0])} />
-        </label>
-        <div className="upload-actions"><p className="file-name" aria-live="polite">{file?.name || "Ningún archivo seleccionado"}</p><button className="primary-button" type="button" onClick={() => void analyzeFile()} disabled={!canAnalyze}>{busy ? "Procesando…" : "Analizar archivo"}</button></div>
-        <p className={`analysis-message${analysisError ? " error" : ""}`} role="status" aria-live="polite">{analysisMessage || (!token ? "Inicia sesión para analizar; el archivo se mantiene local hasta que pulses Analizar." : "Selecciona un CSV para habilitar el análisis.")}</p>
+      <section className="page-heading">
+        <div>
+          <p className="eyebrow">TRACKFLOW TECH</p>
+          <h1>{t("title", lang)}</h1>
+          <p className="page-description">{t("subtitle", lang)}</p>
+        </div>
       </section>
 
-      {summary && <section className="results-section" aria-labelledby="results-title">
-        <div className="results-heading"><div><p className="eyebrow">RESULTADO DEL ARCHIVO</p><h2 id="results-title">Resumen del análisis</h2><p className="page-description">Archivo analizado: {file?.name}</p></div><button className="secondary-button" type="button" onClick={() => void exportResults()} disabled={!canExport}>{busy ? "Preparando…" : "Descargar CSV agregado"}</button></div>
-        <div className={`invalid-notice${summary.invalid_records ? " has-invalid" : ""}`} role="status">{summary.invalid_records ? `Se encontraron ${summary.invalid_records} registros inválidos o incompletos. Se excluyeron del análisis principal; consulta el desglose por regla.` : "No se encontraron registros inválidos."}</div>
-        <div className="metrics-grid" aria-label="Métricas generales">{summaryMetrics.map(([title, value, foot]) => <article className="metric-card" key={title}><div className="metric-top">{title}</div><p className="metric-value metric-value-small">{value}</p><p className="metric-foot">{foot}</p></article>)}</div>
-        <div className="incident-breakdowns">
-          <Breakdown title="Por categoría" description="Solo registros válidos" values={Object.entries(summary.by_category).map(([key, count]) => [valueNames[key] || key, String(count)])} total={summary.valid_records} />
-          <Breakdown title="Por estado" description="Solo registros válidos" values={Object.entries(summary.by_status).map(([key, count]) => [valueNames[key] || key, String(count)])} total={summary.valid_records} />
-          <Breakdown title="Por país" description="Solo registros válidos" values={Object.entries(summary.by_country).map(([key, count]) => [valueNames[key] || key, String(count)])} total={summary.valid_records} />
-          <Breakdown title="Satisfacción" description="Incidencias cerradas con puntuación válida" values={[["Promedio (escala 1–5)", summary.satisfaction.average === null ? "No disponible" : `${summary.satisfaction.average.toFixed(2)} / 5`], ["Puntuaciones registradas", `${summary.satisfaction.scored_incidents} de ${summary.satisfaction.closed_incidents} cerrados`], ...Object.entries(summary.satisfaction.by_score).map(([score, count]): [string, string] => [`Puntuación ${score}`, String(count)])]} />
-          <Breakdown title="Registros inválidos" description="Excluidos de las métricas principales" values={Object.entries(summary.invalid_breakdown).map(([key, count]) => [summary.invalid_labels[key] || key, String(count)])} />
+      <div className="tab-bar" role="tablist">
+        <button
+          className={`tab${tab === "dashboard" ? " is-active" : ""}`}
+          role="tab"
+          onClick={() => setTab("dashboard")}
+        >
+          {t("dashboard", lang)}
+        </button>
+        <button
+          className={`tab${tab === "form" ? " is-active" : ""}`}
+          role="tab"
+          onClick={() => setTab("form")}
+        >
+          {t("newIncident", lang)}
+        </button>
+        <button
+          className="secondary-button seed-btn"
+          type="button"
+          onClick={() => void seedHistory()}
+        >
+          {busy ? t("seeding", lang) : t("seed", lang)}
+        </button>
+      </div>
+
+      {seedMessage && (
+        <div className={`incident-notice${seedError ? " error" : ""}`} role="status">
+          {seedMessage}
         </div>
-      </section>}
+      )}
+
+      {tab === "dashboard" && (
+        <>
+          {busy ? (
+            <p className="loading-text">{t("loading", lang)}</p>
+          ) : (
+            <>
+              {summary && <SummaryCards summary={summary} lang={lang} />}
+
+              <section className="content-card">
+                <div className="card-heading">
+                  <div><h2>{t("incidentList", lang)}</h2></div>
+                </div>
+
+                {/* Filtros */}
+                <div className="incident-filters">
+                  <div className="incident-field">
+                    <label>{t("status", lang)}</label>
+                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.currentTarget.value)}>
+                      <option value="">{t("all", lang)}</option>
+                      <option value="open">{label(STATUS_LABELS, "open", lang)}</option>
+                      <option value="in_progress">{label(STATUS_LABELS, "in_progress", lang)}</option>
+                      <option value="resolved">{label(STATUS_LABELS, "resolved", lang)}</option>
+                      <option value="discarded">{label(STATUS_LABELS, "discarded", lang)}</option>
+                    </select>
+                  </div>
+                  <div className="incident-field">
+                    <label>{t("origin", lang)}</label>
+                    <select value={filterOrigin} onChange={(e) => setFilterOrigin(e.currentTarget.value)}>
+                      <option value="">{t("all", lang)}</option>
+                      {ORIGINS.map((o) => (
+                        <option key={o} value={o}>{label(ORIGIN_LABELS, o, lang)}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="incident-field">
+                    <label>{t("branch", lang)}</label>
+                    <select value={filterBranch} onChange={(e) => setFilterBranch(e.currentTarget.value)}>
+                      <option value="">{t("all", lang)}</option>
+                      {BRANCHES.map((b) => (
+                        <option key={b} value={b}>{label(BRANCH_LABELS, b, lang)}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {loadError ? (
+                  <div className="incident-error-bar">
+                    <p className="error-message">{loadError}</p>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => void loadIncidents()}
+                    >
+                      {t("retry", lang)}
+                    </button>
+                  </div>
+                ) : (
+                  <IncidentTable
+                    incidents={incidents}
+                    lang={lang}
+                    token={token}
+                    onUpdated={loadAll}
+                    onSelectIncident={setSelectedIncident}
+                  />
+                )}
+
+                {selectedIncident && (
+                  <div className="incident-modal-overlay" onClick={() => setSelectedIncident(null)}>
+                    <div className="incident-modal" onClick={(e) => e.stopPropagation()}>
+                      <div className="incident-modal-header">
+                        <h3>{selectedIncident.title}</h3>
+                        <button type="button" className="incident-modal-close" onClick={() => setSelectedIncident(null)}>&times;</button>
+                      </div>
+                      <div className="incident-modal-body">
+                        <dl>
+                          <dt>ID</dt><dd><code>{selectedIncident.id}</code></dd>
+                          <dt>{lang === "es" ? "Categoría" : "Category"}</dt><dd>{label(CATEGORY_LABELS, selectedIncident.category, lang)}</dd>
+                          <dt>{lang === "es" ? "Origen" : "Origin"}</dt><dd>{label(ORIGIN_LABELS, selectedIncident.origin, lang)}</dd>
+                          <dt>{lang === "es" ? "Sede" : "Branch"}</dt><dd>{label(BRANCH_LABELS, selectedIncident.branch, lang)}</dd>
+                          <dt>{lang === "es" ? "Estado" : "Status"}</dt><dd><span className={`status-badge ${STATUS_BADGE[selectedIncident.status] ?? ""}`}>{label(STATUS_LABELS, selectedIncident.status, lang)}</span></dd>
+                          <dt>{lang === "es" ? "Creada" : "Created"}</dt><dd>{selectedIncident.created_at.slice(0, 10)}</dd>
+                          <dt>{lang === "es" ? "Actualizada" : "Updated"}</dt><dd>{selectedIncident.updated_at?.slice(0, 10) ?? "-"}</dd>
+                        </dl>
+                        <div className="incident-description">{selectedIncident.description}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                                {!loadError && incidents.length === 0 && !busy && (
+                  <p className="empty-state">
+                    {filterStatus || filterOrigin || filterBranch
+                      ? t("noResults", lang)
+                      : (lang === "es" ? "No hay incidencias registradas aún." : "No incidents registered yet.")}
+                  </p>
+                )}
+              </section>
+            </>
+          )}
+        </>
+      )}
+
+      {tab === "form" && (
+        <section className="content-card">
+          <div className="card-heading">
+            <div><h2>{t("newIncident", lang)}</h2></div>
+          </div>
+          <IncidentForm lang={lang} token={token} onCreated={loadAll} />
+        </section>
+      )}
     </>
   );
 }

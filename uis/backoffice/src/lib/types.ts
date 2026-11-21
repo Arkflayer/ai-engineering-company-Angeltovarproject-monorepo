@@ -48,3 +48,51 @@ export interface IncidentSummary {
     by_score: Record<string, number>;
   };
 }
+
+export type IncidentStatus = "open" | "in_progress" | "resolved" | "discarded";
+export type IncidentCategory =
+  | "lost_parcel"
+  | "delivery_failure"
+  | "inventory_discrepancy"
+  | "carrier_issue"
+  | "returns_issue"
+  | "warehouse_incident"
+  | "system_failure"
+  | "client_complaint"
+  | "other";
+export type IncidentOrigin = "customer" | "branch" | "internal";
+export type IncidentBranch =
+  | "central"
+  | "la_warehouse"
+  | "la_office"
+  | "zaragoza_warehouse"
+  | "zaragoza_office";
+
+export interface TrackFlowIncident {
+  id: string;
+  title: string;
+  description: string;
+  status: IncidentStatus;
+  category: IncidentCategory;
+  origin: IncidentOrigin;
+  branch: IncidentBranch;
+  reported_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IncidentCreatePayload {
+  title: string;
+  description: string;
+  category: IncidentCategory;
+  origin: IncidentOrigin;
+  branch: IncidentBranch;
+}
+
+export interface IncidentManagerSummary {
+  total: number;
+  by_status: Record<string, number>;
+  by_category: Record<string, number>;
+  by_origin: Record<string, number>;
+  by_branch: Record<string, number>;
+}

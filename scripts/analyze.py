@@ -6,10 +6,13 @@ import argparse
 import sys
 from pathlib import Path
 
-# La interfaz de consola y la API usan la misma implementación.
+# La interfaz de consola y la API usan la misma implementación compartida.
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "services" / "api"))
-from app.domains.incidents.analysis import (  # noqa: E402
+_SHARED_PATH = REPO_ROOT / "packages" / "shared"
+if str(_SHARED_PATH) not in sys.path:
+    sys.path.insert(0, str(_SHARED_PATH))
+from validation.csv_validation import (  # noqa: E402
     CATEGORIES, COUNTRIES, RULE_LABELS, STATUSES, analyze_csv, write_results_csv,
 )
 

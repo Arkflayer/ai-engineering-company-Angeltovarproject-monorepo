@@ -24,6 +24,7 @@ class Settings:
     token_minutes: int
     db_path: str
     supplier_db_path: str
+    incidents_db_path: str
     resend_api_key: str
     reset_token_secret: str
 
@@ -48,6 +49,7 @@ def get_settings() -> Settings:
     if not 1 <= minutes <= 1440:
         raise RuntimeError("ACCESS_TOKEN_EXPIRE_MINUTES debe ser un entero entre 1 y 1440.")
     default_path = Path.home() / ".local" / "share" / "trackflow" / "identity.json"
+    default_incidents_path = Path.home() / ".local" / "share" / "trackflow" / "incidents.json"
     reset_secret = os.environ.get("TRACKFLOW_RESET_TOKEN_SECRET", "")
     if len(reset_secret.encode("utf-8")) < 32:
         raise RuntimeError("TRACKFLOW_RESET_TOKEN_SECRET debe contener al menos 32 bytes aleatorios.")
@@ -56,6 +58,7 @@ def get_settings() -> Settings:
         minutes,
         os.environ.get("TRACKFLOW_DB_PATH", str(default_path)),
         get_supplier_db_path(),
+        os.environ.get("TRACKFLOW_INCIDENTS_DB_PATH", str(default_incidents_path)),
         os.environ.get("RESEND_API_KEY", ""),
         reset_secret,
     )
