@@ -26,6 +26,7 @@ class Settings:
     supplier_db_path: str
     resend_api_key: str
     reset_token_secret: str
+    ui_base_url: str
 
 
 def get_supplier_db_path() -> str:
@@ -51,6 +52,7 @@ def get_settings() -> Settings:
     reset_secret = os.environ.get("TRACKFLOW_RESET_TOKEN_SECRET", "")
     if len(reset_secret.encode("utf-8")) < 32:
         raise RuntimeError("TRACKFLOW_RESET_TOKEN_SECRET debe contener al menos 32 bytes aleatorios.")
+        ui_base_url = os.environ.get("TRACKFLOW_UI_BASE_URL", "http://localhost:3000").rstrip("/")
     return Settings(
         secret,
         minutes,
@@ -58,6 +60,7 @@ def get_settings() -> Settings:
         get_supplier_db_path(),
         os.environ.get("RESEND_API_KEY", ""),
         reset_secret,
+            ui_base_url,
     )
 
 

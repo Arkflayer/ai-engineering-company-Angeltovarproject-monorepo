@@ -176,7 +176,6 @@ class ForgotPasswordRequest(BaseModel):
 def forgot_password(
     body: ForgotPasswordRequest,
     store: IdentityStore = Depends(get_store),
-    request: Request = ...,
 ) -> dict:
     """Genera un token de restablecimiento y lo envía por correo.
 
@@ -185,9 +184,8 @@ def forgot_password(
     user = user_service.get_user_by_email(store, str(body.email))
     if user and user.get("is_active", True):
         token = create_reset_token(user["id"], user["password_reset_version"])
-        scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
-        host = request.headers.get("x-forwarded-host", request.headers.get("host", request.url.hostname))
-        reset_url = f"{scheme}://{host}/reset-password?token={token}"
+        ui_base = get_settings().ui_base_url
+        reset_url = f"{ui_base}/reset-password?token={token}"
         send_reset_email(str(body.email), reset_url)
     else:
         _dummy_hash  # timing-safe no-op
