@@ -1,27 +1,31 @@
 {
-    "name":  "trackflow-backoffice",
-    "version":  "1.0.0",
-    "private":  true,
-    "scripts":  {
-                    "dev":  "next dev --hostname 0.0.0.0",
-                    "build":  "next build",
-                    "start":  "next start --hostname 0.0.0.0",
-                    "lint":  "eslint .",
-                    "typecheck":  "tsc --noEmit"
-                },
-    "dependencies":  {
-                         "next":  "16.4.5",
-                         "react":  "19.2.8",
-                         "react-dom":  "19.2.8"
-                     },
-    "devDependencies":  {
-                            "@tailwindcss/postcss":  "4.3.3",
-                            "@types/node":  "^20",
-                            "@types/react":  "^19",
-                            "@types/react-dom":  "^19",
-                            "eslint":  "^9",
-                            "eslint-config-next":  "16.4.5",
-                            "tailwindcss":  "4.3.3",
-                            "typescript":  "^5"
-                        }
+    "name": "trackflow-backoffice",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --hostname 0.0.0.0",
+        "build": "next build",
+        "start": "next start --hostname 0.0.0.0",
+        "lint": "eslint .",
+        "typecheck": "tsc --noEmit",
+        "test": "jest"
+    },
+    "dependencies": {
+        "next": "16.4.5",
+        "react": "19.2.8",
+        "react-dom": "19.2.8"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "4.3.3",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "eslint": "^9",
+        "eslint-config-next": "16.4.5",
+        "jest": "^30.5.2",
+        "tailwindcss": "4.3.3",
+        "ts-jest": "^29.4.15",
+        "typescript": "^5"
+    }
 }
