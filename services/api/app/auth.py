@@ -10,7 +10,7 @@ from jose import JWTError
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, ValidationError, field_validator
 
 from app import user_service
-from app.email import send_reset_email
+from app.email import EmailDeliveryError, send_reset_email
 from app.models import Profile, UserRole
 from app.security import (
     MAX_BCRYPT_PASSWORD_BYTES,
@@ -186,7 +186,14 @@ def forgot_password(
         token = create_reset_token(user["id"], user["password_reset_version"])
         ui_base = get_settings().ui_base_url
         reset_url = f"{ui_base}/reset-password?token={token}"
-        send_reset_email(str(body.email), reset_url)
+        try:
+            send_reset_email(str(body.email), reset_url)
+        except EmailDeliveryError as exc:
+            # Preserve the anti-enumeration response; this error never contains the token or URL.
+            print(f"[ERROR] Password reset email delivery failed: {exc}")
+        except Exception as exc:
+            # Unexpected exceptions may contain request data, so log only their type.
+            print(f"[ERROR] Password reset email delivery failed ({type(exc).__name__}).")
     else:
         _dummy_hash  # timing-safe no-op
 

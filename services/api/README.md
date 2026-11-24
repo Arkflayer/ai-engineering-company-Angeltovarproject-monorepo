@@ -33,6 +33,20 @@ La clave del ejemplo se genera en la sesión de terminal, sin imprimirla. Para c
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: obligatoria; la plantilla `.env.example` propone `30`. Admite enteros entre 1 y 1440. La API no arranca si falta: no hay expiración hardcodeada ni alias alternativo.
 - `TRACKFLOW_DB_PATH`: ubicación del JSON de TinyDB. Por defecto, `~/.local/share/trackflow/identity.json`, fuera del monorepo que sirve el frontend estático. Si cambias la ruta, usa un directorio privado fuera de cualquier árbol servido por HTTP o versionado. El archivo nuevo se crea con permisos `0600` y su directorio con `0700`.
 - `TRACKFLOW_UI_ORIGINS`: orígenes CORS explícitos separados por comas; la plantilla `.env.example` incluye `http://localhost:3000,http://127.0.0.1:3000`, que también son los valores predeterminados. Si el frontend usa otro host o puerto, incluye el origen exacto (protocolo, host y puerto, sin ruta). Se admiten `Authorization`, `Content-Type` y los métodos de gestión. CORS no sustituye a la autenticación.
+- `RESEND_API_KEY`: clave secreta de Resend, opcional para el arranque pero necesaria para entregar correos de restablecimiento. Guárdala solo en `services/api/.env` o en el gestor de secretos del despliegue; no la pongas en `NEXT_PUBLIC_*`, el frontend, Git ni comandos compartidos.
+- `RESEND_FROM_EMAIL`: opcional; valor predeterminado `onboarding@resend.dev` para pruebas limitadas de Resend. Para enviar desde una dirección propia, verifica primero el dominio en Resend y configura una dirección bajo ese dominio, por ejemplo `TrackFlow <no-reply@tu-dominio-verificado.example>` (sustituye el dominio por el tuyo).
+- `TRACKFLOW_UI_BASE_URL`: origen público del backoffice usado en enlaces de reset; localmente puede ser `http://localhost:3000`. En Codespaces usa la URL pública/forwarded del backoffice, sin ruta final; reinicia la API después de cambiar el `.env`.
+
+### Validar Resend y el correo de restablecimiento
+
+1. En el dashboard de Resend, confirma que el proyecto/cuenta está activo y que la nueva API key tiene permiso para enviar correos. Si rotaste una clave que se compartió accidentalmente, revoca la anterior; no la copies en terminales ni mensajes.
+2. Para una prueba rápida, utiliza `onboarding@resend.dev` solo con un destinatario permitido por las restricciones actuales de Resend (normalmente el correo asociado/verificado en la cuenta). Un HTTP 403 indica que Resend rechazó la solicitud; revisa en el dashboard si la clave/proyecto y el destinatario están autorizados. La API responde genéricamente por protección anti-enumeración, así que busca el detalle `Password reset email delivery failed` en la salida del backend.
+3. Para destinatarios arbitrarios, añade/verifica un dominio remitente en Resend, espera el estado verificado y configura `RESEND_FROM_EMAIL` con una dirección de ese dominio. No uses una dirección ajena o no verificada como remitente.
+4. En `services/api/.env`, configura `RESEND_API_KEY`, opcionalmente `RESEND_FROM_EMAIL`, y `TRACKFLOW_UI_BASE_URL` con la URL accesible del backoffice. No pegues la clave al chat ni la incluyas en el frontend. Reinicia `uv run fastapi dev` para recargar el entorno.
+5. En el formulario de “Olvidé mi contraseña”, solicita el reset para una cuenta de prueba que controles. Comprueba la bandeja de entrada y spam, y el estado/evento del mensaje en Resend. Un ID de aceptación en logs significa que Resend aceptó la solicitud, no necesariamente que llegó a inbox; el dashboard informa rebotes y entregabilidad.
+6. Verifica que el enlace recibido abre el backoffice público, úsalo antes de que expire (30 minutos) y completa el cambio de contraseña. No copies ni compartas el token del enlace. Al terminar, puedes iniciar sesión con la contraseña nueva.
+
+Los errores de envío conservan una respuesta genérica para no revelar si el email existe. El backend registra errores HTTP seguros del proveedor (por ejemplo 403), pero no registra API keys, destinatarios ni enlaces/tokens.
 
 `POST /auth/login` es público y acepta `application/json` con `email` y `password`:
 

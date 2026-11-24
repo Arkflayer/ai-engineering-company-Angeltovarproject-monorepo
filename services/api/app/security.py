@@ -25,6 +25,7 @@ class Settings:
     db_path: str
     supplier_db_path: str
     resend_api_key: str
+    resend_from_email: str
     reset_token_secret: str
     ui_base_url: str
 
@@ -59,6 +60,7 @@ def get_settings() -> Settings:
         os.environ.get("TRACKFLOW_DB_PATH", str(default_path)),
         get_supplier_db_path(),
         os.environ.get("RESEND_API_KEY", ""),
+        os.environ.get("RESEND_FROM_EMAIL", "onboarding@resend.dev"),
         reset_secret,
         ui_base_url,
     )
