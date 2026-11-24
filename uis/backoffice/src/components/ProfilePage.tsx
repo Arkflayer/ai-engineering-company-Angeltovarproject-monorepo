@@ -109,6 +109,11 @@ export default function ProfilePage() {
               Dirección
                       <p className="text-gray-800 text-sm py-1">{user.profile?.address || "—"}</p>
             </div>
+                        <div className="mt-2">
+                          <Link href="/account/change-password" className="text-xs font-semibold text-gray-500 underline hover:text-blue-600">
+                            Cambiar contraseña
+                          </Link>
+                        </div>
             <button type="button" className="profile-submit w-full h-11 inline-flex items-center justify-center gap-2 px-4 border rounded-lg text-sm font-bold" onClick={() => { setEditing(true); setMessage(""); setError(""); }}>
               Actualizar datos
             </button>

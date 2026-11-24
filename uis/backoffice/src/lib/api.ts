@@ -1,12 +1,11 @@
-const configuredApiBaseUrl = process.env.NEXT_PUBLIC_TRACKFLOW_API_URL?.trim();
-
-export const API_BASE_URL = (configuredApiBaseUrl || (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : '')).replace(/\/$/, '');
-
-function getApiBaseUrl(): string {
-  if (!API_BASE_URL) {
-    throw new ApiError('El servicio no está configurado en este momento. Contacta con soporte si el problema continúa.', 0);
+export function getApiBaseUrl(): string {
+  // Keep browser requests same-origin. The Next.js route handler forwards to
+  // FastAPI using server-side environment variables, avoiding Codespaces port
+  // forwarding auth redirects and browser CORS restrictions.
+  if (typeof window === 'undefined') {
+    throw new Error('TrackFlow API requests must be made in the browser.');
   }
-  return API_BASE_URL;
+  return `${window.location.origin}/api/trackflow`;
 }
 
 export type ApiFieldErrors = Partial<Record<'email' | 'password' | 'name' | 'phone' | 'address', string>>;
@@ -107,12 +106,43 @@ export function getStoredToken(): string | null {
 }
 
 export async function register(input: { email: string; password: string; name?: string; phone?: string; address?: string }): Promise<void> {
-  const response = await safeFetch(`${getApiBaseUrl()}/users`, {
+  const response = await fetch(`${getApiBaseUrl()}/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
   if (!response.ok) throw await responseError(response, "No se pudo crear la cuenta");
+}
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) throw await responseError(response, "No se pudo procesar la solicitud.");
+  return response.json() as Promise<{ message: string }>;
+}
+
+export async function resetPassword(token: string, password: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!response.ok) throw await responseError(response, "No se pudo restablecer la contraseña.");
+  return response.json() as Promise<{ message: string }>;
+}
+
+export async function changePassword(token: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
+  const response = await fetch(`${getApiBaseUrl()}/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+  if (response.status === 401 && typeof window !== "undefined") window.dispatchEvent(new Event("trackflow:unauthorized"));
+  if (!response.ok) throw await responseError(response, "No se pudo cambiar la contraseña.");
+  return response.json() as Promise<{ message: string }>;
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
@@ -129,7 +159,7 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
   const headers = new Headers(init.headers);
   headers.set('Authorization', `Bearer ${token}`);
   if (init.body && !(typeof FormData !== 'undefined' && init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  const response = await safeFetch(`${getApiBaseUrl()}${path}`, { ...init, headers });
+  const response = await fetch(`${getApiBaseUrl()}${path.replace(/^\/api\/trackflow/, '')}`, { ...init, headers });
   if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('trackflow:unauthorized'));
   if (!response.ok) throw await responseError(response, 'La solicitud no se completó');
   if (response.status === 204) return undefined as T;
@@ -137,7 +167,7 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
 }
 
 export async function apiBlob(path: string, token: string): Promise<Blob> {
-  const response = await safeFetch(`${getApiBaseUrl()}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+  const response = await fetch(`${getApiBaseUrl()}${path.replace(/^\/api\/trackflow/, '')}`, { headers: { Authorization: `Bearer ${token}` } });
   if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('trackflow:unauthorized'));
   if (!response.ok) throw await responseError(response, 'No se pudo descargar el resultado');
   return response.blob();

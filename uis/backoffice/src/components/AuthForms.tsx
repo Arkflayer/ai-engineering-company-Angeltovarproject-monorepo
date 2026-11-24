@@ -58,6 +58,7 @@ function LoginForm() {
       <button className="auth-submit w-full h-12 inline-flex items-center justify-center gap-2 px-5 border rounded-lg text-sm font-bold" disabled={busy || !ready}>{busy ? "Verificando…" : "Iniciar sesión"}</button>
     </form>
     {error && <p className="analysis-message error mt-3 text-red-600 text-xs" role="alert">{error}</p>}
+          <p className="mt-3 text-center text-xs"><Link href="/forgot-password" className="underline text-gray-500 hover:text-blue-600">¿Olvidaste tu contraseña?</Link></p>
     <p className="auth-switch mt-4 text-center text-sm text-gray-500">¿No tienes cuenta? <Link href="/register" className="font-bold underline text-gray-900 hover:text-blue-600">Crear una cuenta</Link></p>
   </AuthCard>;
 }
@@ -73,9 +74,15 @@ function RegisterForm() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const password = String(data.get("password") || "");
-    if (new TextEncoder().encode(password).length < 12 || new TextEncoder().encode(password).length > 72) {
+    const passwordLength = new TextEncoder().encode(password).length;
+    if (password.length < 12) {
       setError("");
-      setFieldErrors({ password: "La contraseña debe tener entre 12 y 72 bytes UTF-8." });
+      setFieldErrors({ password: "La contraseña debe tener al menos 12 caracteres." });
+      return;
+    }
+    if (passwordLength > 72) {
+      setError("");
+      setFieldErrors({ password: "La contraseña es demasiado larga. Usa una más corta." });
       return;
     }
     setBusy(true); setError(""); setFieldErrors({});

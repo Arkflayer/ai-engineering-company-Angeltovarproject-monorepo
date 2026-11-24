@@ -10,8 +10,18 @@ from jose import JWTError
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, ValidationError, field_validator
 
 from app import user_service
+from app.email import EmailDeliveryError, send_reset_email
 from app.models import Profile, UserRole
-from app.security import create_access_token, decode_access_token, get_settings, hash_password, verify_password
+from app.security import (
+    MAX_BCRYPT_PASSWORD_BYTES,
+    create_access_token,
+    create_reset_token,
+    decode_access_token,
+    decode_reset_token,
+    get_settings,
+    hash_password,
+    verify_password,
+)
 from app.storage import IdentityStore
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
@@ -150,3 +160,135 @@ def read_session(
         "role": current_user.get("role", UserRole.USER),
         "profile": store.get_profile(current_user["id"]),
     }
+
+
+# ──────────────────────────────────────────────
+# Restablecimiento de contraseña
+# ──────────────────────────────────────────────
+
+
+class ForgotPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: EmailStr
+
+
+@router.post("/forgot-password", status_code=200)
+def forgot_password(
+    body: ForgotPasswordRequest,
+    store: IdentityStore = Depends(get_store),
+) -> dict:
+    """Genera un token de restablecimiento y lo envía por correo.
+
+    Siempre responde con el mismo mensaje para evitar enumeración de usuarios.
+    """
+    user = user_service.get_user_by_email(store, str(body.email))
+    if user and user.get("is_active", True):
+        token = create_reset_token(user["id"], user["password_reset_version"])
+        ui_base = get_settings().ui_base_url
+        reset_url = f"{ui_base}/reset-password?token={token}"
+        try:
+            send_reset_email(str(body.email), reset_url)
+        except EmailDeliveryError as exc:
+            # Preserve the anti-enumeration response; this error never contains the token or URL.
+            print(f"[ERROR] Password reset email delivery failed: {exc}")
+        except Exception as exc:
+            # Unexpected exceptions may contain request data, so log only their type.
+            print(f"[ERROR] Password reset email delivery failed ({type(exc).__name__}).")
+    else:
+        _dummy_hash  # timing-safe no-op
+
+    return {
+        "message": "Si el correo existe, recibirás un enlace para restablecer tu contraseña."
+    }
+
+
+class ResetPasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: str = Field(min_length=1)
+    password: SecretStr = Field(min_length=12, max_length=1024)
+
+    @field_validator("password")
+    @classmethod
+    def validate_bcrypt_length(cls, password: SecretStr) -> SecretStr:
+        if len(password.get_secret_value().encode("utf-8")) > MAX_BCRYPT_PASSWORD_BYTES:
+            raise ValueError("La contraseña no puede superar los 72 bytes de bcrypt.")
+        return password
+
+
+@router.post("/reset-password", status_code=200)
+def reset_password(
+    body: ResetPasswordRequest,
+    store: IdentityStore = Depends(get_store),
+) -> dict:
+    """Valida el token de restablecimiento y actualiza la contraseña.
+
+    El token queda invalidado tras el primer uso.
+    """
+    try:
+        claims = decode_reset_token(body.token)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="El enlace no es válido o ha expirado.") from exc
+
+    if claims.get("purpose") != "reset_password":
+        raise HTTPException(status_code=400, detail="El enlace no es válido o ha expirado.")
+
+    user_uuid: str = claims["sub"]
+    token_version = claims.get("pver")
+    if not isinstance(token_version, str):
+            raise HTTPException(status_code=400, detail="El enlace no es válido o ha expirado.")
+
+    user = user_service.get_user_by_id(store, user_uuid)
+    if not user or not user.get("is_active", True):
+        raise HTTPException(status_code=400, detail="El enlace no es válido o ha expirado.")
+
+    stored_version = user.get("password_reset_version")
+    if not isinstance(stored_version, str) or stored_version != token_version:
+        raise HTTPException(status_code=400, detail="El enlace ya ha sido usado o ha sido reemplazado.")
+
+    new_password = body.password.get_secret_value()
+    # Llamamos directamente a store.update_user para evitar el
+    # schema UserUpdate de user_service (que rechaza campos internos)
+    update = {"password": new_password, "password_reset_version": True}
+    store.update_user(user_uuid, update)
+
+    return {"message": "Contraseña actualizada correctamente."}
+
+
+# ──────────────────────────────────────────────
+# Cambio de contraseña estando conectado
+# ──────────────────────────────────────────────
+
+
+class ChangePasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    current_password: SecretStr = Field(min_length=1, max_length=1024)
+    new_password: SecretStr = Field(min_length=12, max_length=1024)
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_bcrypt_length(cls, password: SecretStr) -> SecretStr:
+        if len(password.get_secret_value().encode("utf-8")) > MAX_BCRYPT_PASSWORD_BYTES:
+            raise ValueError("La contraseña no puede superar los 72 bytes de bcrypt.")
+        return password
+
+
+@router.post("/change-password", status_code=200)
+def change_password(
+    body: ChangePasswordRequest,
+    current_user: dict = Depends(get_current_user),
+    store: IdentityStore = Depends(get_store),
+) -> dict:
+    """Cambia la contraseña del usuario autenticado.
+
+    Verifica la contraseña actual antes de aceptar la nueva.
+    Invalida todos los tokens JWT previos (bump auth_version).
+    """
+    stored_hash = current_user.get("hashed_password", current_user.get("password_hash"))
+    if not stored_hash or not verify_password(body.current_password.get_secret_value(), stored_hash):
+        raise HTTPException(status_code=400, detail="La contraseña actual no es correcta.")
+
+    new_password = body.new_password.get_secret_value()
+    update = {"password": new_password}
+    user_service.update_user(store, current_user["id"], update)
+
+    return {"message": "Contraseña actualizada correctamente."}

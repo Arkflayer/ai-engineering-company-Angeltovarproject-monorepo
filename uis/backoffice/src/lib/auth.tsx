@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ApiError, apiRequest, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
+import { getApiBaseUrl, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
 
 interface AuthContextValue {
   token: string;
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authCheckAttempt, setAuthCheckAttempt] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password";
   const isInAuthFlow = isAuthPage || pathname.startsWith("/auth/");
 
   const logout = useCallback(() => {
@@ -70,7 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (active) setReady(true);
       }
     }
-    void verifySession();
+    fetch(`${getApiBaseUrl()}/auth/me`, { headers: { Authorization: `Bearer ${stored}` } })
+      .then((response) => {
+        if (!response.ok) throw new ApiError("La sesión no es válida.", response.status);
+        return response.json();
+      })
+      .then(() => { if (active) setToken(stored); })
+      .catch(() => { clearStoredToken(); if (active) setToken(""); })
+      .finally(() => { if (active) setReady(true); });
     return () => { active = false; };
   }, [authCheckAttempt]);
 

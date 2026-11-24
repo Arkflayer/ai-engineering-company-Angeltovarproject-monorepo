@@ -13,12 +13,48 @@ from jose import jwt
 
 import support
 from app import bootstrap
+from app.email import EmailDeliveryError
 from app import user_service
 from app.security import decode_access_token, get_settings
 from app.storage import IdentityStore
 
 
 class AuthEndpointsTests(support.ApiTestCase):
+    @patch("app.auth.send_reset_email")
+    def test_forgot_password_sends_reset_link_for_existing_user(self, send_email):
+        response = self.client.post("/auth/forgot-password", json={"email": self.user["email"]})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("recibirás un enlace", response.json()["message"])
+        send_email.assert_called_once()
+        recipient, reset_url = send_email.call_args.args
+        self.assertEqual(recipient, self.user["email"])
+        self.assertIn("/reset-password?token=", reset_url)
+
+    @patch("app.auth.send_reset_email", side_effect=RuntimeError("provider unavailable"))
+    def test_forgot_password_keeps_generic_response_when_delivery_fails(self, _send_email):
+        response = self.client.post("/auth/forgot-password", json={"email": self.user["email"]})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("recibirás un enlace", response.json()["message"])
+
+    @patch("app.auth.send_reset_email", side_effect=EmailDeliveryError("Resend rechazó el envío (HTTP 403)."))
+    def test_forgot_password_logs_safe_provider_status_without_breaking_response(self, _send_email):
+        output = io.StringIO()
+        with redirect_stdout(output):
+            response = self.client.post("/auth/forgot-password", json={"email": self.user["email"]})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("HTTP 403", output.getvalue())
+        self.assertNotIn("token=", output.getvalue())
+
+    @patch("app.auth.send_reset_email")
+    def test_forgot_password_does_not_send_for_unknown_user(self, send_email):
+        response = self.client.post("/auth/forgot-password", json={"email": "desconocida@example.com"})
+
+        self.assertEqual(response.status_code, 200)
+        send_email.assert_not_called()
+
     def test_login_accepts_json_email_password_and_issues_valid_jwt(self):
         response = self.client.post("/auth/login", json={
             "email": "PERSONA@example.com", "password": support.PASSWORD,

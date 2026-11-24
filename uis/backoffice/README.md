@@ -23,14 +23,15 @@ Los módulos de proveedores e incidencias necesitan una cuenta válida del backe
 
 ### Variables de entorno
 
-Usa [`.env.example`](./.env.example) como referencia. Para desarrollo local, crea manualmente `.env.local` en esta carpeta (está ignorado por Git) y configura:
+Usa [`.env.example`](./.env.example) como referencia. En Codespaces/local el frontend llama al backend a través de un proxy same-origin de Next.js; por defecto ese proxy conecta a `127.0.0.1:8000` dentro del contenedor. Si la API está en otro host, configura en `uis/backoffice/.env.local` la variable de servidor:
 
 ```dotenv
-NEXT_PUBLIC_TRACKFLOW_API_URL=<backend-origin>
+TRACKFLOW_API_URL=https://<backend-origin>
 NEXT_PUBLIC_API_URL=<candidate-api-base-url>
 ```
 
-La primera URL sirve a proveedores e incidencias; la segunda configura la integración del pipeline de candidaturas. Estos valores son marcadores, no endpoints operativos: sustituye ambos por las direcciones autorizadas de tu entorno. Para desarrollo local de proveedores e incidencias puedes usar `http://localhost:8000` en el archivo local `.env.local` (nunca lo subas). En producción, `NEXT_PUBLIC_TRACKFLOW_API_URL` es obligatoria para usar proveedores e incidencias; sin ella, las solicitudes fallan con un error de configuración en vez de dirigirse a localhost. Añade el origen exacto del frontend a `TRACKFLOW_UI_ORIGINS` en `services/api/.env`. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración).
+Registro, inicio de sesión, proveedores e incidencias usan `/api/trackflow/*`; el navegador no contacta directamente el puerto reenviado de Codespaces, evitando sus redirecciones de autenticación y restricciones CORS. `TRACKFLOW_API_URL` solo se necesita si FastAPI no está en `127.0.0.1:8000` dentro del contenedor. Next.js carga las variables al arrancar, así que reinicia el servidor tras cambiar `.env.local`.
+`NEXT_PUBLIC_API_URL` configura por separado la integración del pipeline de candidaturas. No guardes secretos en variables `NEXT_PUBLIC_*`: se exponen al navegador. Como el proxy es same-origin, no es necesario añadir la URL del frontend a `TRACKFLOW_UI_ORIGINS` para las llamadas del backoffice; consulta [la configuración del backend](../../services/api/README.md#autenticación-y-configuración) para otros clientes.
 `npm run dev` desde esta carpeta inicia Next.js. Desde la raíz del repositorio usa `npm --prefix uis/backoffice run dev`; el `npm run dev` raíz solo sirve archivos estáticos. Abre la URL que muestra Next.js, normalmente [http://localhost:3000](http://localhost:3000).
 
 ## Desarrollo

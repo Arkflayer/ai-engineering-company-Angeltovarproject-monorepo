@@ -88,6 +88,15 @@ class SecurityTests(unittest.TestCase):
             get_settings.cache_clear()
             self.assertEqual(get_settings().token_minutes, 9)
 
+    def test_resend_sender_is_configurable_with_test_sender_default(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("RESEND_FROM_EMAIL", None)
+            get_settings.cache_clear()
+            self.assertEqual(get_settings().resend_from_email, "onboarding@resend.dev")
+        with patch.dict(os.environ, {"RESEND_FROM_EMAIL": "TrackFlow <no-reply@example.com>"}):
+            get_settings.cache_clear()
+            self.assertEqual(get_settings().resend_from_email, "TrackFlow <no-reply@example.com>")
+
     def test_dotenv_template_has_no_real_secret(self):
         template = Path(__file__).resolve().parents[1] / ".env.example"
         values = {}
