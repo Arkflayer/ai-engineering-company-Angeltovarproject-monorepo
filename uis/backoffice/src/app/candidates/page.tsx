@@ -41,8 +41,8 @@ function HomePageContent() {
     try {
       const data = await fetchCandidates();
       setCandidates(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar las candidaturas');
+    } catch {
+      setError('No se pudieron cargar las candidaturas. Comprueba tu conexión e inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }

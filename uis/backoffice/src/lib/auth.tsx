@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { getApiBaseUrl, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
 
@@ -23,23 +24,51 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState("");
   const [ready, setReady] = useState(false);
+  const [authCheckError, setAuthCheckError] = useState("");
+  const [authCheckAttempt, setAuthCheckAttempt] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password";
   const isInAuthFlow = isAuthPage || pathname.startsWith("/auth/");
 
   const logout = useCallback(() => {
-    clearStoredToken();
+    try {
+      clearStoredToken();
+    } catch {
+      // La sesión en memoria se elimina aunque el almacenamiento no esté disponible.
+    }
     setToken("");
     router.replace("/login");
   }, [router]);
 
   useEffect(() => {
     let active = true;
-    const stored = window.localStorage.getItem("trackflow-access-token");
-    if (!stored) {
-      Promise.resolve().then(() => { if (active) setReady(true); });
-      return () => { active = false; };
+    async function verifySession() {
+      try {
+        const stored = await Promise.resolve().then(() => window.localStorage.getItem("trackflow-access-token"));
+        if (!active) return;
+        if (!stored) {
+          setReady(true);
+          return;
+        }
+        await apiRequest("/auth/me", stored);
+        if (active) setToken(stored);
+      } catch (error: unknown) {
+        if (!active) return;
+        if (error instanceof ApiError && error.status === 401) {
+          try {
+            clearStoredToken();
+          } catch {
+            // El estado en memoria permite continuar a la página de acceso.
+          }
+          setToken("");
+          setAuthCheckError("Tu sesión ha caducado. Inicia sesión para continuar.");
+        } else {
+          setAuthCheckError("No pudimos verificar tu sesión. Comprueba tu conexión e inténtalo de nuevo.");
+        }
+      } finally {
+        if (active) setReady(true);
+      }
     }
     fetch(`${getApiBaseUrl()}/auth/me`, { headers: { Authorization: `Bearer ${stored}` } })
       .then((response) => {
@@ -50,11 +79,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => { clearStoredToken(); if (active) setToken(""); })
       .finally(() => { if (active) setReady(true); });
     return () => { active = false; };
-  }, []);
+  }, [authCheckAttempt]);
 
   useEffect(() => {
     const handleExpired = () => {
-      clearStoredToken();
+      try {
+        clearStoredToken();
+      } catch {
+        // La sesión en memoria se elimina aunque el almacenamiento no esté disponible.
+      }
       setToken("");
       router.replace("/login");
     };
@@ -81,9 +114,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo(() => ({ token, ready, login, register, logout }), [token, ready, login, register, logout]);
   const content = isAuthPage
     ? children
-    : !ready || (!token && !isInAuthFlow)
-      ? <div className="auth-loading" role="status">Comprobando sesiÃ³nâ€¦</div>
-      : children;
+    : !ready
+      ? <div className="auth-loading" role="status">Comprobando sesión…</div>
+      : authCheckError
+        ? <main role="alert" className="mx-auto max-w-lg p-8 text-center">
+            <h1 className="text-xl font-semibold">No pudimos comprobar tu sesión</h1>
+            <p className="mt-2">{authCheckError}</p>
+            <div className="mt-4 flex justify-center gap-4">
+              <button type="button" className="btn-primary" onClick={() => { setReady(false); setAuthCheckError(""); setAuthCheckAttempt((attempt) => attempt + 1); }}>Reintentar</button>
+              <Link className="btn-secondary" href="/login">Ir a iniciar sesión</Link>
+            </div>
+          </main>
+        : !token && !isInAuthFlow
+          ? <div className="auth-loading" role="status">Redirigiendo a iniciar sesión…</div>
+          : children;
 
   return <AuthContext.Provider value={value}>{content}</AuthContext.Provider>;
 }

@@ -21,8 +21,8 @@ const currencyFor = (country: SupplierCountry) => country === "USA" ? "USD" : "E
 const dateFormatter = new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeStyle: "short" });
 const rateFormatter = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 
-function errorText(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+function errorText(_error: unknown, fallback: string) {
+  return fallback;
 }
 
 export default function SuppliersWorkspace() {
@@ -36,7 +36,14 @@ export default function SuppliersWorkspace() {
   const [listMessage, setListMessage] = useState("");
   const [formMessage, setFormMessage] = useState("");
   const [history, setHistory] = useState<Record<number, SupplierStatusHistoryEntry[]>>({});
+  const [historyErrors, setHistoryErrors] = useState<Record<number, string>>({});
   const [historyLoading, setHistoryLoading] = useState<Record<number, boolean>>({});
+  const [rateErrors, setRateErrors] = useState<Record<number, string>>({});
+  const [statusErrors, setStatusErrors] = useState<Record<number, string>>({});
+  const [rateBusy, setRateBusy] = useState<Record<number, boolean>>({});
+  const [statusBusy, setStatusBusy] = useState<Record<number, boolean>>({});
+  const [rateRetry, setRateRetry] = useState<Record<number, number>>({});
+  const [statusRetry, setStatusRetry] = useState<Record<number, SupplierStatus>>({});
 
   const filteredSuppliers = suppliers.filter((supplier) =>
     (!countryFilter || supplier.country === countryFilter)
@@ -64,49 +71,63 @@ export default function SuppliersWorkspace() {
   }, [token]);
 
 
-  async function updateRate(event: FormEvent<HTMLFormElement>, supplier: Supplier) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const rate = Number(formData.get("rate"));
-    if (!Number.isFinite(rate) || rate <= 0) {
-      setListMessage("La tarifa debe ser un nÃºmero mayor que cero.");
-      return;
-    }
+  async function updateRate(supplier: Supplier, rate: number) {
+    if (!Number.isFinite(rate) || rate <= 0 || rateBusy[supplier.id]) return;
+    setRateBusy((current) => ({ ...current, [supplier.id]: true }));
+    setRateErrors((current) => ({ ...current, [supplier.id]: "" }));
+    setRateRetry((current) => ({ ...current, [supplier.id]: rate }));
     try {
       const updated = await apiRequest<Supplier>(`/suppliers/${supplier.id}/rate`, token, {
         method: "PATCH",
         body: JSON.stringify({ rate_per_shipment: rate }),
       });
       setSuppliers((current) => current.map((item) => item.id === updated.id ? updated : item));
-      setListMessage(`Tarifa actualizada para ${supplier.name}.`);
-    } catch (error) {
-      setListMessage(errorText(error, "No se pudo actualizar la tarifa."));
+      setRateErrors((current) => ({ ...current, [supplier.id]: "" }));
+    } catch {
+      setRateErrors((current) => ({ ...current, [supplier.id]: "No se pudo actualizar la tarifa. Inténtalo de nuevo." }));
+    } finally {
+      setRateBusy((current) => ({ ...current, [supplier.id]: false }));
     }
   }
 
-  async function updateStatus(supplier: Supplier) {
-    const nextStatus: SupplierStatus = supplier.status === "active" ? "suspended" : "active";
+  async function updateStatus(supplier: Supplier, nextStatus: SupplierStatus) {
+    if (statusBusy[supplier.id]) return;
+    setStatusBusy((current) => ({ ...current, [supplier.id]: true }));
+    setStatusErrors((current) => ({ ...current, [supplier.id]: "" }));
+    setStatusRetry((current) => ({ ...current, [supplier.id]: nextStatus }));
     try {
       const updated = await apiRequest<Supplier>(`/suppliers/${supplier.id}/status`, token, {
         method: "PATCH",
         body: JSON.stringify({ status: nextStatus }),
       });
       setSuppliers((current) => current.map((item) => item.id === updated.id ? updated : item));
-      setListMessage(`${supplier.name}: ${nextStatus === "active" ? "activo" : "suspendido"}.`);
-    } catch (error) {
-      setListMessage(errorText(error, "No se pudo actualizar el estado."));
+      setStatusErrors((current) => ({ ...current, [supplier.id]: "" }));
+    } catch {
+      setStatusErrors((current) => ({ ...current, [supplier.id]: "No se pudo actualizar el estado. Inténtalo de nuevo." }));
+    } finally {
+      setStatusBusy((current) => ({ ...current, [supplier.id]: false }));
     }
   }
 
-  async function loadHistory(supplierId: number) {
-    if (history[supplierId] || historyLoading[supplierId]) return;
+  function handleRateSubmit(event: FormEvent<HTMLFormElement>, supplier: Supplier) {
+    event.preventDefault();
+    const rate = Number(new FormData(event.currentTarget).get("rate"));
+    if (!Number.isFinite(rate) || rate <= 0) {
+      setRateErrors((current) => ({ ...current, [supplier.id]: "La tarifa debe ser un número mayor que cero." }));
+      return;
+    }
+    void updateRate(supplier, rate);
+  }
+
+  async function loadHistory(supplierId: number, retry = false) {
+    if ((!retry && history[supplierId] !== undefined) || historyLoading[supplierId]) return;
     setHistoryLoading((current) => ({ ...current, [supplierId]: true }));
+    setHistoryErrors((current) => ({ ...current, [supplierId]: "" }));
     try {
       const data = await apiRequest<SupplierStatusHistoryEntry[]>(`/suppliers/${supplierId}/status-history`, token);
       setHistory((current) => ({ ...current, [supplierId]: data }));
-    } catch (error) {
-      setHistory((current) => ({ ...current, [supplierId]: [] }));
-      setListMessage(errorText(error, "No se pudo cargar el historial."));
+    } catch {
+      setHistoryErrors((current) => ({ ...current, [supplierId]: "No se pudo cargar el historial. Inténtalo de nuevo." }));
     } finally {
       setHistoryLoading((current) => ({ ...current, [supplierId]: false }));
     }
@@ -147,7 +168,7 @@ export default function SuppliersWorkspace() {
       setFormCountry("USA");
       setFormMessage("Proveedor registrado correctamente.");
     } catch (error) {
-      setFormMessage(errorText(error, "No se pudo registrar el proveedor."));
+      setFormMessage(errorText(error, "No se pudo registrar el proveedor. Revisa los datos e inténtalo de nuevo."));
     } finally {
       setFormBusy(false);
     }
@@ -176,9 +197,9 @@ export default function SuppliersWorkspace() {
 
         <section className="content-card supplier-table-card" aria-labelledby="supplier-list-title">
           <div className="card-heading"><div><h2 id="supplier-list-title">Proveedores</h2><p aria-live="polite">{loading ? "Cargando directorioâ€¦" : `${filteredSuppliers.length} de ${suppliers.length} proveedores`}</p></div><button className="secondary-button" type="button" onClick={() => void loadSuppliers(token)} disabled={loading}>{loading ? "Actualizandoâ€¦" : "Actualizar lista"}</button></div>
-          {listMessage && <p className="analysis-message" role="status" aria-live="polite">{listMessage}</p>}
+          {listMessage && <div className={`analysis-message${listMessage.includes("No se pudo") ? " error" : ""}`} role={listMessage.includes("No se pudo") ? "alert" : "status"} aria-live="polite"><p>{listMessage}</p>{listMessage.includes("No se pudo") && <button type="button" className="secondary-button" onClick={() => void loadSuppliers(token)} disabled={loading}>Reintentar</button>}</div>}
           <div className="table-wrap"><table className="supplier-table"><thead><tr><th scope="col">PROVEEDOR</th><th scope="col">PAÃS</th><th scope="col">CATEGORÃAS</th><th scope="col">TARIFA / UNIDAD</th><th scope="col">ESTADO</th><th scope="col">ACTUALIZACIÃ“N DE TARIFA</th><th scope="col">ACCIONES</th></tr></thead>
-            <tbody>{loading && suppliers.length === 0 ? <tr><td colSpan={7}>Cargando proveedoresâ€¦</td></tr> : filteredSuppliers.length === 0 ? <tr><td colSpan={7}>No hay proveedores que coincidan con los filtros.</td></tr> : filteredSuppliers.map((supplier) => <SupplierRows key={supplier.id} supplier={supplier} history={history[supplier.id]} historyLoading={Boolean(historyLoading[supplier.id])} onRateUpdate={updateRate} onStatusUpdate={updateStatus} onHistoryToggle={handleHistoryToggle} />)}</tbody>
+            <tbody>{loading && suppliers.length === 0 ? <tr><td colSpan={7}>Cargando proveedoresâ€¦</td></tr> : filteredSuppliers.length === 0 ? <tr><td colSpan={7}>No hay proveedores que coincidan con los filtros.</td></tr> : filteredSuppliers.map((supplier) => <SupplierRows key={supplier.id} supplier={supplier} history={history[supplier.id]} historyError={historyErrors[supplier.id]} historyLoading={Boolean(historyLoading[supplier.id])} rateError={rateErrors[supplier.id]} statusError={statusErrors[supplier.id]} rateBusy={Boolean(rateBusy[supplier.id])} statusBusy={Boolean(statusBusy[supplier.id])} retryRate={rateRetry[supplier.id]} retryStatus={statusRetry[supplier.id]} onRateUpdate={handleRateSubmit} onRateRetry={(rate) => void updateRate(supplier, rate)} onStatusUpdate={(next) => void updateStatus(supplier, next)} onHistoryToggle={handleHistoryToggle} onHistoryRetry={(supplierId) => void loadHistory(supplierId, true)} />)}</tbody>
           </table></div>
         </section>
 
@@ -194,7 +215,7 @@ export default function SuppliersWorkspace() {
             <label htmlFor="supplier-zone">Zona de servicio (opcional)<input id="supplier-zone" name="service_zone" maxLength={160} /></label>
             <label htmlFor="supplier-email">Email de contacto (opcional)<input id="supplier-email" name="contact_email" type="email" /></label>
             <label className="supplier-notes" htmlFor="supplier-notes">Notas (opcional)<textarea id="supplier-notes" name="notes" maxLength={1000} rows={3} /></label>
-            <div className="supplier-form-actions"><button className="primary-button" type="submit" disabled={formBusy}>{formBusy ? "Guardandoâ€¦" : "Guardar proveedor"}</button><p className="analysis-message" role="status" aria-live="polite">{formMessage}</p></div>
+            <div className="supplier-form-actions"><button className="primary-button" type="submit" disabled={formBusy}>{formBusy ? "Guardandoâ€¦" : "Guardar proveedor"}</button>{formMessage && <p className={`analysis-message${formMessage.startsWith("No se pudo") ? " error" : ""}`} role={formMessage.startsWith("No se pudo") ? "alert" : "status"} aria-live="polite">{formMessage}</p>}</div>
           </form>
         </section>
       </div>
@@ -205,17 +226,35 @@ export default function SuppliersWorkspace() {
 function SupplierRows({
   supplier,
   history,
+  historyError,
   historyLoading,
+  rateError,
+  statusError,
+  rateBusy,
+  statusBusy,
+  retryRate,
+  retryStatus,
   onRateUpdate,
+  onRateRetry,
   onStatusUpdate,
   onHistoryToggle,
+  onHistoryRetry,
 }: {
   supplier: Supplier;
   history: SupplierStatusHistoryEntry[] | undefined;
+  historyError: string | undefined;
   historyLoading: boolean;
+  rateError: string | undefined;
+  statusError: string | undefined;
+  rateBusy: boolean;
+  statusBusy: boolean;
+  retryRate: number | undefined;
+  retryStatus: SupplierStatus | undefined;
   onRateUpdate: (event: FormEvent<HTMLFormElement>, supplier: Supplier) => void;
-  onStatusUpdate: (supplier: Supplier) => void;
+  onRateRetry: (rate: number) => void;
+  onStatusUpdate: (nextStatus: SupplierStatus) => void;
   onHistoryToggle: (event: SyntheticEvent<HTMLDetailsElement>, supplierId: number) => void;
+  onHistoryRetry: (supplierId: number) => void;
 }) {
   return (
     <>
@@ -226,18 +265,20 @@ function SupplierRows({
         <td><span className={`supplier-status ${supplier.status}`}>{supplier.status === "active" ? "Activo" : "Suspendido"}</span></td>
         <td>{dateFormatter.format(new Date(supplier.updated_at))}</td>
         <td><div className="supplier-actions" aria-label={`Acciones de ${supplier.name}`}>
-          <form className="inline-rate-form" onSubmit={(event) => void onRateUpdate(event, supplier)}>
+          <form className="inline-rate-form" onSubmit={(event) => onRateUpdate(event, supplier)}>
             <label className="visually-hidden" htmlFor={`rate-${supplier.id}`}>Nueva tarifa de {supplier.name} en {supplier.currency}</label>
             <input id={`rate-${supplier.id}`} name="rate" type="number" min="0.0001" step="any" defaultValue={supplier.rate_per_shipment} required />
-            <button className="secondary-button" type="submit">Cambiar tarifa</button>
+            <button className="secondary-button" type="submit" disabled={rateBusy}>{rateBusy ? "Actualizando…" : "Cambiar tarifa"}</button>
           </form>
-          <button className="secondary-button" type="button" onClick={() => void onStatusUpdate(supplier)} aria-label={`${supplier.status === "active" ? "Suspender" : "Reactivar"} ${supplier.name}`}>{supplier.status === "active" ? "Suspender" : "Reactivar"}</button>
+          {rateError && <div role="alert"><p>{rateError}</p>{retryRate !== undefined && <button type="button" className="secondary-button" onClick={() => onRateRetry(retryRate)} disabled={rateBusy}>Reintentar tarifa</button>}</div>}
+          <button className="secondary-button" type="button" onClick={() => onStatusUpdate(supplier.status === "active" ? "suspended" : "active")} disabled={statusBusy} aria-label={`${supplier.status === "active" ? "Suspender" : "Reactivar"} ${supplier.name}`}>{statusBusy ? "Actualizando…" : supplier.status === "active" ? "Suspender" : "Reactivar"}</button>
+          {statusError && <div role="alert"><p>{statusError}</p>{retryStatus && <button type="button" className="secondary-button" onClick={() => onStatusUpdate(retryStatus)} disabled={statusBusy}>Reintentar estado</button>}</div>}
         </div></td>
       </tr>
       <tr className="supplier-history-row"><td colSpan={7}>
         <details onToggle={(event) => onHistoryToggle(event, supplier.id)}>
           <summary>Historial de suspensiones y reactivaciones</summary>
-          {historyLoading ? <p>Cargando historialâ€¦</p> : history ? history.length ? <ul className="supplier-status-history">{history.map((item, index) => <li key={`${item.changed_at}-${index}`}>{item.previous_status === "active" ? "Activo" : "Suspendido"} â†’ {item.status === "active" ? "Activo" : "Suspendido"} Â· {dateFormatter.format(new Date(item.changed_at))}</li>)}</ul> : <p>Sin cambios de estado registrados.</p> : <p>Abre para consultar el historial.</p>}
+          {historyLoading ? <p role="status">Cargando historial…</p> : historyError ? <div><p role="alert">{historyError}</p><button type="button" className="secondary-button" onClick={() => onHistoryRetry(supplier.id)}>Reintentar</button></div> : history ? history.length ? <ul className="supplier-status-history">{history.map((item, index) => <li key={`${item.changed_at}-${index}`}>{item.previous_status === "active" ? "Activo" : "Suspendido"} â†’ {item.status === "active" ? "Activo" : "Suspendido"} Â· {dateFormatter.format(new Date(item.changed_at))}</li>)}</ul> : <p>Sin cambios de estado registrados.</p> : <p>Abre para consultar el historial.</p>}
         </details>
       </td></tr>
     </>

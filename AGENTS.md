@@ -28,6 +28,13 @@ Todo agente de programación que trabaje en este repositorio debe seguir este pr
 6. Protege los secretos y los datos personales. Considera falibles los resultados de IA y conserva la revisión humana en decisiones operativas o laborales de impacto.
 7. Añade o actualiza pruebas y verificaciones cuando cambie el comportamiento; sigue las convenciones existentes y evita dependencias nuevas si no son necesarias.
 
+## Regla obligatoria para toda PR hacia `main`
+
+- Antes de abrir, actualizar o recomendar integrar una pull request cuyo destino sea `main`, audita los cambios de esa rama respecto de su base en manejo de errores y seguridad, además de ejecutar los checks automatizados pertinentes. Esto aplica también a PR existentes (incluidos #11 y #12) cuando se actualicen o se integren; revisa sus cambios, no reaudites archivos heredados sin relación.
+- No declares una PR lista para merge si falla un check requerido o si quedan hallazgos de severidad alta/crítica sin resolver. Informa y corrige los problemas en la rama de la PR, con pruebas y revisión; nunca modifiques `main` para arreglarlos automáticamente ni hagas push/merge sin autorización.
+- Tras cada merge a `main`, la automatización vuelve a ejecutar los checks sobre el cambio integrado. La automatización está definida en `.github/workflows/pr-audit.yml`; el análisis heurístico no sustituye la revisión humana indicada en `.github/scripts/audit-checklist.md`.
+- Esta regla es una política persistente del repositorio para agentes y colaboradores, pero no puede hacerse técnicamente inmutable frente a propietarios/administradores con permisos para editar el repositorio, workflows o protecciones de rama. Configura el check `Error-handling and changed-code audit` como requerido en las reglas de protección de `main` para bloquear merges cuando falle.
+
 ## Flujo obligatorio antes de cada commit
 
 Antes de crear o modificar cualquier commit, sigue estos pasos en orden:

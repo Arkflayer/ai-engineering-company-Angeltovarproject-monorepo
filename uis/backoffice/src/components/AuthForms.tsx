@@ -39,8 +39,8 @@ function LoginForm() {
       await login(String(data.get("email")), String(data.get("password")));
       const next = search.get("next") || "/";
       router.replace(next.startsWith("/") && !next.startsWith("//") ? next : "/");
-    } catch (reason) {
-          setError(reason instanceof Error ? reason.message : "No se pudo iniciar sesión.");
+    } catch {
+      setError("No se pudo iniciar sesión. Comprueba tus datos e inténtalo de nuevo.");
     } finally { setBusy(false); }
   }
   return <AuthCard>
@@ -94,7 +94,7 @@ function RegisterForm() {
         setFieldErrors(reason.fieldErrors as typeof fieldErrors);
         setError(Object.keys(reason.fieldErrors).length ? "Revisa los campos indicados." : reason.message);
       } else {
-        setError(reason instanceof Error ? reason.message : "No se pudo crear la cuenta.");
+        setError("No se pudo crear la cuenta. Revisa tus datos e inténtalo de nuevo.");
       }
     } finally { setBusy(false); }
   }

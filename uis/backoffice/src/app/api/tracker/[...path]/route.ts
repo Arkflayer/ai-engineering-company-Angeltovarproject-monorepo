@@ -30,6 +30,10 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   } catch {
     return NextResponse.json({ detail: 'No se pudo conectar con el servicio de candidaturas.' }, { status: 502 });
   }
+  const responseHeaders = new Headers();
+  const upstreamType = response.headers.get('content-type');
+  if (upstreamType) responseHeaders.set('Content-Type', upstreamType);
+  return new NextResponse(response.body, { status: response.status, headers: responseHeaders });
 }
 export const GET = proxy;
 export const HEAD = proxy;

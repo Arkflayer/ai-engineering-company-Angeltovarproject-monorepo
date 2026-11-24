@@ -15,18 +15,26 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!token) return;
     let active = true;
-    apiRequest<CurrentUser>("/auth/me", token)
-      .then((currentUser) => { if (active) setUser(currentUser); })
-      .catch((reason: unknown) => {
-        if (active) setError(reason instanceof Error ? reason.message : "No se pudo cargar el perfil.");
-      });
+    async function loadProfile() {
+      try {
+        const currentUser = await apiRequest<CurrentUser>("/auth/me", token);
+        if (active) setUser(currentUser);
+      } catch {
+        if (active) setError("No se pudo cargar el perfil. Comprueba tu conexión e inténtalo de nuevo.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    void loadProfile();
     return () => { active = false; };
-  }, [token]);
+  }, [token, loadAttempt]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,8 +58,8 @@ export default function ProfilePage() {
       setFormVersion((version) => version + 1);
       setMessage("Perfil actualizado correctamente.");
       setEditing(false);
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "No se pudo actualizar el perfil.");
+    } catch {
+      setError("No se pudo actualizar el perfil. Revisa tu conexión e inténtalo de nuevo.");
     } finally {
       setBusy(false);
     }
@@ -80,6 +88,8 @@ export default function ProfilePage() {
 
       {/* Profile card */}
       <div className="profile-card border border-gray-200 rounded-lg bg-white shadow-sm mt-4 overflow-hidden">
+        {loading && <p className="px-8 py-6 text-sm text-gray-600" role="status">Cargando perfil…</p>}
+        {!loading && error && !user && <div className="px-8 py-6"><p className="text-sm text-red-600" role="alert">{error}</p><button type="button" className="profile-submit mt-4 px-4 py-2 border rounded-lg text-sm font-bold" onClick={() => { setLoading(true); setError(""); setLoadAttempt((attempt) => attempt + 1); }}>Reintentar</button></div>}
         {user && !editing && (
                   <div className="profile-fields grid gap-4 px-8 pb-8 pt-4">
                     {/* Vista: datos como texto sin borde de input */}

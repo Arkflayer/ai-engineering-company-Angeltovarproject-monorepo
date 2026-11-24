@@ -1,0 +1,102 @@
+name: PR audit
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Error-handling and changed-code audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set audit range
+        id: range
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            echo "base=$PR_BASE" >> "$GITHUB_OUTPUT"
+          elif [[ "$EVENT_NAME" == "push" && "$PUSH_BASE" != "0000000000000000000000000000000000000000" ]]; then
+            echo "base=$PUSH_BASE" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=$(git rev-parse "$CURRENT_SHA^" 2>/dev/null || git hash-object -t tree /dev/null)" >> "$GITHUB_OUTPUT"
+          fi
+          echo "head=$CURRENT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Audit changed code for high-risk error-handling patterns
+        env:
+          AUDIT_BASE: ${{ steps.range.outputs.base }}
+          AUDIT_HEAD: ${{ steps.range.outputs.head }}
+        run: python .github/scripts/error_handling_audit.py "$AUDIT_BASE" "$AUDIT_HEAD"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: uis/backoffice/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix uis/backoffice
+
+      - name: Frontend lint
+        run: npm --prefix uis/backoffice run lint
+
+      - name: Frontend production build
+        env:
+          NEXT_PUBLIC_TRACKFLOW_API_URL: http://127.0.0.1:8000
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: npm --prefix uis/backoffice run build
+
+      - name: Frontend TypeScript check
+        run: npm --prefix uis/backoffice run typecheck
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/api/uv.lock
+
+      - name: Install locked API dependencies
+        run: uv sync --locked --project services/api
+
+      - name: Backend API tests
+        run: uv run --locked --project services/api python -m unittest discover -s services/api/tests -v
+
+      - name: Script regression tests
+        run: uv run --locked --project services/api python -m unittest discover -s scripts/tests -v
+
+      - name: Python syntax check
+        run: python -m compileall -q services/api/app scripts skills/data-analysis/scripts
+
+      - name: Whitespace and patch check
+        env:
+          AUDIT_BASE: ${{ steps.range.outputs.base }}
+          AUDIT_HEAD: ${{ steps.range.outputs.head }}
+        run: git diff --check "$AUDIT_BASE...$AUDIT_HEAD"
