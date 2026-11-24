@@ -1,12 +1,11 @@
-const configuredApiBaseUrl = process.env.NEXT_PUBLIC_TRACKFLOW_API_URL?.trim();
-
-export const API_BASE_URL = (configuredApiBaseUrl || (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : '')).replace(/\/$/, '');
-
-function getApiBaseUrl(): string {
-  if (!API_BASE_URL) {
-    throw new Error('NEXT_PUBLIC_TRACKFLOW_API_URL must be configured before using supplier or incident workflows.');
+export function getApiBaseUrl(): string {
+  // Keep browser requests same-origin. The Next.js route handler forwards to
+  // FastAPI using server-side environment variables, avoiding Codespaces port
+  // forwarding auth redirects and browser CORS restrictions.
+  if (typeof window === 'undefined') {
+    throw new Error('TrackFlow API requests must be made in the browser.');
   }
-  return API_BASE_URL;
+  return `${window.location.origin}/api/trackflow`;
 }
 
 export type ApiFieldErrors = Partial<Record<'email' | 'password' | 'name' | 'phone' | 'address', string>>;
@@ -72,7 +71,7 @@ export function clearStoredToken() {
 }
 
 export async function register(input: { email: string; password: string; name?: string; phone?: string; address?: string }): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/users`, {
+  const response = await fetch(`${getApiBaseUrl()}/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -125,7 +124,7 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
   const headers = new Headers(init.headers);
   headers.set('Authorization', `Bearer ${token}`);
   if (init.body && !(typeof FormData !== 'undefined' && init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  const response = await fetch(`${getApiBaseUrl()}${path}`, { ...init, headers });
+  const response = await fetch(`${getApiBaseUrl()}${path.replace(/^\/api\/trackflow/, '')}`, { ...init, headers });
   if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('trackflow:unauthorized'));
   if (!response.ok) throw await responseError(response, 'La solicitud no se completó');
   if (response.status === 204) return undefined as T;
@@ -133,7 +132,7 @@ export async function apiRequest<T>(path: string, token: string, init: RequestIn
 }
 
 export async function apiBlob(path: string, token: string): Promise<Blob> {
-  const response = await fetch(`${getApiBaseUrl()}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+  const response = await fetch(`${getApiBaseUrl()}${path.replace(/^\/api\/trackflow/, '')}`, { headers: { Authorization: `Bearer ${token}` } });
   if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('trackflow:unauthorized'));
   if (!response.ok) throw await responseError(response, 'No se pudo descargar el resultado');
   return response.blob();

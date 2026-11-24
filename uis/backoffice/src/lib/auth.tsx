@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { API_BASE_URL, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
+import { getApiBaseUrl, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
 
 interface AuthContextValue {
   token: string;
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       Promise.resolve().then(() => { if (active) setReady(true); });
       return () => { active = false; };
     }
-    fetch(`${API_BASE_URL}/auth/me`, { headers: { Authorization: `Bearer ${stored}` } })
+    fetch(`${getApiBaseUrl()}/auth/me`, { headers: { Authorization: `Bearer ${stored}` } })
       .then((response) => {
         if (!response.ok) throw new ApiError("La sesión no es válida.", response.status);
         return response.json();
