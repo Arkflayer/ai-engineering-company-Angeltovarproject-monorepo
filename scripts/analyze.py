@@ -64,24 +64,41 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Valida y resume un CSV de incidencias TrackFlow.")
     parser.add_argument("csv_file", type=Path, help="Ruta al CSV UTF-8")
     args = parser.parse_args()
+
     try:
         with args.csv_file.open("r", encoding="utf-8-sig", newline="") as stream:
             summary = analyze_csv(stream)
-        display(summary, args.csv_file.name)
-        while True:
+    except OSError:
+        print("No se pudo leer el archivo de entrada. Comprueba la ruta y los permisos.", file=sys.stderr)
+        return 2
+    except UnicodeError:
+        print("El archivo debe estar codificado en UTF-8.", file=sys.stderr)
+        return 2
+    except ValueError:
+        print("El archivo CSV no cumple con el formato esperado.", file=sys.stderr)
+        return 2
+
+    display(summary, args.csv_file.name)
+    while True:
+        try:
             answer = input("¿Exportar resultados a CSV? [s / n]: ").strip().lower()
-            if answer in {"s", "n"}:
-                break
-            print("Responde s o n, por favor.")
-        if answer == "s":
-            output = Path("results.csv")
+        except EOFError:
+            print("No se recibió una respuesta para la exportación.", file=sys.stderr)
+            return 2
+        if answer in {"s", "n"}:
+            break
+        print("Responde s o n, por favor.")
+
+    if answer == "s":
+        output = Path("results.csv")
+        try:
             with output.open("w", encoding="utf-8", newline="") as stream:
                 write_results_csv(summary, stream)
-            print(f"Resultados agregados exportados a {output.resolve()}")
-        return 0
-    except (OSError, UnicodeError, ValueError) as exc:
-        print(f"Se produjo un error: {exc}", file=sys.stderr)
-        return 2
+        except OSError:
+            print("No se pudo escribir el archivo de resultados. Comprueba los permisos.", file=sys.stderr)
+            return 2
+        print(f"Resultados agregados exportados a {output.resolve()}")
+    return 0
 
 
 if __name__ == "__main__":

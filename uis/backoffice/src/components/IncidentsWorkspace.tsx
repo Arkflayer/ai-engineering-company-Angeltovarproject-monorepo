@@ -19,8 +19,8 @@ const valueNames: Record<string, string> = {
   ES: "España",
 };
 
-function errorText(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+function errorText(_error: unknown, fallback: string) {
+  return fallback;
 }
 
 function Breakdown({ title, description, values, total }: {
@@ -105,7 +105,7 @@ export default function IncidentsWorkspace() {
       setSummary(result);
       setAnalysisMessage("Análisis completado. Los datos se muestran de forma agregada.");
     } catch (error) {
-      setAnalysisMessage(errorText(error, "No se pudo analizar el archivo."));
+      setAnalysisMessage(errorText(error, "No se pudo analizar el archivo. Comprueba el CSV e inténtalo de nuevo."));
       setAnalysisError(true);
     } finally {
       setBusy(false);
@@ -128,8 +128,7 @@ export default function IncidentsWorkspace() {
       setAnalysisMessage("CSV agregado descargado.");
       setAnalysisError(false);
     } catch (error) {
-      if (error instanceof Error) setSummary(null);
-      setAnalysisMessage(errorText(error, "No se pudo descargar el resultado."));
+      setAnalysisMessage(errorText(error, "No se pudo descargar el resultado. Inténtalo de nuevo."));
       setAnalysisError(true);
     } finally {
       setBusy(false);
@@ -159,7 +158,7 @@ export default function IncidentsWorkspace() {
           <input id="csv-file" name="file" type="file" accept=".csv,text/csv" disabled={busy} onChange={(event) => selectFile(event.currentTarget.files?.[0])} />
         </label>
         <div className="upload-actions"><p className="file-name" aria-live="polite">{file?.name || "Ningún archivo seleccionado"}</p><button className="primary-button" type="button" onClick={() => void analyzeFile()} disabled={!canAnalyze}>{busy ? "Procesando…" : "Analizar archivo"}</button></div>
-        <p className={`analysis-message${analysisError ? " error" : ""}`} role="status" aria-live="polite">{analysisMessage || (!token ? "Inicia sesión para analizar; el archivo se mantiene local hasta que pulses Analizar." : "Selecciona un CSV para habilitar el análisis.")}</p>
+        <div className={`analysis-message${analysisError ? " error" : ""}`} role={analysisError ? "alert" : "status"} aria-live="polite"><p>{analysisMessage || (!token ? "Inicia sesión para analizar; el archivo se mantiene local hasta que pulses Analizar." : "Selecciona un CSV para habilitar el análisis.")}</p>{analysisError && analysisMessage.startsWith("No se pudo") && <button className="secondary-button" type="button" onClick={() => summary ? void exportResults() : void analyzeFile()} disabled={busy}>{summary ? "Reintentar descarga" : "Reintentar análisis"}</button>}</div>
       </section>
 
       {summary && <section className="results-section" aria-labelledby="results-title">

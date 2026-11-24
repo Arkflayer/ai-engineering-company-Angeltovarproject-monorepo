@@ -13,11 +13,45 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from app.domains.incidents.analysis import analyze_csv, write_results_csv
 from analyze import main as cli_main
 
+AUDIT_SCRIPT = Path(__file__).resolve().parents[2] / ".github" / "scripts"
+sys.path.insert(0, str(AUDIT_SCRIPT))
+from error_handling_audit import findings_from_lines
+
 HEADER = "incident_id,date,country,customer_type,tracking_number,carrier,category,description,status,customer_email,satisfaction_score\n"
 VALID = "TRF-000001,2026-01-01,US,B2C,TRACK12345,UPS,LOST_PARCEL,Parcel is missing,CLOSED,private@example.com,5\n"
 
 
 class IncidentAnalysisTests(unittest.TestCase):
+    def test_audit_detects_multiline_silent_except(self):
+        findings = findings_from_lines([
+            ("sample.py", 10, "except Exception:"),
+            ("sample.py", 11, "    # ignored"),
+            ("sample.py", 12, "    pass"),
+        ])
+        self.assertEqual(len(findings), 1)
+        self.assertIn("sample.py:10", findings[0])
+
+    def test_audit_does_not_flag_handled_exception(self):
+        findings = findings_from_lines([
+            ("sample.py", 10, "except Exception:"),
+            ("sample.py", 11, "    logger.warning('operation failed')"),
+        ])
+        self.assertEqual(findings, [])
+
+    def test_cli_returns_nonzero_when_input_is_not_interactive(self):
+        fixture = Path(__file__).resolve().parents[2] / "data" / "eval" / "incidents-trackflow.synthetic.csv"
+        errors = io.StringIO()
+        with patch.object(sys, "argv", ["analyze.py", str(fixture)]), patch("builtins.input", side_effect=EOFError), contextlib.redirect_stderr(errors), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(cli_main(), 2)
+        self.assertIn("No se recibió una respuesta", errors.getvalue())
+
+    def test_cli_reports_input_io_failure_without_exception_details(self):
+        errors = io.StringIO()
+        with patch.object(sys, "argv", ["analyze.py", "private-path.csv"]), patch("pathlib.Path.open", side_effect=OSError("secret path details")), contextlib.redirect_stderr(errors):
+            self.assertEqual(cli_main(), 2)
+        self.assertIn("Comprueba la ruta y los permisos", errors.getvalue())
+        self.assertNotIn("secret path details", errors.getvalue())
+
     def test_cli_exports_to_results_csv_when_confirmed(self):
         fixture = Path(__file__).resolve().parents[2] / "data" / "eval" / "incidents-trackflow.synthetic.csv"
         with tempfile.TemporaryDirectory() as directory:

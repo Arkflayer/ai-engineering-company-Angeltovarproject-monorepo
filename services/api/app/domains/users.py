@@ -43,7 +43,7 @@ def create_user(
             name=data.name, phone=data.phone, address=data.address,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        raise HTTPException(status_code=409, detail="No se pudo crear la cuenta con esos datos.") from exc
 
 
 @router.get("", response_model=list[UserResponse])
@@ -88,9 +88,9 @@ def update_user(
             store, user_uuid, data.model_dump(exclude_unset=True), allow_role_change=is_admin,
         )
     except user_service.UserNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.") from exc
     except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        raise HTTPException(status_code=409, detail="No se pudieron actualizar los datos de la cuenta.") from exc
 
 
 @router.delete("/{user_uuid}", status_code=204)
@@ -104,7 +104,7 @@ def delete_user(
     try:
         user_service.delete_user(store, user_uuid)
     except user_service.UserNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.") from exc
     with request.app.state.summary_lock:
         request.app.state.summaries.pop(user_uuid, None)
     return Response(status_code=204)
