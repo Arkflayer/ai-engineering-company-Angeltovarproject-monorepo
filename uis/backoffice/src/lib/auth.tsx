@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { getApiBaseUrl, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
+import { apiRequest, getApiBaseUrl, ApiError, clearStoredToken, login as requestLogin, register as requestRegister, setStoredToken } from "@/lib/api";
 
 interface AuthContextValue {
   token: string;
@@ -70,14 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (active) setReady(true);
       }
     }
-    fetch(`${getApiBaseUrl()}/auth/me`, { headers: { Authorization: `Bearer ${stored}` } })
-      .then((response) => {
-        if (!response.ok) throw new ApiError("La sesión no es válida.", response.status);
-        return response.json();
-      })
-      .then(() => { if (active) setToken(stored); })
-      .catch(() => { clearStoredToken(); if (active) setToken(""); })
-      .finally(() => { if (active) setReady(true); });
+    verifySession();
     return () => { active = false; };
   }, [authCheckAttempt]);
 
