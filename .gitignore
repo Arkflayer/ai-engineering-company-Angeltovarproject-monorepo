@@ -21,3 +21,8 @@ Thumbs.db
 # Archivos de entorno local (credenciales, API keys, etc.)
 .env*.local
 .env.local
+
+# Coverage artifacts
+.coverage
+coverage/
+*.coverage
