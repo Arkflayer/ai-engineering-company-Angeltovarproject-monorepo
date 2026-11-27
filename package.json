@@ -6,9 +6,14 @@
     "dev": "npx serve . -l 3000",
     "start": "npx serve . -l 3000",
     "typecheck": "tsc --noEmit",
-    "demo": "tsx src/demo.ts"
+    "demo": "tsx src/demo.ts",
+    "test": "jest --config jest.config.ts",
+    "test:coverage": "jest --config jest.config.ts --coverage"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.15",
     "tsx": "^4.16.0",
     "typescript": "^5.5.0"
   }

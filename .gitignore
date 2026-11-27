@@ -8,6 +8,11 @@
 !services/api/.env.example
 services/api/var/
 
+# Coverage artifacts
+.coverage
+coverage/
+*.coverage
+
 # Dependencias
 node_modules/
 uis/backoffice/.next/

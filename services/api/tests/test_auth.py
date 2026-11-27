@@ -198,6 +198,7 @@ class AuthApiTests(support.ApiTestCase):
         record = self.store.get_user(self.user_uuid)
         self.assertEqual(set(record), {
             "id", "email", "hashed_password", "is_active", "role", "created_at", "auth_version",
+            "password_reset_version",
         })
         self.assertEqual(str(UUID(record["id"])), self.user_uuid)
         self.assertTrue(record["is_active"])
