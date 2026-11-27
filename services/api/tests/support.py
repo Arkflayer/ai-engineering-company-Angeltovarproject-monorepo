@@ -22,6 +22,7 @@ class ApiTestCase(unittest.TestCase):
             "TRACKFLOW_JWT_SECRET": "clave-solo-para-pruebas-" * 3,
             "TRACKFLOW_DB_PATH": str(Path(temporary.name) / "identity.json"),
             "TRACKFLOW_SUPPLIER_DB_PATH": str(Path(temporary.name) / "suppliers.json"),
+            "TRACKFLOW_INCIDENT_DB_PATH": str(Path(temporary.name) / "incidents.json"),
             "ACCESS_TOKEN_EXPIRE_MINUTES": "30",
         })
         environment.start()

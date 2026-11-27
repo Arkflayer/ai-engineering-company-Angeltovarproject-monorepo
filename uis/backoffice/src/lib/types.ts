@@ -32,6 +32,67 @@ export interface SupplierStatusHistoryEntry {
   changed_at: string;
 }
 
+// ── Incident types ─────────────────────────────────────────────────────
+
+export type IncidentStatus = "open" | "in_progress" | "resolved" | "discarded";
+export type IncidentCategory =
+  | "lost_parcel"
+  | "delivery_failure"
+  | "inventory_discrepancy"
+  | "carrier_issue"
+  | "returns_issue"
+  | "warehouse_incident"
+  | "system_failure"
+  | "client_complaint"
+  | "other";
+export type IncidentOrigin = "customer" | "branch" | "internal";
+export type IncidentBranch =
+  | "central"
+  | "la_warehouse"
+  | "la_office"
+  | "zaragoza_warehouse"
+  | "zaragoza_office";
+
+export interface Incident {
+  id: string;
+  title: string;
+  description: string;
+  status: IncidentStatus;
+  category: IncidentCategory;
+  origin: IncidentOrigin;
+  branch: IncidentBranch;
+  country: string | null;
+  customer_type: string | null;
+  tracking_number: string | null;
+  carrier: string | null;
+  customer_email: string | null;
+  satisfaction_score: number | null;
+  reported_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IncidentCreate {
+  title: string;
+  description?: string;
+  category: IncidentCategory;
+  origin?: IncidentOrigin;
+  branch: IncidentBranch;
+  country?: string;
+  customer_type?: string;
+  tracking_number?: string;
+  carrier?: string;
+  customer_email?: string;
+}
+
+export interface IncidentUpdate {
+  status?: IncidentStatus;
+  description?: string;
+  tracking_number?: string;
+  carrier?: string;
+  satisfaction_score?: number;
+}
+
 export interface IncidentSummary {
   total_records: number;
   valid_records: number;
@@ -47,4 +108,12 @@ export interface IncidentSummary {
     average: number | null;
     by_score: Record<string, number>;
   };
+}
+
+export interface IncidentAggSummary {
+  total: number;
+  by_status: Record<string, number>;
+  by_category: Record<string, number>;
+  by_branch: Record<string, number>;
+  by_origin: Record<string, number>;
 }

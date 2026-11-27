@@ -96,7 +96,7 @@ class AuthEndpointsTests(support.ApiTestCase):
         ):
             with self.subTest(payload=payload):
                 response = self.client.post("/auth/login", json=payload)
-                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.status_code, 400)
                 self.assertNotIn(support.PASSWORD, response.text)
         invalid_json = self.client.post("/auth/login", content="{", headers={"Content-Type": "application/json"})
         self.assertEqual(invalid_json.status_code, 400)
@@ -198,6 +198,7 @@ class AuthApiTests(support.ApiTestCase):
         record = self.store.get_user(self.user_uuid)
         self.assertEqual(set(record), {
             "id", "email", "hashed_password", "is_active", "role", "created_at", "auth_version",
+            "password_reset_version",
         })
         self.assertEqual(str(UUID(record["id"])), self.user_uuid)
         self.assertTrue(record["is_active"])
@@ -235,10 +236,10 @@ class AuthApiTests(support.ApiTestCase):
                 created = self.client.post("/users", headers=self.headers, json={
                     "email": "sin-privilegios@example.com", "password": support.PASSWORD, field: value,
                 })
-                self.assertEqual(created.status_code, 422)
+                self.assertEqual(created.status_code, 400)
                 changed = self.client.patch(f"/users/{self.user_uuid}", headers=self.headers,
                                             json={field: value})
-                expected = 403 if field == "role" and value in ("admin", "manager", "user") else 422
+                expected = 403 if field == "role" and value in ("admin", "manager", "user") else 400
                 self.assertEqual(changed.status_code, expected)
         self.assertEqual(self.store.get_user(self.user_uuid)["role"], "user")
         self.assertTrue(self.store.get_user(self.user_uuid)["is_active"])
@@ -398,14 +399,14 @@ class AuthApiTests(support.ApiTestCase):
             {"email": "valido@example.com", "password": support.PASSWORD, "display_name": "Perfil"},
         ):
             response = self.client.post("/users", headers=self.headers, json=body)
-            self.assertEqual(response.status_code, 422)
+            self.assertEqual(response.status_code, 400)
             self.assertNotIn(body["password"], response.text)
         for body in ({}, {"email": None}, {"password": None}):
             response = self.client.patch(f"/users/{self.user_uuid}", headers=self.headers, json=body)
-            self.assertEqual(response.status_code, 422)
+            self.assertEqual(response.status_code, 400)
         response = self.client.patch(f"/profiles/{self.user_uuid}", headers=self.headers,
                                      json={"user_uuid": "otra-cuenta"})
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, 400)
 
     def test_initial_account_cannot_be_recreated(self):
         with self.assertRaises(ValueError):
@@ -551,7 +552,7 @@ class UserRestTests(support.ApiTestCase):
                 response = self.client.post("/users", headers=self.headers, json={
                     "email": "invalida@example.com", "password": support.PASSWORD, **fields,
                 })
-                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.status_code, 400)
         self.assertEqual(len(self.store.users), before_users)
         self.assertEqual(len(self.store.profiles), before_profiles)
 
@@ -619,7 +620,7 @@ class UserRestTests(support.ApiTestCase):
                        {"is_active": False}, {"name": "No es una credencial"}):
             with self.subTest(fields=fields):
                 response = self.client.put(f"/users/{self.user_uuid}", headers=headers, json=fields)
-                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.status_code, 400)
         duplicate = self.client.put(f"/users/{self.user_uuid}", headers=headers,
                                     json={"email": other["email"]})
         self.assertEqual(duplicate.status_code, 409)
@@ -727,7 +728,7 @@ class ProfileMeTests(support.ApiTestCase):
         ):
             with self.subTest(fields=fields):
                 response = self.client.put("/profiles/me", headers=self.headers, json=fields)
-                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.status_code, 400)
                 self.assertNotIn(support.PASSWORD, response.text)
         self.assertEqual(self.store.get_profile(self.user_uuid), original)
 
@@ -736,7 +737,7 @@ class ProfileMeTests(support.ApiTestCase):
         for fields in ({}, {"name": None}, {"name": "x" * 121}, {"phone": "1" * 41}, {"address": "x" * 501}):
             with self.subTest(fields=fields):
                 response = self.client.put("/profiles/me", headers=self.headers, json=fields)
-                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.status_code, 400)
         self.assertEqual(self.store.get_profile(self.user_uuid), original)
 
     def test_me_uses_token_owner_and_admin_cannot_modify_another_profile(self):
