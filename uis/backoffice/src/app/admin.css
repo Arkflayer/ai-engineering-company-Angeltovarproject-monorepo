@@ -199,7 +199,7 @@
 .admin-main .tab { min-height: 40px; padding: 0 18px; border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; }
 .admin-main .tab:hover { color: var(--ink); }
 .admin-main .tab.active { border-bottom-color: var(--accent); color: var(--accent-dark); }
-.admin-main .incident-crud-layout { display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; padding-bottom: 22px; }
+.admin-main .incident-crud-layout { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; padding-bottom: 22px; }
 .admin-main .incident-crud-layout > * { min-width: 0; }
 .admin-main .incident-crud-layout .content-card { margin-top: 0; }
 
@@ -281,7 +281,6 @@
   .admin-module-card > p:not(.admin-eyebrow) { min-height: 0; }
   .admin-main .supplier-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-main .incident-breakdowns { grid-template-columns: 1fr; }
-  .admin-main .incident-crud-layout { grid-template-columns: 1fr; }
   .admin-main .field-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 680px) {

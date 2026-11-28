@@ -118,21 +118,24 @@ class SeedIdempotencyTests(unittest.TestCase):
 
     def test_seed_returns_95_on_first_call(self):
         import os
-        with unittest.mock.patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
             inserted = seed()
             self.assertEqual(inserted, 95)
 
     def test_seed_returns_0_on_second_call(self):
         import os
-        with unittest.mock.patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
             seed()
             inserted = seed()
             self.assertEqual(inserted, 0)
 
     def test_seeded_data_is_readable(self):
         import os
+        from unittest.mock import patch
         from app.domains.incidents.storage import IncidentStore
-        with unittest.mock.patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
+        with patch.dict(os.environ, {"TRACKFLOW_INCIDENT_DB_PATH": self.db_path}):
             seed()
             store = IncidentStore(self.db_path)
             try:
