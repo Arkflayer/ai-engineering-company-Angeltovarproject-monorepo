@@ -90,7 +90,7 @@ class SupplierApiTests(ApiTestCase):
                 "rate_per_shipment": 0, "currency": "USD", "status": "active",
             },
         )
-        self.assertEqual(invalid.status_code, 422)
+        self.assertEqual(invalid.status_code, 400)
 
         created = self.client.post(
             "/suppliers", headers=self.headers,

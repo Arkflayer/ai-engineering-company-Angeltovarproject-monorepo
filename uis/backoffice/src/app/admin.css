@@ -193,6 +193,64 @@
 .supplier-form-actions .analysis-message { margin: 0; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .incident-privacy, .invalid-notice { margin: 6px 0 18px; padding: 13px 15px; border-left: 3px solid #d59a43; background: #fbf2e3; color: #715629; font-size: 12px; line-height: 1.6; }
+
+/* ── Incident CRUD ──────────────────────────────────────────────────── */
+.admin-main .tab-bar { display: flex; gap: 0; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.admin-main .tab { min-height: 40px; padding: 0 18px; border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; }
+.admin-main .tab:hover { color: var(--ink); }
+.admin-main .tab.active { border-bottom-color: var(--accent); color: var(--accent-dark); }
+.admin-main .incident-crud-layout { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; padding-bottom: 22px; }
+.admin-main .incident-crud-layout > * { min-width: 0; }
+.admin-main .incident-crud-layout .content-card { margin-top: 0; }
+
+/* Filters bar */
+.admin-main .filter-bar { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; padding: 0 19px 16px; }
+.admin-main .filter-bar select { min-width: 140px; min-height: 34px; padding: 6px 8px; border: 1px solid #cad8d1; border-radius: 4px; background: #fff; color: var(--ink); font-size: 11px; }
+.admin-main .filter-bar select:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
+
+/* Data table */
+.admin-main .table-wrapper { overflow-x: auto; }
+.admin-main .data-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+.admin-main .data-table thead { background: #f7faf8; }
+.admin-main .data-table th { padding: 11px 15px; color: #75867f; font-size: 8px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; }
+.admin-main .data-table td { padding: 13px 15px; border-top: 1px solid #e9efeb; color: #5f7069; font-size: 10px; }
+.admin-main .data-table .clickable-row { cursor: pointer; }
+.admin-main .data-table .clickable-row:hover { background: #f4f9f5; }
+.admin-main .data-table .clickable-row:focus-visible { outline: 3px solid #e29b3d; outline-offset: -3px; }
+.admin-main .cell-mono { font-family: "SF Mono", ui-monospace, monospace; font-size: 9px; }
+.admin-main .cell-title { max-width: 220px; overflow: hidden; color: var(--ink); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.admin-main .status-badge { display: inline-flex; padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: .3px; }
+.admin-main .empty-state { padding: 30px 19px; color: var(--muted); font-size: 12px; text-align: center; }
+
+/* Detail view */
+.admin-main .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 0 19px 16px; }
+.admin-main .detail-field { display: grid; gap: 4px; }
+.admin-main .detail-field strong { color: #5e726a; font-size: 9px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.admin-main .detail-field span { color: var(--ink); font-size: 12px; }
+.admin-main .detail-field .status-badge { justify-self: start; }
+.admin-main .detail-section { padding: 0 19px 16px; }
+.admin-main .detail-section h3 { margin: 0 0 8px; color: #5e726a; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.admin-main .detail-section p { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+.admin-main .divider { margin: 8px 19px 16px; border: none; border-top: 1px solid var(--line); }
+
+/* Update form */
+.admin-main .update-form { display: grid; gap: 14px; padding: 0 19px 18px; }
+.admin-main .update-form .field-group { display: grid; gap: 6px; }
+.admin-main .update-form .field-group label { color: #52675e; font-size: 11px; }
+.admin-main .update-form .field-group input,
+.admin-main .update-form .field-group select,
+.admin-main .update-form .field-group textarea { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #cad8d1; border-radius: 4px; background: #fff; color: var(--ink); font: inherit; }
+.admin-main .update-form .field-group input:focus,
+.admin-main .update-form .field-group select:focus,
+.admin-main .update-form .field-group textarea:focus { border-color: var(--accent); outline: 2px solid rgb(35 123 102 / 18%); }
+.admin-main .update-form textarea { resize: vertical; }
+.admin-main .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* Form actions */
+.admin-main .form-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.admin-main .danger-button { min-height: 38px; padding: 0 15px; border: 1px solid var(--danger); border-radius: 5px; background: #fff; color: var(--danger); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.admin-main .danger-button:hover:not(:disabled) { background: #fae9e3; }
+.admin-main .danger-button:disabled { opacity: .58; cursor: not-allowed; }
 .upload-card { padding-bottom: 18px; }
 .file-drop { display: grid; min-height: 150px; place-content: center; justify-items: center; gap: 8px; margin: 0 19px; padding: 20px; border: 1px dashed #7ba692; border-radius: 5px; background: #f7fbf8; color: #647970; text-align: center; cursor: pointer; }
 .file-drop:hover, .file-drop.dragging { border-color: var(--accent); background: #edf6f1; }
@@ -223,6 +281,7 @@
   .admin-module-card > p:not(.admin-eyebrow) { min-height: 0; }
   .admin-main .supplier-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-main .incident-breakdowns { grid-template-columns: 1fr; }
+  .admin-main .field-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 680px) {
   :scope { display: block; }
@@ -254,4 +313,104 @@
 @media (max-width: 370px) {
   .admin-main { padding: 0 11px; }
   .admin-metrics-grid, .admin-main .metrics-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Incident field errors ────────────────────────────────────────────── */
+.admin-main .field-group.field-error input,
+.admin-main .field-group.field-error select,
+.admin-main .field-group.field-error textarea {
+  border-color: #d32f2f;
+}
+.admin-main .field-error-text {
+  display: block;
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.admin-main .field-highlight {
+  background: #fffae6;
+  border-radius: 6px;
+  padding: 8px;
+  margin: -8px;
+}
+.admin-main .field-hint {
+  display: block;
+  color: #8a6d2b;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+/* ── Inline status actions ──────────────────────────────────────────── */
+.admin-main .inline-status-actions {
+  margin-top: 5px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.admin-main .status-link {
+  background: none;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: var(--accent, #1a73e8);
+  cursor: pointer;
+}
+.admin-main .status-link:hover {
+  background: var(--accent, #1a73e8);
+  color: #fff;
+}
+.admin-main .status-link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Summary panel ──────────────────────────────────────────────────── */
+.admin-main .summary-panel {
+  margin-bottom: 20px;
+}
+.admin-main .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.admin-main .summary-card {
+  background: #fff;
+  border: 1px solid var(--line, #e0e0e0);
+  border-radius: 8px;
+  padding: 16px;
+}
+.admin-main .summary-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.admin-main .summary-card .summary-total {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent, #1a73e8);
+  margin: 0 0 10px;
+}
+.admin-main .summary-breakdown {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.admin-main .summary-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.admin-main .summary-breakdown li:last-child {
+  border-bottom: none;
+}
+.admin-main .summary-breakdown li .summary-count {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }

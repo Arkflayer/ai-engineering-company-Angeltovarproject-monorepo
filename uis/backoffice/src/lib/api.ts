@@ -8,7 +8,7 @@ export function getApiBaseUrl(): string {
   return `${window.location.origin}/api/trackflow`;
 }
 
-export type ApiFieldErrors = Partial<Record<'email' | 'password' | 'name' | 'phone' | 'address', string>>;
+export type ApiFieldErrors = Partial<Record<string, string>>;
 
 export class ApiError extends Error {
   constructor(
@@ -50,13 +50,22 @@ async function responseError(response: Response, fallback: string): Promise<ApiE
   const fieldErrors: ApiFieldErrors = {};
   try {
     const body: unknown = await response.json();
-    if (body && typeof body === 'object' && 'detail' in body && Array.isArray(body.detail)) {
-      for (const item of body.detail) {
-        if (!item || typeof item !== 'object' || !('loc' in item) || !Array.isArray(item.loc)) continue;
-        const field = [...item.loc].reverse().find((part): part is keyof ApiFieldErrors =>
-          typeof part === 'string' && registrationFields.has(part),
-        );
-        if (field) fieldErrors[field] = validationMessage(field);
+    if (body && typeof body === 'object') {
+      // New format: field_errors as flat object (incidents, etc.)
+      if ('field_errors' in body && body.field_errors && typeof body.field_errors === 'object') {
+        for (const [key, msg] of Object.entries(body.field_errors)) {
+          if (typeof msg === 'string') fieldErrors[key] = msg;
+        }
+      }
+      // Legacy format: detail array (auth/supplier)
+      if (!Object.keys(fieldErrors).length && 'detail' in body && Array.isArray(body.detail)) {
+        for (const item of body.detail) {
+          if (!item || typeof item !== 'object' || !('loc' in item) || !Array.isArray(item.loc)) continue;
+          const field = [...item.loc].reverse().find((part): part is keyof ApiFieldErrors =>
+            typeof part === 'string' && registrationFields.has(part),
+          );
+          if (field) fieldErrors[field] = validationMessage(field);
+        }
       }
     }
   } catch {

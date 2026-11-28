@@ -1,1 +1,1 @@
-"""Incident analysis domain."""
+"""Incident management domain."""

@@ -11,5 +11,8 @@
   "devDependencies": {
     "tsx": "^4.16.0",
     "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "playwright": "^1.65.1"
   }
 }

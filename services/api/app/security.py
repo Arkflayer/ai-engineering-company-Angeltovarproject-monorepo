@@ -35,6 +35,11 @@ def get_supplier_db_path() -> str:
     return os.environ.get("TRACKFLOW_SUPPLIER_DB_PATH", str(default_path))
 
 
+def get_incident_db_path() -> str:
+    default_path = Path.home() / ".local" / "share" / "trackflow" / "incidents.json"
+    return os.environ.get("TRACKFLOW_INCIDENT_DB_PATH", str(default_path))
+
+
 @lru_cache
 def get_settings() -> Settings:
     secret = os.environ.get("TRACKFLOW_JWT_SECRET", "")
